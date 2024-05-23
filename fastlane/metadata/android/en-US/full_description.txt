@@ -1,0 +1,21 @@
+MusicBee Wifi Sync is an Android application that synchronizes MusicBee on a PC with a device via Wifi.
+
+Features and Specifications
+Synchronize music files and playlists via Wifi with MusicBee on PC that have been synchronized via USB.
+Select internal storage or SD card (1st external storage)
+Playback history can be reflected from Poweramp and GoneMAP to MusicBee (reverse sync) (rate under investigation)
+English and Japanese are supported.
+
+Caution
+You need to grant “Access all files” permission to perform reverse sync.
+If you change the PC you are connecting to, you may have to delete the app's cache storage.
+
+GitHub
+https://github.com/kimt1688/MusicBeeWfisync-2
+
+GitHub Issue
+https://github.com/kimt1688/MusicBeeWfisync-2/issues
+
+Please send requests, bug reports, etc. here or to @kimt1688 on X
+
+Translated with DeepL.com (free version)
