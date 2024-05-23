@@ -3,7 +3,7 @@ MusicBee Wifi Syncは、PCのMusicBeeとデバイスをWifi経由で同期する
 機能・仕様
 ・USB経由で同期したことのあるPCのMusicBeeと音楽ファイル及びプレイリストをWifi経由で同期します
 ・内蔵ストレージ、SDカード（1つ目の外部ストレージ）を選択することができます
-・再生履歴をPoweramp、GoneMAPからMusicBeeに反映することができます（リバースシンク）（レートについては調査中）
+・再生履歴をPoweramp、GoneMADからMusicBeeに反映することができます（リバースシンク）（レートについては調査中）
 ・英語、日本語に対応しています
 
 注意
