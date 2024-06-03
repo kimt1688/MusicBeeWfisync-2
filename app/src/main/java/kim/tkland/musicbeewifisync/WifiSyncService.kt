@@ -16,9 +16,9 @@ import android.os.FileObserver
 import android.os.IBinder
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
-import androidx.core.net.toFile
 import androidx.documentfile.provider.DocumentFile
 import kim.tkland.musicbeewifisync.Dialog.showOkCancel
 import kim.tkland.musicbeewifisync.ErrorHandler.logError
@@ -952,20 +952,45 @@ class WifiSyncService() : Service() {
             val waitWrite = AutoResetEvent(true)
             val separatorIndex = filePath.lastIndexOf('/') + 1
             val path = filePath.substring(0, separatorIndex)
-            val name = filePath.substring(separatorIndex)
+            var name = filePath.substring(separatorIndex)
+
+            if (!name.endsWith(".m3u", ignoreCase = true)){
+                name = "$name.m3u"
+            }
 
             val values = ContentValues().apply {
-                put(MediaStore.Files.FileColumns.DISPLAY_NAME, name)
-                put(MediaStore.Files.FileColumns.RELATIVE_PATH, path)
-                put(MediaStore.Files.FileColumns.IS_PENDING, true)
+                put(MediaStore.Audio.Playlists.DISPLAY_NAME, name)
+                put(MediaStore.Audio.Playlists.RELATIVE_PATH, path)
+                put(MediaStore.Audio.Playlists.IS_PENDING, false)
             }
 
             val collection = MediaStore.Audio.Playlists.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1])
-//            val collection = MediaStore.Audio.Playlists.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[1])
-            val item = applicationContext.contentResolver.insert(collection, values)
-            val os = contentResolver.openOutputStream(item!!, "wt")
             try {
-                os.use{fs: OutputStream? ->
+                applicationContext.contentResolver.query(
+                    collection,
+                    arrayOf(MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.DISPLAY_NAME),
+                    "${MediaStore.Audio.Playlists.DISPLAY_NAME} = ?",
+                    arrayOf(name),
+                    null,
+                    null
+                )?.use { cursor ->
+                    // val columnIndex = cursor.getColumnIndexOrThrow("_id")
+                    while (cursor.moveToNext()) {
+                        if (!cursor.getString(1).equals(name)) {
+                            continue
+                        }
+                        val contentUri: Uri = ContentUris.withAppendedId(
+                            collection, cursor.getString(0).toLong()
+                        )
+                        Log.d("", contentUri.toString())
+                        Log.d("", cursor.getString(0))
+                        applicationContext.contentResolver.delete(contentUri, null)
+                    }
+                    cursor.close()
+                }
+                val item = applicationContext.contentResolver.insert(collection, values)
+                val os = contentResolver.openOutputStream(item!!, "wt")
+                os.use { fs: OutputStream? ->
                     writeString(syncStatusOK)
                     flushWriter()
                     val thread = Thread(
@@ -997,13 +1022,16 @@ class WifiSyncService() : Service() {
                         thread.interrupt()
                     }
                 }
-                values.clear()
-                contentResolver.update(item, ContentValues().apply{
-                    put(MediaStore.Files.FileColumns.IS_PENDING, false)
-                }, null, null)
-                contentResolver.update(item, values, null, null)
+                //              values.clear()
+                //              contentResolver.update(item, ContentValues().apply{
+                //                  put(MediaStore.Files.FileColumns.IS_PENDING, false)
+                //              }, null, null)
+                //              contentResolver.update(item, values, null, null)
+                //cursor!!.close()
                 os?.close()
-            }finally {
+            } catch (ex: Exception) {
+                logError("receivePlaylist", ex.toString())
+            } finally {
             }
             writeString(syncStatusOK)
             flushWriter()
