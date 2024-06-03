@@ -1,0 +1,123 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="kim.tkland.musicbeewifisync"
+4    android:versionCode="81"
+5    android:versionName="2.5.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="33"
+9        android:targetSdkVersion="33" />
+10
+11    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+11-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:4:5-82
+11-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:4:22-79
+12    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+12-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:5:5-75
+12-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:5:22-72
+13    <uses-permission android:name="android.permission.STORAGE" />
+13-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:6:5-66
+13-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:6:22-63
+14    <uses-permission android:name="android.permission.INTERNET" />
+14-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:5-67
+14-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:22-64
+15    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+15-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:8:5-77
+15-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:8:22-74
+16    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+16-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:9:5-76
+16-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:9:22-73
+17    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+17-->[org.chromium.net:cronet-embedded:102.5005.125] C:\Users\toshi\.gradle\caches\transforms-4\a0b8026d2f5501d02d3b3ec2da73c80d\transformed\jetified-cronet-embedded-102.5005.125\AndroidManifest.xml:20:6-79
+17-->[org.chromium.net:cronet-embedded:102.5005.125] C:\Users\toshi\.gradle\caches\transforms-4\a0b8026d2f5501d02d3b3ec2da73c80d\transformed\jetified-cronet-embedded-102.5005.125\AndroidManifest.xml:20:23-77
+18
+19    <application
+19-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:11:5-48:19
+20        android:name="kim.tkland.musicbeewifisync.WifiSyncApp"
+20-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:12:9-63
+21        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+21-->[androidx.core:core:1.8.0] C:\Users\toshi\.gradle\caches\transforms-4\3f6ae140aca274505350da80ef218047\transformed\core-1.8.0\AndroidManifest.xml:24:18-86
+22        android:debuggable="true"
+23        android:extractNativeLibs="false"
+24        android:icon="@mipmap/ic_launcher"
+24-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:13:9-43
+25        android:label="@string/app_name"
+25-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:14:9-41
+26        android:roundIcon="@mipmap/ic_launcher_round"
+26-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:15:9-54
+27        android:supportsRtl="true"
+27-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:16:9-35
+28        android:theme="@style/AppTheme" >
+28-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:17:9-40
+29        <service
+29-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:19:9-21:40
+30            android:name="kim.tkland.musicbeewifisync.WifiSyncService"
+30-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:20:13-71
+31            android:exported="false" />
+31-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:21:13-37
+32
+33        <activity
+33-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:23:9-32:20
+34            android:name="kim.tkland.musicbeewifisync.MainActivity"
+34-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:24:13-68
+35            android:exported="true" >
+35-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:25:13-36
+36            <intent-filter>
+36-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:13-31:29
+37                <action android:name="android.intent.action.MAIN" />
+37-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:27:17-69
+37-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:27:25-66
+38                <action android:name="android.intent.action.VIEW" />
+38-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:28:17-69
+38-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:28:25-66
+39
+40                <category android:name="android.intent.category.LAUNCHER" />
+40-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:17-77
+40-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:27-74
+41            </intent-filter>
+42        </activity>
+43        <activity
+43-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:33:9-35:63
+44            android:name="kim.tkland.musicbeewifisync.SettingsActivity"
+44-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:34:13-72
+45            android:label="@string/title_activity_settings" />
+45-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:35:13-60
+46        <activity
+46-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:36:9-38:66
+47            android:name="kim.tkland.musicbeewifisync.SyncResultsStatusActivity"
+47-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:37:13-81
+48            android:label="@string/title_activity_sync_status" />
+48-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:38:13-63
+49        <activity
+49-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:39:9-41:67
+50            android:name="kim.tkland.musicbeewifisync.SyncResultsPreviewActivity"
+50-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:40:13-82
+51            android:label="@string/title_activity_sync_preview" />
+51-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:13-64
+52        <activity
+52-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:42:9-44:69
+53            android:name="kim.tkland.musicbeewifisync.PlaylistSyncActivity"
+53-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:43:13-76
+54            android:label="@string/title_activity_sync_playlists" />
+54-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:44:13-66
+55        <activity
+55-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:45:9-47:69
+56            android:name="kim.tkland.musicbeewifisync.ViewErrorLogActivity"
+56-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:46:13-76
+57            android:label="@string/title_activity_view_error_log" />
+57-->D:\Google\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:13-66
+58
+59        <uses-library
+59-->[androidx.window:window:1.0.0] C:\Users\toshi\.gradle\caches\transforms-4\9f98ae2e77defdbe404f51e01b256942\transformed\jetified-window-1.0.0\AndroidManifest.xml:25:9-27:40
+60            android:name="androidx.window.extensions"
+60-->[androidx.window:window:1.0.0] C:\Users\toshi\.gradle\caches\transforms-4\9f98ae2e77defdbe404f51e01b256942\transformed\jetified-window-1.0.0\AndroidManifest.xml:26:13-54
+61            android:required="false" />
+61-->[androidx.window:window:1.0.0] C:\Users\toshi\.gradle\caches\transforms-4\9f98ae2e77defdbe404f51e01b256942\transformed\jetified-window-1.0.0\AndroidManifest.xml:27:13-37
+62        <uses-library
+62-->[androidx.window:window:1.0.0] C:\Users\toshi\.gradle\caches\transforms-4\9f98ae2e77defdbe404f51e01b256942\transformed\jetified-window-1.0.0\AndroidManifest.xml:28:9-30:40
+63            android:name="androidx.window.sidecar"
+63-->[androidx.window:window:1.0.0] C:\Users\toshi\.gradle\caches\transforms-4\9f98ae2e77defdbe404f51e01b256942\transformed\jetified-window-1.0.0\AndroidManifest.xml:29:13-51
+64            android:required="false" />
+64-->[androidx.window:window:1.0.0] C:\Users\toshi\.gradle\caches\transforms-4\9f98ae2e77defdbe404f51e01b256942\transformed\jetified-window-1.0.0\AndroidManifest.xml:30:13-37
+65    </application>
+66
+67</manifest>

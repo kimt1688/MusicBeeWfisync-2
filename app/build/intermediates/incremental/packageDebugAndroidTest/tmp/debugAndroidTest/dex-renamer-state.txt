@@ -1,0 +1,7 @@
+#Mon Jun 03 23:48:22 JST 2024
+base.0=D\:\\Google\\MusicBeeWfisync-2\\app\\build\\intermediates\\dex\\debugAndroidTest\\mergeExtDexDebugAndroidTest\\classes.dex
+base.1=D\:\\Google\\MusicBeeWfisync-2\\app\\build\\intermediates\\dex\\debugAndroidTest\\mergeProjectDexDebugAndroidTest\\0\\classes.dex
+path.0=classes.dex
+path.1=0/classes.dex
+renamed.0=classes.dex
+renamed.1=classes2.dex

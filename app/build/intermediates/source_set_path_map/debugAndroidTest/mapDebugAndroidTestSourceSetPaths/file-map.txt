@@ -1,0 +1,4 @@
+kim.tkland.musicbeewifisync.test.app-androidTest-0 D:\Google\MusicBeeWfisync-2\app\build\generated\res\resValues\androidTest\debug
+kim.tkland.musicbeewifisync.test.app-mergeDebugAndroidTestResources-1 D:\Google\MusicBeeWfisync-2\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+kim.tkland.musicbeewifisync.test.app-mergeDebugAndroidTestResources-2 D:\Google\MusicBeeWfisync-2\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+kim.tkland.musicbeewifisync.test.app-debugAndroidTest-3 D:\Google\MusicBeeWfisync-2\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources

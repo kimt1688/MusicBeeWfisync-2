@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/MusicBeeWfisync-2.iml" filepath="$PROJECT_DIR$/.idea/MusicBeeWfisync-2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MusicBeeWifiSync.iml" filepath="$PROJECT_DIR$/.idea/modules/MusicBeeWifiSync.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MusicBeeWifiSync.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MusicBeeWifiSync.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MusicBeeWifiSync.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MusicBeeWifiSync.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MusicBeeWifiSync.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MusicBeeWifiSync.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MusicBeeWifiSync.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MusicBeeWifiSync.app.unitTest.iml" />
     </modules>
   </component>
 </project>
