@@ -200,10 +200,10 @@ class WifiSyncService() : Service() {
             try {
                 var socketFailRetryAttempts = 0
                 loop@ while (true) {
-                    if (socketFailRetryAttempts > 0) {
+                    //if (socketFailRetryAttempts > 0) {
                         // allow some time for the server to re-open the listener
-                        Thread.sleep(1000)
-                    }
+                    //    Thread.sleep(1000)
+                    //}
                     if (WifiSyncServiceSettings.debugMode) {
                         logInfo("tryStart", "connecting $address, attempt=$socketFailRetryAttempts")
                     }
@@ -2592,7 +2592,7 @@ internal object WifiSyncServiceSettings {
     val PLAYER_GONEMAD = 1
     val PLAYER_POWERAMP = 2
     var reverseSyncPlayer = 0
-    var reverseSyncPlaylists = false
+    var reverseSyncPlaylists = true
     var reverseSyncPlaylistsPath = ""
     var reverseSyncRatings = false
     var reverseSyncPlayCounts = false

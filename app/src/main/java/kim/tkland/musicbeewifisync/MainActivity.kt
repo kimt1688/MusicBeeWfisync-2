@@ -24,6 +24,7 @@ class MainActivity : WifiSyncBaseActivity() {
     private var syncPreviewButton: Button? = null
     private var syncStartButton: LinearLayout? = null
     private var serverStatusThread: Thread? = null
+    private var syncPlayerGoneMad: CheckBox? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ErrorHandler.initialise(this)
@@ -33,14 +34,13 @@ class MainActivity : WifiSyncBaseActivity() {
         ))
 
         WifiSyncServiceSettings.loadSettings(this)
-        if (WifiSyncServiceSettings.defaultIpAddressValue.length == 0) {
+        if (WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()) {
             val intent = Intent(this, SettingsActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
         } else if (WifiSyncService.syncIsRunning.get()) {
-            val intent: Intent
-            intent = Intent(this, SyncResultsStatusActivity::class.java)
+            val intent: Intent = Intent(this, SyncResultsStatusActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
@@ -51,6 +51,7 @@ class MainActivity : WifiSyncBaseActivity() {
             syncStartButton = findViewById(R.id.syncStartButton)
             syncToPlaylists = findViewById(R.id.syncToPlaylists)
             syncToPlaylistsPath = findViewById(R.id.syncToPlaylistPath)
+            syncPlayerGoneMad = findViewById(R.id.syncPlayerGoneMad)
             val syncFromMusicBee = findViewById<CheckBox>(R.id.syncFromMusicBee)
             syncFromMusicBee.isChecked = WifiSyncServiceSettings.syncFromMusicBee
             syncFromMusicBee.setOnCheckedChangeListener { _, _ ->
@@ -60,39 +61,28 @@ class MainActivity : WifiSyncBaseActivity() {
             val syncToRatings = findViewById<CheckBox>(R.id.syncToRatings)
             val syncToPlayCounts = findViewById<CheckBox>(R.id.syncToPlayCounts)
             val syncToUsingPlayer = findViewById<RadioGroup>(R.id.syncToUsingPlayer)
-            var playlistsSupported = false
-            when (WifiSyncServiceSettings.reverseSyncPlayer) {
-                WifiSyncServiceSettings.PLAYER_GONEMAD -> {
-                    playlistsSupported = true
-                    syncToUsingPlayer.check(R.id.syncPlayerGoneMad)
-                }
-                WifiSyncServiceSettings.PLAYER_POWERAMP -> syncToUsingPlayer.check(R.id.syncPlayerPowerAmp)
+            val reverseSyncPlayer = findViewById<CheckBox>(R.id.syncPlayerGoneMad)
+            var playlistsSupported = true
+            if (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) {
+                playlistsSupported = true
+                syncToUsingPlayer.check(R.id.syncPlayerGoneMad)
             }
             syncToUsingPlayer.setOnCheckedChangeListener { _, _ ->
-                when (syncToUsingPlayer.checkedRadioButtonId) {
-                    R.id.syncPlayerGoneMad -> {
-                        WifiSyncServiceSettings.reverseSyncPlaylistsPath = "/gmmp/playlists"
-                        WifiSyncServiceSettings.reverseSyncPlayer =
-                            WifiSyncServiceSettings.PLAYER_GONEMAD
-                        setPlaylistsEnabled(true)
-                    }
-                    R.id.syncPlayerPowerAmp -> {
-                        WifiSyncServiceSettings.reverseSyncPlaylistsPath = ""
-                        WifiSyncServiceSettings.reverseSyncPlayer =
-                            WifiSyncServiceSettings.PLAYER_POWERAMP
-                        setPlaylistsEnabled(false)
-                    }
+                if (reverseSyncPlayer.isChecked) {
+                    WifiSyncServiceSettings.reverseSyncPlaylistsPath = "/gmmp/playlists"
+                    WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+                    setPlaylistsEnabled(true)
                 }
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
             setPlaylistsEnabled(playlistsSupported)
             syncToPlaylists?.let{it.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, _ ->
-                WifiSyncServiceSettings.reverseSyncPlaylists = syncToPlaylists?.let{it.isChecked()}!!
+                WifiSyncServiceSettings.reverseSyncPlaylists = syncToPlaylists?.isChecked!!
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             })}
             syncToPlaylistsPath?.let{it.setOnEditorActionListener(OnEditorActionListener { _, _, _ ->
                 WifiSyncServiceSettings.reverseSyncPlaylistsPath =
-                    syncToPlaylistsPath?.let{it.getText().toString()}!!
+                    syncToPlaylistsPath?.getText()?.toString()!!
                 WifiSyncServiceSettings.saveSettings(mainWindow)
                 false
             })}
@@ -106,6 +96,8 @@ class MainActivity : WifiSyncBaseActivity() {
                 WifiSyncServiceSettings.reverseSyncPlayCounts = syncToPlayCounts.isChecked
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
+            if(syncPlayerGoneMad!!.isChecked)
+                WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
             checkServerStatus()
         }
     }
@@ -184,11 +176,11 @@ class MainActivity : WifiSyncBaseActivity() {
                 if (!WifiSyncServiceSettings.syncFromMusicBee) {
                     message = getString(R.string.errorSyncParamsNoneSelected)
                 }
-            } else {
-                if (WifiSyncServiceSettings.reverseSyncPlayer == 0) {
-                    message = getString(R.string.errorSyncParamsPlayerNotSelected)
-                }
-            }
+            } //else {
+              // if (WifiSyncServiceSettings.reverseSyncPlayer == 0) {
+              //      message = getString(R.string.errorSyncParamsPlayerNotSelected)
+              //  }
+            //}
             return if (message == null) {
                 true
             } else {
