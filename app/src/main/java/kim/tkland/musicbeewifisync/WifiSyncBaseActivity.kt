@@ -2,16 +2,11 @@ package kim.tkland.musicbeewifisync
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.io.File
 
 abstract class WifiSyncBaseActivity : AppCompatActivity() {
     protected var mainWindow: WifiSyncBaseActivity? = this
-    private var accessPermissionsGranted = false
-    protected var grantAccessToSdCard: File? = null
     protected var buttonTextEnabledColor = 0
     protected var buttonTextDisabledColor = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,12 +24,6 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (hasAllFilesPermission()) {
-            Toast.makeText(this, R.string.already_permission, Toast.LENGTH_LONG)
-                .show()
-        }
-
-
         val intent: Intent
         when (item.itemId) {
             R.id.fullSyncMenuItem -> {
@@ -70,5 +59,4 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-    private fun hasAllFilesPermission() = Environment.isExternalStorageManager()
 }

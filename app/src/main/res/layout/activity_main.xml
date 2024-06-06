@@ -159,6 +159,7 @@
                     android:id="@+id/syncPlayerGoneMad"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:checked="true"
                     android:text="GoneMAD"
                     android:textSize="20sp" />
 
@@ -193,11 +194,12 @@
         android:layout_width="@+id/syncHalfWidthGuideline"
         android:layout_height="58dp"
         android:background="@color/colorButtonBackground"
-        android:onClick="onSyncPreviewButton_Click"
+        android:onClick="onSyncPreviewButtonClick"
         android:text="@string/syncPreview"
         android:textColor="@color/colorButtonTextEnabled"
         android:textSize="17sp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/syncHalfWidthGuideline" />
 
@@ -209,7 +211,7 @@
         android:background="@color/colorButtonBackground"
         android:clickable="true"
         android:focusable="true"
-        android:onClick="onSyncStartButton_Click"
+        android:onClick="onSyncStartButtonClick"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/syncHalfWidthGuideline"

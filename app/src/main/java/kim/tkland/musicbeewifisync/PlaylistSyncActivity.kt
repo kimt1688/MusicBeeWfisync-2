@@ -1,11 +1,18 @@
 package kim.tkland.musicbeewifisync
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.LinearLayout
+import android.widget.ListView
+import android.widget.TextView
 import androidx.core.view.MenuCompat
 import java.net.SocketTimeoutException
 

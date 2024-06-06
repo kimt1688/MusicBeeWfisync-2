@@ -4,18 +4,23 @@ import android.app.ActivityManager.TaskDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.provider.Settings
+import android.provider.DocumentsContract
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.RadioGroup
 import android.widget.TextView.OnEditorActionListener
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import androidx.core.view.MenuCompat
+
 
 class MainActivity : WifiSyncBaseActivity() {
     private var syncPreview = false
@@ -25,13 +30,19 @@ class MainActivity : WifiSyncBaseActivity() {
     private var syncStartButton: LinearLayout? = null
     private var serverStatusThread: Thread? = null
     private var syncPlayerGoneMad: CheckBox? = null
+    private val PICK_XML_FILE = 75
+    private var isGotAccessPermission: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ErrorHandler.initialise(this)
         // needed so android "Recent Views" actually shows the icon - only seems to be an issue with P
-        @Suppress("DEPRECATION")setTaskDescription(TaskDescription(null,
-            R.drawable.ic_launcher_round
-        ))
+        @Suppress("DEPRECATION") setTaskDescription(
+            TaskDescription(
+                null,
+                R.drawable.ic_launcher_round
+            )
+        )
 
         WifiSyncServiceSettings.loadSettings(this)
         if (WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()) {
@@ -63,29 +74,34 @@ class MainActivity : WifiSyncBaseActivity() {
             val syncToUsingPlayer = findViewById<RadioGroup>(R.id.syncToUsingPlayer)
             val reverseSyncPlayer = findViewById<CheckBox>(R.id.syncPlayerGoneMad)
             var playlistsSupported = true
-            if (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) {
-                playlistsSupported = true
-                syncToUsingPlayer.check(R.id.syncPlayerGoneMad)
-            }
+            //if (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) {
+            playlistsSupported = true
+            syncToUsingPlayer.check(R.id.syncPlayerGoneMad)
+            //}
             syncToUsingPlayer.setOnCheckedChangeListener { _, _ ->
                 if (reverseSyncPlayer.isChecked) {
                     WifiSyncServiceSettings.reverseSyncPlaylistsPath = "/gmmp/playlists"
-                    WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+                    WifiSyncServiceSettings.reverseSyncPlayer =
+                        WifiSyncServiceSettings.PLAYER_GONEMAD
                     setPlaylistsEnabled(true)
                 }
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
             setPlaylistsEnabled(playlistsSupported)
-            syncToPlaylists?.let{it.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, _ ->
-                WifiSyncServiceSettings.reverseSyncPlaylists = syncToPlaylists?.isChecked!!
-                WifiSyncServiceSettings.saveSettings(mainWindow)
-            })}
-            syncToPlaylistsPath?.let{it.setOnEditorActionListener(OnEditorActionListener { _, _, _ ->
-                WifiSyncServiceSettings.reverseSyncPlaylistsPath =
-                    syncToPlaylistsPath?.getText()?.toString()!!
-                WifiSyncServiceSettings.saveSettings(mainWindow)
-                false
-            })}
+            syncToPlaylists?.let {
+                it.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, _ ->
+                    WifiSyncServiceSettings.reverseSyncPlaylists = syncToPlaylists?.isChecked!!
+                    WifiSyncServiceSettings.saveSettings(mainWindow)
+                })
+            }
+            syncToPlaylistsPath?.let {
+                it.setOnEditorActionListener(OnEditorActionListener { _, _, _ ->
+                    WifiSyncServiceSettings.reverseSyncPlaylistsPath =
+                        syncToPlaylistsPath?.getText()?.toString()!!
+                    WifiSyncServiceSettings.saveSettings(mainWindow)
+                    false
+                })
+            }
             syncToRatings.isChecked = WifiSyncServiceSettings.reverseSyncRatings
             syncToRatings.setOnCheckedChangeListener { _, _ ->
                 WifiSyncServiceSettings.reverseSyncRatings = syncToRatings.isChecked
@@ -96,7 +112,7 @@ class MainActivity : WifiSyncBaseActivity() {
                 WifiSyncServiceSettings.reverseSyncPlayCounts = syncToPlayCounts.isChecked
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
-            if(syncPlayerGoneMad!!.isChecked)
+            if (syncPlayerGoneMad!!.isChecked)
                 WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
             checkServerStatus()
         }
@@ -128,44 +144,73 @@ class MainActivity : WifiSyncBaseActivity() {
         fullSyncItem.isCheckable = true
         fullSyncItem.isChecked = true
         val playlistSyncMenuItem = menu.findItem(R.id.playlistSyncMenuItem)
-        playlistSyncMenuItem.isCheckable = false
-        playlistSyncMenuItem.isChecked = false
+        // playlistSyncMenuItem.isCheckable = false
+        // playlistSyncMenuItem.isChecked = false
         return true
     }
 
-    fun onSyncPreviewButton_Click(view: View) {
+    // アクティビティの結果に対するコールバックの登録
+    private val launcher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        Log.d("registerForActivityResult(result)", result.toString())
+
+        if (result.resultCode != RESULT_OK) {
+            // アクティビティ結果NG
+            return@registerForActivityResult
+        } else {
+            // アクティビティ結果OK
+            try {
+                result.data?.data?.also { uri : Uri ->
+                    contentResolver.takePersistableUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    }
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    private fun setLaunchIntent(): Intent {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/xml"
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, "/storage/emulated/0/gmmp/".toUri())
+        }
+        return intent
+    }
+
+    fun onSyncPreviewButtonClick(view: View) {
         if (isConfigOK) {
             syncPreviewButton!!.isEnabled = false
             try {
                 WifiSyncServiceSettings.syncCustomFiles = false
+                launcher.launch(setLaunchIntent())
                 syncPreview = true
-                //if (tryGetStorageAccessGrant()) {
                 WifiSyncService.startSynchronisation(this, 0, true, false)
-                //}
             } finally {
                 syncPreviewButton!!.isEnabled = true
             }
         }
     }
 
-    fun onSyncStartButton_Click(view: View) {
+    fun onSyncStartButtonClick(view: View) {
         if (isConfigOK) {
             syncStartButton!!.isEnabled = false
             try {
                 WifiSyncServiceSettings.syncCustomFiles = false
                 syncPreview = false
-                //if (tryGetStorageAccessGrant()) {
+                launcher.launch(setLaunchIntent())
                 WifiSyncService.startSynchronisation(this, 0, false, false)
-                //}
+            }catch (ex:Exception){
+                Log.d("onSyncStartButtonClick", ex.message!!)
             } finally {
                 syncStartButton!!.isEnabled = true
             }
         }
     }
 
-    @Suppress("REDUNDANT_MODIFIER_IN_GETTER")
     private val isConfigOK: Boolean
-        private get() {
+        get () {
             var message: String? = null
             if (serverStatusThread != null) {
                 message = getString(R.string.errorServerNotFound)
@@ -176,11 +221,12 @@ class MainActivity : WifiSyncBaseActivity() {
                 if (!WifiSyncServiceSettings.syncFromMusicBee) {
                     message = getString(R.string.errorSyncParamsNoneSelected)
                 }
-            } //else {
-              // if (WifiSyncServiceSettings.reverseSyncPlayer == 0) {
-              //      message = getString(R.string.errorSyncParamsPlayerNotSelected)
-              //  }
-            //}
+            } else {
+                if (syncPlayerGoneMad!!.isChecked)
+                    WifiSyncServiceSettings.reverseSyncPlayer = 1
+                else
+                    WifiSyncServiceSettings.reverseSyncPlayer = 0
+            }
             return if (message == null) {
                 true
             } else {
@@ -195,7 +241,7 @@ class MainActivity : WifiSyncBaseActivity() {
             }
         }
 
-    private fun checkServerStatus() {
+        private fun checkServerStatus() {
         serverStatusThread = Thread {
             try {
                 var statusDisplayed = false
@@ -225,6 +271,7 @@ class MainActivity : WifiSyncBaseActivity() {
         }
         serverStatusThread!!.start()
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return super.onOptionsItemSelected(item)
     }
