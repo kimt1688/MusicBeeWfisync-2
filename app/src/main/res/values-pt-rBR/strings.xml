@@ -47,6 +47,7 @@
     <string name="syncErrorHeader">Erro</string>
     <string name="syncFileActionCopy">Copiar %s</string>
     <string name="syncFileActionDelete">Apagar %s</string>
+    <string name="syncFileActionReSync">ressincronização %s</string>
     <string name="syncDeleteConfirm1">CONFIRMAÇÃO: Apagar permanentemente 1 arquivo do dispositivo?</string>
     <string name="syncDeleteConfirm9">CONFIRMAÇÃO: Apagar permanentemente %d arquivos do dispositivo?</string>
     <string name="syncCompleted">Sincronização completada com sucesso!</string>
