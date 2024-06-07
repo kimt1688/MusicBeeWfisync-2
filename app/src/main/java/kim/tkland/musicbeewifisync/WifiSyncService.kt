@@ -722,12 +722,6 @@ class WifiSyncService() : Service() {
             if (WifiSyncServiceSettings.debugMode) {
                 logInfo("receiveFile", "Receive: $filePath")
             }
-            syncProgressMessage.set(
-                String.format(
-                    getString(R.string.syncFileActionCopy),
-                    filePath
-                )
-            )
             try {
                 val contentResolver = applicationContext.contentResolver
                 val ext = File(filePath).extension
@@ -746,18 +740,57 @@ class WifiSyncService() : Service() {
                 val path = filePath.substring(0, separatorIndex)
                 val name = filePath.substring(separatorIndex)
                 val values = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, path)
-                    put(MediaStore.MediaColumns.MIME_TYPE, mimetype)
-                    put(MediaStore.MediaColumns.IS_PENDING, true)
+                    put(MediaStore.Audio.Media.DISPLAY_NAME, name)
+                    put(MediaStore.Audio.Media.RELATIVE_PATH, path)
+                    put(MediaStore.Audio.Media.MIME_TYPE, mimetype)
+                    put(MediaStore.Audio.Media.IS_PENDING, false)
                 }
 //                val audioCollection = MediaStore.Audio.Media.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[1])
                 val audioCollection = MediaStore.Audio.Media.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1])
-//                val audioCollection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-//                val audioCollection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_INTERNAL)
-                val mediaUri = contentResolver.insert(audioCollection, values)
-                val os = contentResolver.openOutputStream(mediaUri!!, "wt")
+                var os: OutputStream? = null
+                var breakFlg = false
                 try {
+                    applicationContext.contentResolver.query(
+                        audioCollection,
+                        arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.RELATIVE_PATH, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DATE_MODIFIED),
+                        "${MediaStore.Audio.Media.RELATIVE_PATH} = ? AND ${MediaStore.Audio.Media.DISPLAY_NAME} = ? AND ${MediaStore.Audio.Media.DATE_MODIFIED} <= ?",
+                        arrayOf(path, name, fileDateModified.toString()),
+                        null,
+                        null
+                    )?.use { cursor ->
+                        while (cursor.moveToNext()) {
+                            if (!cursor.getString(2).equals(name)) {
+                                continue
+                            }
+                            val contentUri: Uri = ContentUris.withAppendedId(
+                                audioCollection, cursor.getString(0).toLong()
+                            )
+                            Log.d("", contentUri.toString())
+                            Log.d("", cursor.getString(0))
+                            applicationContext.contentResolver.delete(contentUri, null)
+                            breakFlg = true
+                        }
+                        cursor.close()
+                    }
+                    if (!breakFlg) {
+                        syncProgressMessage.set(
+                            String.format(
+                                getString(R.string.syncFileActionReSync),
+                                filePath
+                            )
+                        )
+                        writeString(syncStatusOK)
+                        flushWriter()
+                        return
+                    }
+                    syncProgressMessage.set(
+                        String.format(
+                            getString(R.string.syncFileActionCopy),
+                            filePath
+                        )
+                    )
+                    val mediaUri = contentResolver.insert(audioCollection, values)
+                    os = contentResolver.openOutputStream(mediaUri!!, "wt")
                     os.use{fs: OutputStream? ->
                         writeString(syncStatusOK)
                         flushWriter()
@@ -791,12 +824,14 @@ class WifiSyncService() : Service() {
                         }
                     }
                 }finally {
-                    values.clear()
-                    contentResolver.update(mediaUri, ContentValues().apply{
-                        put(MediaStore.Audio.Media.IS_PENDING, false)
-                    }, null, null)
-                    contentResolver.update(mediaUri, values, null, null)
-                    os?.close()
+                    // values.clear()
+                    // contentResolver.update(mediaUri, ContentValues().apply{
+                    //     put(MediaStore.Audio.Media.IS_PENDING, false)
+                    // }, null, null)
+                    // contentResolver.update(mediaUri, values, null, null)
+                    if (!breakFlg) {
+                        os?.close()
+                    }
                 }
                 writeString(syncStatusOK)
                 flushWriter()
@@ -866,6 +901,12 @@ class WifiSyncService() : Service() {
 
             val collection = MediaStore.Audio.Playlists.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1])
             try {
+                syncProgressMessage.set(
+                    String.format(
+                        getString(R.string.syncFileActionCopy),
+                        filePath
+                    )
+                )
                 applicationContext.contentResolver.query(
                     collection,
                     arrayOf(MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.DISPLAY_NAME),

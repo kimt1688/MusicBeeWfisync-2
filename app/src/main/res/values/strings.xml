@@ -47,6 +47,7 @@
     <string name="syncErrorHeader">Error</string>
     <string name="syncFileActionCopy">Copy %s</string>
     <string name="syncFileActionDelete">Delete %s</string>
+    <string name="syncFileActionReSync">Resynchronizing %s</string>
     <string name="syncDeleteConfirm1">CONFIRMATION: Permanently delete 1 file from the device?</string>
     <string name="syncDeleteConfirm9">CONFIRMATION: Permanently delete %d files from the device?</string>
     <string name="syncCompleted">MusicBee synchronization successfully completed</string>
@@ -80,7 +81,6 @@
     <string name="menuWifiFullSync">Full Sync</string>
     <string name="menuWifiPlaylistSync">Playlist Sync</string>
     <string name="errorInvalidIp">This is not a valid IP address</string>
-    <string name="already_permission">You should already have permission!</string>
     <!-- Strings used for fragments for navigation -->
 
 </resources>
