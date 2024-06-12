@@ -8,7 +8,6 @@ import android.app.Service
 import android.content.*
 import android.database.Cursor
 import android.media.MediaScannerConnection
-import android.media.MediaScannerConnection.OnScanCompletedListener
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -33,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.xml.parsers.SAXParserFactory
 
-class WifiSyncService() : Service() {
+class WifiSyncService : Service() {
     private val syncFileScanCount = AtomicInteger(0)
     private var settingsSyncFromMusicBee = false
     private var settingsSyncPreview = false
@@ -149,7 +148,7 @@ class WifiSyncService() : Service() {
         return START_REDELIVER_INTENT
     }
 
-    private inner class SynchronisationWorker internal constructor(private val context: Context) :
+    private inner class SynchronisationWorker(private val context: Context) :
         Runnable {
         private var clientSocket: Socket? = null
         private var socketInputStream: InputStream? = null
@@ -237,7 +236,7 @@ class WifiSyncService() : Service() {
                                                 this.socketStreamReader = socketStreamReader
                                                 this.socketOutputStream = socketOutputStream
                                                 this.socketStreamWriter = socketStreamWriter
-                                                var failedSyncFilesCount: Int = 0
+                                                var failedSyncFilesCount = 0
                                                 try {
                                                     clientSocket.soTimeout = socketReadTimeout
                                                     val hello: String = readString()
@@ -246,7 +245,7 @@ class WifiSyncService() : Service() {
                                                     if (WifiSyncServiceSettings.debugMode) {
                                                         logInfo(
                                                             "tryStart",
-                                                            "hello=" + serverLocated + ",fromMB=" + settingsSyncFromMusicBee + ",custfiles=" + settingsSyncCustomFiles + ",preview=" + settingsSyncPreview + ",dev=" + settingsDeviceName + "," + settingsDeviceStorageIndex
+                                                            "hello=$serverLocated,fromMB=$settingsSyncFromMusicBee,custfiles=$settingsSyncCustomFiles,preview=$settingsSyncPreview,dev=$settingsDeviceName,$settingsDeviceStorageIndex"
                                                         )
                                                     }
                                                     if (!serverLocated) {
@@ -316,7 +315,7 @@ class WifiSyncService() : Service() {
                                                     throw ex
                                                 } catch (ex: SocketException) {
                                                     logError(
-                                                        "tryStart" + socketFailRetryAttempts,
+                                                        "tryStart$socketFailRetryAttempts",
                                                         ex
                                                     )
                                                     if (storage != null) {
@@ -336,7 +335,7 @@ class WifiSyncService() : Service() {
                                                     }
                                                 } catch (ex: Exception) {
                                                     logError(
-                                                        "tryStart" + socketFailRetryAttempts,
+                                                        "tryStart$socketFailRetryAttempts",
                                                         ex
                                                     )
                                                     if (storage != null) {
@@ -752,7 +751,12 @@ class WifiSyncService() : Service() {
                 try {
                     applicationContext.contentResolver.query(
                         audioCollection,
-                        arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.RELATIVE_PATH, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DATE_MODIFIED),
+                        arrayOf(
+                            MediaStore.Audio.Media._ID,
+                            MediaStore.Audio.Media.RELATIVE_PATH,
+                            MediaStore.Audio.Media.DISPLAY_NAME,
+                            MediaStore.Audio.Media.DATE_MODIFIED
+                        ),
                         "${MediaStore.Audio.Media.RELATIVE_PATH} = ? AND ${MediaStore.Audio.Media.DISPLAY_NAME} = ? AND ${MediaStore.Audio.Media.DATE_MODIFIED} <= ?",
                         arrayOf(path, name, fileDateModified.toString()),
                         null,
@@ -772,6 +776,9 @@ class WifiSyncService() : Service() {
                         }
                         cursor.close()
                     }
+                }catch (ex: Exception) {
+                    logError("receiveFile", ex, "file=$filePath")
+                } finally {
                     if (!breakFlg) {
                         syncProgressMessage.set(
                             String.format(
@@ -781,8 +788,11 @@ class WifiSyncService() : Service() {
                         )
                         writeString(syncStatusOK)
                         flushWriter()
-                        return
+                        // return
                     }
+                }
+
+                try {
                     syncProgressMessage.set(
                         String.format(
                             getString(R.string.syncFileActionCopy),
@@ -806,7 +816,7 @@ class WifiSyncService() : Service() {
                         thread.start()
                         try {
                             var bytesRead: Int
-                            var bufferIndex: Int = 0
+                            var bufferIndex = 0
                             while (true) {
                                 waitRead.waitOne()
                                 bytesRead = readCount[bufferIndex]
@@ -868,7 +878,7 @@ class WifiSyncService() : Service() {
                             skipBytes -= socketReadBufferLength
                         }
                     }
-                    writeString(syncStatusFAIL + " " + ex.toString())
+                    writeString("$syncStatusFAIL $ex")
                     flushWriter()
 
                 } finally {
@@ -946,7 +956,7 @@ class WifiSyncService() : Service() {
                     thread.start()
                     try {
                         var bytesRead: Int
-                        var bufferIndex: Int = 0
+                        var bufferIndex = 0
                         while (true) {
                             waitRead.waitOne()
                             bytesRead = readCount[bufferIndex]
@@ -1044,13 +1054,13 @@ class WifiSyncService() : Service() {
                     fileLength = storage!!.getLength(filePath)
                     writeLong(fileLength)
                     flushWriter()
-                    val thread: Thread =
+                    val thread =
                         Thread(sendFileWriteLoop(buffer, readCount, waitRead, waitWrite, exception))
                     thread.start()
                     remainingBytes = fileLength
                     try {
                         var bytesRead: Int
-                        var bufferIndex: Int = 0
+                        var bufferIndex = 0
                         while (true) {
                             try {
                                 bytesRead = fs.read(buffer[bufferIndex], 0, 65536)
@@ -1066,7 +1076,7 @@ class WifiSyncService() : Service() {
                             readCount[bufferIndex] = bytesRead
                             waitRead.set()
                             if (exception[0] != null) {
-                                throw exception.get(0)!!
+                                throw exception[0]!!
                             } else if (bytesRead <= 0) {
                                 break
                             }
@@ -1082,7 +1092,7 @@ class WifiSyncService() : Service() {
                 if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
                     throw ex
                 }
-                status = syncStatusFAIL + " " + ex.toString()
+                status = "$syncStatusFAIL $ex"
                 if (fileLength == -1L) {
                     writeLong(0)
                 } else {
@@ -1289,7 +1299,7 @@ class WifiSyncService() : Service() {
                 }
                 setPreviewFailed()
                 writeString(syncEndOfData)
-                writeString(syncStatusFAIL + " " + ex.toString())
+                writeString("$syncStatusFAIL $ex")
             }
             flushWriter()
         }
@@ -1338,7 +1348,7 @@ class WifiSyncService() : Service() {
                         "Unable to retrieve stats for player: $settingsReverseSyncPlayer"
                     )
                     writeString(syncEndOfData)
-                    writeString(syncStatusFAIL + " Unable to retrieve stats")
+                    writeString("$syncStatusFAIL Unable to retrieve stats")
                 } else {
                     for (latestStatsInfo: FileStatsInfo in latestStats) {
                         var incrementalPlayCount: Int
@@ -1390,7 +1400,7 @@ class WifiSyncService() : Service() {
                                     val count: Int = latestStats.size
                                     writer.writeInt(count)
                                     for (index in 0 until count) {
-                                        val stats: FileStatsInfo = latestStats.get(index)
+                                        val stats: FileStatsInfo = latestStats[index]
                                         writer.writeUTF(stats.fileUrl)
                                         writer.writeByte(stats.rating.toInt())
                                         writer.writeLong(stats.lastPlayedDate)
@@ -1411,7 +1421,7 @@ class WifiSyncService() : Service() {
                 }
                 setPreviewFailed()
                 writeString(syncEndOfData)
-                writeString(syncStatusFAIL + " " + ex.toString())
+                writeString("$syncStatusFAIL $ex")
             }
             flushWriter()
         }
@@ -1460,13 +1470,13 @@ class WifiSyncService() : Service() {
         @Throws(Exception::class)
         private fun loadGoneMadStats(): ArrayList<FileStatsInfo>? {
             val statsFile = File("/storage/emulated/0/gmmp/stats.xml")
-            if (!statsFile!!.exists()) {
+            if (!statsFile.exists()) {
                 FileOutputStream(statsFile).use { stream -> stream.write(0) }
             }
             val fileWriteWait = Object()
             val fileWriteStarted = AtomicBoolean(false)
             val fileWriteCompleted = AtomicBoolean(false)
-            val observer: FileObserver = object : FileObserver(statsFile!!) {
+            val observer: FileObserver = object : FileObserver(statsFile) {
                 //            val observer: FileObserver = object : FileObserver(statsFile.path) {
                 override fun onEvent(event: Int, path: String?) {
                     when (event) {
@@ -1497,14 +1507,14 @@ class WifiSyncService() : Service() {
                 observer.stopWatching()
             }
             FileInputStream(statsFile).use { stream ->
-                val handler: GmmpStatsXmlHandler = GmmpStatsXmlHandler(storage!!.storageRootPath)
+                val handler = GmmpStatsXmlHandler(storage!!.storageRootPath)
                 SAXParserFactory.newInstance().newSAXParser().parse(stream, handler)
                 return handler.stats
             }
 
         }
 
-        private inner class GmmpStatsXmlHandler internal constructor(val storageRootPath: String) :
+        inner class GmmpStatsXmlHandler internal constructor(val storageRootPath: String) :
             DefaultHandler() {
             var stats = ArrayList<FileStatsInfo>()
             private var lastName: String? = null
@@ -1551,7 +1561,7 @@ class WifiSyncService() : Service() {
             }
         }
 
-        private inner class FileStatsMap internal constructor(initialCapacity: Int) :
+        inner class FileStatsMap internal constructor(initialCapacity: Int) :
             HashMap<String, FileStatsInfo?>(initialCapacity) {
             override fun put(key: String, value: FileStatsInfo?): FileStatsInfo? {
                 return super.put(key.lowercase(), value)
@@ -1593,7 +1603,7 @@ class WifiSyncService() : Service() {
                     }
                     syncErrorMessageId.set(R.string.errorSyncNonSpecific)
                     results = null
-                    status = syncStatusFAIL + " " + ex.toString()
+                    status = "$syncStatusFAIL $ex"
                 }
                 writeString(status)
                 flushWriter()
@@ -1610,7 +1620,7 @@ class WifiSyncService() : Service() {
                 readLong() //estimatedBytesSendToDevice =
                 while (true) {
                     val action = readString()
-                    if (action.length == 0) {
+                    if (action.isEmpty()) {
                         break
                     }
                     val estimatedSize = readString()
@@ -1624,7 +1634,7 @@ class WifiSyncService() : Service() {
                     throw ex
                 }
                 syncErrorMessageId.set(R.string.errorSyncNonSpecific)
-                showSyncPreviewResults(null, syncStatusFAIL + " " + ex.toString())
+                showSyncPreviewResults(null, "$syncStatusFAIL $ex")
             }
         }
 
@@ -1753,7 +1763,7 @@ class WifiSyncService() : Service() {
         }
     }
 
-    private inner class FileStatsInfo internal constructor(
+    inner class FileStatsInfo internal constructor(
         val fileUrl: String,
         var rating: Byte,
         var lastPlayedDate: Long,
@@ -1775,37 +1785,35 @@ class WifiSyncService() : Service() {
         @Volatile
         var syncFromResults: ArrayList<SyncResultsInfo>? = null
         val waitSyncResults = AutoResetEvent(false)
-        private val socketConnectTimeout = 10000000
-        private val socketReadTimeout = 30000000
-//        private val socketConnectTimeout = 10000
-//        private val socketReadTimeout = 30000
-        private val socketReadBufferLength = 131072
-        private val FOREGROUND_ID = 2938
-        private val serverPort = 27304
-        private val intentNameDefaultIpAddressValue = "defaultIpAddressValue"
-        private val intentNameDeviceName = "deviceName"
-        private val intentNameDeviceStorageIndex = "deviceStorageIndex"
-        private val intentNameAccessPermissionsUri = "accessPermissionsUri"
-        private val intentNameSyncIteration = "syncIteration"
-        private val intentNameSyncPreview = "syncPreview"
-        private val intentNameSyncFromMusicBee = "syncFromMusicBee"
-        private val intentNameSyncCustomFiles = "syncCustomFiles"
-        private val intentNameSyncDeleteUnselectedFiles = "syncDeleteUnselectedFiles"
-        private val intentNameSyncCustomPlaylistNames = "syncCustomPlaylistNames"
-        private val intentNameSyncIgnoreErrors = "syncIgnoreErrors"
-        private val intentNameReverseSyncPlayer = "reverseSyncPlayer"
-        private val intentNameReverseSyncPlaylists = "reverseSyncPlaylists"
-        private val intentNameReverseSyncPlaylistsPath = "reverseSyncPlaylistsPath"
-        private val intentNameReverseSyncRatings = "reverseSyncRatings"
-        private val intentNameReverseSyncPlayCounts = "reverseSyncPlayCounts"
-        private val commandSyncDevice = "SyncDevice"
-        private val commandSyncToDevice = "SyncToDevice"
-        private val syncStatusOK = "OK"
-        private val syncStatusFAIL = "FAIL"
-        private val syncStatusCANCEL = "CANCEL"
-        private val syncEndOfData = ""
-        private val serverHelloPrefix = "MusicBeeWifiSyncServer/"
-        private val clientHelloVersion = "MusicBeeWifiSyncClient/1.0"
+        private const val socketConnectTimeout = 10000000
+        private const val socketReadTimeout = 30000000
+        private const val socketReadBufferLength = 131072
+        private const val FOREGROUND_ID = 2938
+        private const val serverPort = 27304
+        private const val intentNameDefaultIpAddressValue = "defaultIpAddressValue"
+        private const val intentNameDeviceName = "deviceName"
+        private const val intentNameDeviceStorageIndex = "deviceStorageIndex"
+        private const val intentNameAccessPermissionsUri = "accessPermissionsUri"
+        private const val intentNameSyncIteration = "syncIteration"
+        private const val intentNameSyncPreview = "syncPreview"
+        private const val intentNameSyncFromMusicBee = "syncFromMusicBee"
+        private const val intentNameSyncCustomFiles = "syncCustomFiles"
+        private const val intentNameSyncDeleteUnselectedFiles = "syncDeleteUnselectedFiles"
+        private const val intentNameSyncCustomPlaylistNames = "syncCustomPlaylistNames"
+        private const val intentNameSyncIgnoreErrors = "syncIgnoreErrors"
+        private const val intentNameReverseSyncPlayer = "reverseSyncPlayer"
+        private const val intentNameReverseSyncPlaylists = "reverseSyncPlaylists"
+        private const val intentNameReverseSyncPlaylistsPath = "reverseSyncPlaylistsPath"
+        private const val intentNameReverseSyncRatings = "reverseSyncRatings"
+        private const val intentNameReverseSyncPlayCounts = "reverseSyncPlayCounts"
+        private const val commandSyncDevice = "SyncDevice"
+        private const val commandSyncToDevice = "SyncToDevice"
+        private const val syncStatusOK = "OK"
+        private const val syncStatusFAIL = "FAIL"
+        private const val syncStatusCANCEL = "CANCEL"
+        private const val syncEndOfData = ""
+        private const val serverHelloPrefix = "MusicBeeWifiSyncServer/"
+        private const val clientHelloVersion = "MusicBeeWifiSyncClient/1.0"
         fun startSynchronisation(
             context: Context,
             iteration: Int,
@@ -1899,7 +1907,7 @@ class WifiSyncService() : Service() {
                                         socketStreamWriter.flush()
                                         while (true) {
                                             val playlistName: String = socketStreamReader.readUTF()
-                                            if (playlistName.length == 0) {
+                                            if (playlistName.isEmpty()) {
                                                 break
                                             }
                                             playlists.add(playlistName)
@@ -1956,7 +1964,7 @@ class WifiSyncService() : Service() {
 }
 
 class AutoResetEvent(@field:Volatile private var open: Boolean) {
-    private val monitor = java.lang.Object()
+    private val monitor = Object()
     fun set() {
         synchronized(monitor) {
             open = true
@@ -1981,25 +1989,20 @@ class AutoResetEvent(@field:Volatile private var open: Boolean) {
 
 internal class FileStorageAccess(
     private val context: Context,
-    storageRootPath: String,
-    storageRootPermissionedUri: Uri?
+    val storageRootPath: String,
+    private val storageRootPermissionedUri: Uri?
 ) {
     private val contentResolver: ContentResolver = context.contentResolver
-    val storageRootPath: String
-    private val storageRootPermissionedUri: Uri?
     private var rootId: String? = null
-    private val isDocumentFileStorage: Boolean
+    private val isDocumentFileStorage: Boolean = (storageRootPermissionedUri != null)
     private val fileScanCount = AtomicInteger(0)
-    private val fileScanWait = java.lang.Object()
+    private val fileScanWait = Object()
 //    private val updateFiles = ArrayList<FileInfo>()
 //    private val deleteFileUrls = ArrayList<String>()
     private val updatePlaylists = ArrayList<FileInfo>()
     private val deletePlaylistUrls = ArrayList<String>()
 
     init {
-        this.storageRootPath = storageRootPath
-        this.storageRootPermissionedUri = storageRootPermissionedUri
-        isDocumentFileStorage = (storageRootPermissionedUri != null)
         if (!isDocumentFileStorage) {
             rootId = null
         } else {
@@ -2030,8 +2033,8 @@ internal class FileStorageAccess(
                                 context,
                                 DocumentsContract.buildDocumentUriUsingTree(folderUri, documentId)
                             )
-                            if (file!!.isFile()) {
-                                val fileUrl: String = file.getUri().toString()
+                            if (file!!.isFile) {
+                                val fileUrl: String = file.uri.toString()
                                 files.add(
                                     FileInfo(
                                         folderPath + fileUrl.substring(
@@ -2122,7 +2125,7 @@ internal class FileStorageAccess(
             } catch (ex: Exception) {
                 logError(
                     "createFile",
-                    filePath + ": " + ex.toString() + ", folder=" + (folderUri?.toString()
+                    "$filePath: $ex, folder=" + (folderUri?.toString()
                         ?: "null")
                 )
                 throw ex
@@ -2191,7 +2194,6 @@ internal class FileStorageAccess(
                 return true
             }
             try {
-                // if (deleteDocument(filePath)) {
                 if (DocumentsContract.deleteDocument(contentResolver, fileUri)) {
                     if (WifiSyncServiceSettings.debugMode) {
                         logInfo("deleteFile", "Delete: $filePath : true Finished")
@@ -2221,39 +2223,15 @@ internal class FileStorageAccess(
         }
     }
 
-    @SuppressLint("Range")
-    fun deleteDocument(filePath: String): Boolean {
-        // Perform the actual removal.
-        //Manifest.permission.MANAGE_MEDIA
-        val cursor: Cursor? = contentResolver.query(
-            MediaStore.Audio.Media.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]),
-            //MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-            null, "${MediaStore.Audio.Media.DATA} like ?",
-            arrayOf("%$filePath"),null
-        )
-
-        cursor!!.moveToFirst()
-
-        val numAudioRemoved = contentResolver.delete(
-            ContentUris.withAppendedId(MediaStore.Audio.Media.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]),
-            //ContentUris.withAppendedId(MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-                cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID))),
-            null,
-            null)
-
-        cursor.close()
-        return numAudioRemoved > 0
-    }
-
     @Throws(Exception::class)
     fun deleteFolder(folderPath: String): Boolean {
         val folderUrl = getFileUrl(folderPath)
         if (isDocumentFileStorage) {
             val folderUri = getDocumentFileUri(folderPath)
-            try {
-                return DocumentsContract.deleteDocument(contentResolver, folderUri)
+            return try {
+                DocumentsContract.deleteDocument(contentResolver, folderUri)
             } catch (ex: Exception) {
-                return if (documentFileExists(folderUri)) {
+                if (documentFileExists(folderUri)) {
                     throw ex
                 } else {
                     true
@@ -2356,12 +2334,12 @@ internal class FileStorageAccess(
             fileScanCount.getAndIncrement()
             MediaScannerConnection.scanFile(
                 context,
-                arrayOf<String>(fileUrl),
-                null,
-                OnScanCompletedListener { _, _ ->
-                    fileScanCount.getAndDecrement()
-                    synchronized(fileScanWait) { fileScanWait.notifyAll() }
-                })
+                arrayOf(fileUrl),
+                null
+            ) { _, _ ->
+                fileScanCount.getAndDecrement()
+                synchronized(fileScanWait) { fileScanWait.notifyAll() }
+            }
         }
     }
 
@@ -2410,12 +2388,12 @@ internal class FileStorageAccess(
     }
 
     companion object {
-        val ACTION_ADD = 0
-        val ACTION_DELETE = 1
+        const val ACTION_ADD = 0
+        const val ACTION_DELETE = 1
         fun getSdCardFromIndex(context: Context, idx: Int): File? {
             //var index = idx
             try {
-                var file = context.getExternalFilesDirs(Environment.DIRECTORY_MUSIC)[idx - 1]
+                val file = context.getExternalFilesDirs(Environment.DIRECTORY_MUSIC)[idx - 1]
                 val path = file.path
 
                 return File(path.substring(0, path.indexOf("/Android/")))
@@ -2485,18 +2463,18 @@ class SyncResultsInfo {
     }
 
     companion object {
-        val DIRECTION_REVERSE_SYNC: Short = -1
-        val DIRECTION_NONE: Short = 0
-        val DIRECTION_FORWARD_SYNC: Short = 1
-        val ALERT_INFO: Short = 0
-        val ALERT_WARNING: Short = 1
-        val ALERT_SEVERE: Short = 2
+        const val DIRECTION_REVERSE_SYNC: Short = -1
+        const val DIRECTION_NONE: Short = 0
+        const val DIRECTION_FORWARD_SYNC: Short = 1
+        const val ALERT_INFO: Short = 0
+        const val ALERT_WARNING: Short = 1
+        const val ALERT_SEVERE: Short = 2
     }
 }
 
 internal class FileInfo {
     val filename: String
-    val length: Long
+    private val length: Long
     val dateModified: Long
 
     constructor(filename: String, dateModified: Long) {
@@ -2514,23 +2492,23 @@ internal class FileInfo {
 
 class FileErrorInfo(val errorCategory: Int, val filename: String, val errorMessage: String) {
     companion object {
-        val ERROR_COPY = 0
-        val ERROR_DELETE = 1
+        const val ERROR_COPY = 0
+        const val ERROR_DELETE = 1
     }
 }
 
 internal object WifiSyncServiceSettings {
     var defaultIpAddressValue = ""
-    var deviceName = Build.MODEL
+    var deviceName: String? = Build.MODEL
     var deviceStorageIndex = 0
-    val permissionPathToSdCardMapping: MutableMap<String, String> = HashMap()
+    private val permissionPathToSdCardMapping: MutableMap<String, String> = HashMap()
     val accessPermissionsUri = AtomicReference<Uri>()
     var syncFromMusicBee = true
     var syncCustomFiles = false
     var syncDeleteUnselectedFiles = false
     val syncCustomPlaylistNames = ArrayList<String>()
-    val PLAYER_GONEMAD = 1
-    val PLAYER_POWERAMP = 2
+    const val PLAYER_GONEMAD = 1
+    const val PLAYER_POWERAMP = 2
     var reverseSyncPlayer = 1
     var reverseSyncPlaylists = true
     var reverseSyncPlaylistsPath = ""
@@ -2558,7 +2536,7 @@ internal object WifiSyncServiceSettings {
                             count--
                             val permissionsPath: String = reader.readUTF()
                             val sdCardPath: String = reader.readUTF()
-                            permissionPathToSdCardMapping.put(permissionsPath, sdCardPath)
+                            permissionPathToSdCardMapping[permissionsPath] = sdCardPath
                         }
                         syncDeleteUnselectedFiles = reader.readBoolean()
                         count = reader.readInt()

@@ -72,14 +72,14 @@ class MainActivity : WifiSyncBaseActivity() {
             val syncToRatings = findViewById<CheckBox>(R.id.syncToRatings)
             val syncToPlayCounts = findViewById<CheckBox>(R.id.syncToPlayCounts)
             val syncToUsingPlayer = findViewById<RadioGroup>(R.id.syncToUsingPlayer)
-            val reverseSyncPlayer = findViewById<CheckBox>(R.id.syncPlayerGoneMad)
-            var playlistsSupported = true
+            // val reverseSyncPlayer = findViewById<CheckBox>(R.id.syncPlayerGoneMad)
+            val playlistsSupported = true
             //if (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) {
-            playlistsSupported = true
+            // playlistsSupported = true
             syncToUsingPlayer.check(R.id.syncPlayerGoneMad)
             //}
             syncToUsingPlayer.setOnCheckedChangeListener { _, _ ->
-                if (reverseSyncPlayer.isChecked) {
+                if (syncPlayerGoneMad!!.isChecked) {
                     WifiSyncServiceSettings.reverseSyncPlaylistsPath = "/gmmp/playlists"
                     WifiSyncServiceSettings.reverseSyncPlayer =
                         WifiSyncServiceSettings.PLAYER_GONEMAD
@@ -89,18 +89,18 @@ class MainActivity : WifiSyncBaseActivity() {
             }
             setPlaylistsEnabled(playlistsSupported)
             syncToPlaylists?.let {
-                it.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, _ ->
+                it.setOnCheckedChangeListener { _, _ ->
                     WifiSyncServiceSettings.reverseSyncPlaylists = syncToPlaylists?.isChecked!!
                     WifiSyncServiceSettings.saveSettings(mainWindow)
-                })
+                }
             }
             syncToPlaylistsPath?.let {
-                it.setOnEditorActionListener(OnEditorActionListener { _, _, _ ->
+                it.setOnEditorActionListener { _, _, _ ->
                     WifiSyncServiceSettings.reverseSyncPlaylistsPath =
                         syncToPlaylistsPath?.getText()?.toString()!!
                     WifiSyncServiceSettings.saveSettings(mainWindow)
                     false
-                })
+                }
             }
             syncToRatings.isChecked = WifiSyncServiceSettings.reverseSyncRatings
             syncToRatings.setOnCheckedChangeListener { _, _ ->
@@ -112,8 +112,10 @@ class MainActivity : WifiSyncBaseActivity() {
                 WifiSyncServiceSettings.reverseSyncPlayCounts = syncToPlayCounts.isChecked
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
-            if (syncPlayerGoneMad!!.isChecked)
-                WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+
+            (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD).also { syncPlayerGoneMad!!.isChecked = it }
+            //if (syncPlayerGoneMad!!.isChecked)
+            //    WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
             checkServerStatus()
         }
     }
@@ -207,6 +209,12 @@ class MainActivity : WifiSyncBaseActivity() {
                 syncStartButton!!.isEnabled = true
             }
         }
+    }
+
+    fun onGoneMADCheckClick(view: View) {
+        if (syncPlayerGoneMad!!.isChecked) {
+            WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+        } else WifiSyncServiceSettings.reverseSyncPlayer = 0
     }
 
     private val isConfigOK: Boolean

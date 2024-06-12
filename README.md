@@ -1,2 +1,2 @@
-# MusicBeeWfisync-2
+# MusicBeeWifisync-2
  start repository
