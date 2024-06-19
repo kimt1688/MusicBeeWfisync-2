@@ -33,6 +33,7 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    @Suppress("NAME_SHADOWING")
     protected fun showResults(
         resultsListView: ListView,
         resultsToData: ArrayList<SyncResultsInfo>?,
@@ -97,7 +98,7 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
         }
         val adapter: ArrayAdapter<SyncResultsInfo?> = object : ArrayAdapter<SyncResultsInfo?>(
         //val adapter: ArrayAdapter<SyncResultsInfo?
-            mainWindow?.let{it.applicationContext}!!,
+            mainWindow?.applicationContext!!,
             R.layout.row_item_sync_results,
             R.id.syncResultsLine1,
             filteredPreviewData as List<SyncResultsInfo?>
@@ -146,7 +147,7 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
                     syncResultsLine1.setTextColor(infoColor)
                     syncResultsLine1.text = info.targetName
                     syncResultsLine2.text =
-                        if (info.estimatedSize!!.length == 0) info.action else info.action + " - " + info.estimatedSize
+                        if (info.estimatedSize!!.isEmpty()) info.action else "${info.action} - ${info.estimatedSize}"
                 }
                 return view
             }

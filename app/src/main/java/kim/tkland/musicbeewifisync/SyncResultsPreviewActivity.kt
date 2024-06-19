@@ -29,7 +29,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 WifiSyncService.waitSyncResults.waitOne()
                 runOnUiThread {
                     findViewById<View>(R.id.previewWaitIndicator).visibility = View.GONE
-                    proceedSyncButton?.let{it.setVisibility(View.VISIBLE)}
+                    proceedSyncButton?.visibility = View.VISIBLE
                     val previewStatusMessage = findViewById<TextView>(R.id.previewStatusMessage)
                     val previewListView = findViewById<ListView>(R.id.previewResults)
                     val previewErrorMessage = findViewById<TextView>(R.id.previewErrorMessage)

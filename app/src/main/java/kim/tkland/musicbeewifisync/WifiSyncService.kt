@@ -1,6 +1,5 @@
 package kim.tkland.musicbeewifisync
 
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -18,6 +17,8 @@ import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import kim.tkland.musicbeewifisync.Dialog.showOkCancel
 import kim.tkland.musicbeewifisync.ErrorHandler.logError
@@ -51,7 +52,6 @@ class WifiSyncService : Service() {
     private var settingsReverseSyncPlayCounts = false
     private var syncWorkerThread: Thread? = null
     private var storage: FileStorageAccess? = null
-    private var gonemadstatsfileuri: Uri? = null
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
@@ -719,16 +719,23 @@ class WifiSyncService : Service() {
             val waitRead = AutoResetEvent(false)
             val waitWrite = AutoResetEvent(true)
             if (WifiSyncServiceSettings.debugMode) {
-                logInfo("receiveFile", "Receive: $filePath")
+                Log.d("receiveFile", "Receive: $filePath")
             }
             try {
                 val contentResolver = applicationContext.contentResolver
                 val ext = File(filePath).extension
                 var isplaylist = false
+                var playlistname: String
                 if (ext.isNotEmpty())
                     isplaylist = ext.equals("m3u", ignoreCase = true) || ext.equals("m3u8", ignoreCase = true) || ext.equals("wpl", ignoreCase = true)
                 val mimetype: String?
                 if (isplaylist) {
+                    val playListCollection = MediaStore.Audio.Playlists.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1])
+                    playlistname = File(filePath).name
+                    if (!ext.endsWith("m3u", ignoreCase = true)){
+                        playlistname = "$playlistname.m3u"
+                    }
+                    deleteOldPlayList(playlistname, playListCollection)
                     receivePlaylist(filePath, fileLength, fileDateModified)
                     return
                 } else {
@@ -800,7 +807,7 @@ class WifiSyncService : Service() {
                         )
                     )
                     val mediaUri = contentResolver.insert(audioCollection, values)
-                    os = contentResolver.openOutputStream(mediaUri!!, "wt")
+                    os = contentResolver.openOutputStream(mediaUri!!, "w")
                     os.use{fs: OutputStream? ->
                         writeString(syncStatusOK)
                         flushWriter()
@@ -890,6 +897,52 @@ class WifiSyncService : Service() {
             }
         }
 
+        private fun deleteOldPlayList(playListName: String, collection: Uri) {
+            var deleteTarget = ""
+            var contentUri: Uri? = null
+
+            applicationContext.contentResolver.query(
+                collection,
+                arrayOf(MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.DISPLAY_NAME, MediaStore.Audio.Playlists.RELATIVE_PATH),
+                "${MediaStore.Audio.Playlists.DISPLAY_NAME} = ?",
+                arrayOf(playListName),
+                null,
+                null
+            )?.use { cursor ->
+                if (!cursor.moveToFirst()) {
+                    cursor.close()
+                    return
+                }
+                do {
+                    contentUri = ContentUris.withAppendedId(collection, cursor.getString(0).toLong())
+                    deleteTarget =  "${cursor.getString(2)}${cursor.getString(1)}"
+                }while (cursor.moveToNext())
+            cursor.close()
+            }
+
+            try {
+                var deleteResult: Boolean
+                if (WifiSyncServiceSettings.deviceStorageIndex == 1) {
+                    deleteTarget = "/storage/emulated/0/${deleteTarget}"
+                    Log.d("Delete Name: ", deleteTarget)
+                    deleteResult = File(deleteTarget).delete()
+                    Log.d("Delete result:", deleteResult.toString())
+                } else if (WifiSyncServiceSettings.deviceStorageIndex == 2) {
+                    deleteTarget = "/storage/${
+                        MediaStore.getExternalVolumeNames(applicationContext)
+                            .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
+                            }/${deleteTarget}"
+                    Log.d("Delete Name: ", deleteTarget)
+                    deleteResult = File(deleteTarget).delete()
+                    Log.d("Delete result:", deleteResult.toString())
+                } else {
+                    throw ArrayIndexOutOfBoundsException("WifiSyncServiceSettings.deviceStorageIndex is out of range.")
+                }
+            } catch (ex: Exception) {
+                Log.d("Delete PlayList", ex.message!!)
+            }
+        }
+
         private fun receivePlaylist(filePath: String, fileLength: Long, fileDateModified: Long) {
             val buffer = arrayOf(ByteArray(socketReadBufferLength), ByteArray(socketReadBufferLength))
             val readCount = IntArray(2)
@@ -898,10 +951,6 @@ class WifiSyncService : Service() {
             val separatorIndex = filePath.lastIndexOf('/') + 1
             val path = filePath.substring(0, separatorIndex)
             var name = filePath.substring(separatorIndex)
-
-            if (!name.endsWith(".m3u", ignoreCase = true)){
-                name = "$name.m3u"
-            }
 
             val values = ContentValues().apply {
                 put(MediaStore.Audio.Playlists.DISPLAY_NAME, name)
@@ -917,30 +966,9 @@ class WifiSyncService : Service() {
                         filePath
                     )
                 )
-                applicationContext.contentResolver.query(
-                    collection,
-                    arrayOf(MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.DISPLAY_NAME),
-                    "${MediaStore.Audio.Playlists.DISPLAY_NAME} = ?",
-                    arrayOf(name),
-                    null,
-                    null
-                )?.use { cursor ->
-                    // val columnIndex = cursor.getColumnIndexOrThrow("_id")
-                    while (cursor.moveToNext()) {
-                        if (!cursor.getString(1).equals(name)) {
-                            continue
-                        }
-                        val contentUri: Uri = ContentUris.withAppendedId(
-                            collection, cursor.getString(0).toLong()
-                        )
-                        Log.d("", contentUri.toString())
-                        Log.d("", cursor.getString(0))
-                        applicationContext.contentResolver.delete(contentUri, null)
-                    }
-                    cursor.close()
-                }
+
                 val item = applicationContext.contentResolver.insert(collection, values)
-                val os = contentResolver.openOutputStream(item!!, "wt")
+                val os = contentResolver.openOutputStream(item!!, "w")
                 os.use { fs: OutputStream? ->
                     writeString(syncStatusOK)
                     flushWriter()
@@ -1415,7 +1443,7 @@ class WifiSyncService : Service() {
                     writeString(syncStatusOK)
                 }
             } catch (ex: Exception) {
-                logError("sendStats", ex)
+                Log.d("sendStats", ex.message!!)
                 if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
                     throw ex
                 }
@@ -1814,6 +1842,7 @@ class WifiSyncService : Service() {
         private const val syncEndOfData = ""
         private const val serverHelloPrefix = "MusicBeeWifiSyncServer/"
         private const val clientHelloVersion = "MusicBeeWifiSyncClient/1.0"
+
         fun startSynchronisation(
             context: Context,
             iteration: Int,

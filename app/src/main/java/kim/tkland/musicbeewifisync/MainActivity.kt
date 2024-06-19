@@ -1,24 +1,22 @@
 package kim.tkland.musicbeewifisync
 
 import android.app.ActivityManager.TaskDescription
+import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.content.Intent.*
+import android.content.UriPermission
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RadioGroup
-import android.widget.TextView.OnEditorActionListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.net.toUri
 import androidx.core.view.MenuCompat
 
 
@@ -47,13 +45,13 @@ class MainActivity : WifiSyncBaseActivity() {
         WifiSyncServiceSettings.loadSettings(this)
         if (WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()) {
             val intent = Intent(this, SettingsActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            intent.flags = FLAG_ACTIVITY_NEW_TASK
+            intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
         } else if (WifiSyncService.syncIsRunning.get()) {
             val intent: Intent = Intent(this, SyncResultsStatusActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            intent.flags = FLAG_ACTIVITY_NEW_TASK
+            intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
         } else {
             setContentView(R.layout.activity_main)
@@ -118,6 +116,7 @@ class MainActivity : WifiSyncBaseActivity() {
             //    WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
             checkServerStatus()
         }
+        launcher.launch(setLaunchIntent())
     }
 
     private fun setPlaylistsEnabled(enabled: Boolean) {
@@ -163,20 +162,46 @@ class MainActivity : WifiSyncBaseActivity() {
         } else {
             // アクティビティ結果OK
             try {
-                result.data?.data?.also { uri : Uri ->
-                    contentResolver.takePersistableUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    }
+                val mUri = result.data?.data
+                clearAllPersistedUriPermissions(applicationContext)
+                contentResolver.takePersistableUriPermission(mUri!!, FLAG_GRANT_READ_URI_PERMISSION or
+                        FLAG_GRANT_WRITE_URI_PERMISSION
+                        //FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
+                        //FLAG_GRANT_PREFIX_URI_PERMISSION
+                )
+                val permissions = contentResolver.persistedUriPermissions
+                Log.d("Permission", permissions.toString())
             } catch (e: Exception) {
+                Log.d("launcher", e.message!!)
             }
         }
     }
 
+    private fun clearAllPersistedUriPermissions(context: Context) {
+        try {
+            val contentResolver = context.contentResolver
+            for (uriPermission in contentResolver.persistedUriPermissions) {
+                contentResolver.releasePersistableUriPermission(
+                    /* uri = */ uriPermission.uri,
+                    /* modeFlags = */ FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            }
+        } catch (e: Throwable) {
+            // just to be safe...
+            e.printStackTrace()
+        }
+    }
+
     private fun setLaunchIntent(): Intent {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "text/xml"
-            putExtra(DocumentsContract.EXTRA_INITIAL_URI, "/storage/emulated/0/gmmp/".toUri())
+        val intent = Intent(ACTION_OPEN_DOCUMENT_TREE).apply {
+//            addFlags(
+//                FLAG_GRANT_READ_URI_PERMISSION or
+//                     FLAG_GRANT_WRITE_URI_PERMISSION or
+//                     FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
+//                     FLAG_GRANT_PREFIX_URI_PERMISSION )
+            //addCategory(CATEGORY_OPENABLE)
+            //type = "text/xml"
+            //putExtra(DocumentsContract.EXTRA_INITIAL_URI, "/storage/emulated/0/gmmp".toUri())
         }
         return intent
     }
@@ -186,7 +211,6 @@ class MainActivity : WifiSyncBaseActivity() {
             syncPreviewButton!!.isEnabled = false
             try {
                 WifiSyncServiceSettings.syncCustomFiles = false
-                launcher.launch(setLaunchIntent())
                 syncPreview = true
                 WifiSyncService.startSynchronisation(this, 0, true, false)
             } finally {
@@ -201,7 +225,6 @@ class MainActivity : WifiSyncBaseActivity() {
             try {
                 WifiSyncServiceSettings.syncCustomFiles = false
                 syncPreview = false
-                launcher.launch(setLaunchIntent())
                 WifiSyncService.startSynchronisation(this, 0, false, false)
             }catch (ex:Exception){
                 Log.d("onSyncStartButtonClick", ex.message!!)
