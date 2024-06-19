@@ -1,23 +1,26 @@
 package kim.tkland.musicbeewifisync
 
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.*
+import android.database.ContentObserver
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.FileObserver
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import kim.tkland.musicbeewifisync.Dialog.showOkCancel
 import kim.tkland.musicbeewifisync.ErrorHandler.logError
@@ -31,6 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.xml.parsers.SAXParserFactory
+
 
 class WifiSyncService : Service() {
     private val syncFileScanCount = AtomicInteger(0)
@@ -51,7 +55,6 @@ class WifiSyncService : Service() {
     private var settingsReverseSyncPlayCounts = false
     private var syncWorkerThread: Thread? = null
     private var storage: FileStorageAccess? = null
-    private var gonemadstatsfileuri: Uri? = null
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
@@ -719,16 +722,23 @@ class WifiSyncService : Service() {
             val waitRead = AutoResetEvent(false)
             val waitWrite = AutoResetEvent(true)
             if (WifiSyncServiceSettings.debugMode) {
-                logInfo("receiveFile", "Receive: $filePath")
+                Log.d("receiveFile", "Receive: $filePath")
             }
             try {
                 val contentResolver = applicationContext.contentResolver
                 val ext = File(filePath).extension
                 var isplaylist = false
+                var playlistname: String
                 if (ext.isNotEmpty())
                     isplaylist = ext.equals("m3u", ignoreCase = true) || ext.equals("m3u8", ignoreCase = true) || ext.equals("wpl", ignoreCase = true)
                 val mimetype: String?
                 if (isplaylist) {
+                    val playListCollection = MediaStore.Audio.Playlists.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1])
+                    playlistname = File(filePath).name
+                    if (!ext.endsWith("m3u", ignoreCase = true)){
+                        playlistname = "$playlistname.m3u"
+                    }
+                    deleteOldPlayList(playlistname, playListCollection)
                     receivePlaylist(filePath, fileLength, fileDateModified)
                     return
                 } else {
@@ -800,7 +810,7 @@ class WifiSyncService : Service() {
                         )
                     )
                     val mediaUri = contentResolver.insert(audioCollection, values)
-                    os = contentResolver.openOutputStream(mediaUri!!, "wt")
+                    os = contentResolver.openOutputStream(mediaUri!!, "w")
                     os.use{fs: OutputStream? ->
                         writeString(syncStatusOK)
                         flushWriter()
@@ -890,6 +900,52 @@ class WifiSyncService : Service() {
             }
         }
 
+        private fun deleteOldPlayList(playListName: String, collection: Uri) {
+            var deleteTarget = ""
+            var contentUri: Uri? = null
+
+            applicationContext.contentResolver.query(
+                collection,
+                arrayOf(MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.DISPLAY_NAME, MediaStore.Audio.Playlists.RELATIVE_PATH),
+                "${MediaStore.Audio.Playlists.DISPLAY_NAME} = ?",
+                arrayOf(playListName),
+                null,
+                null
+            )?.use { cursor ->
+                if (!cursor.moveToFirst()) {
+                    cursor.close()
+                    return
+                }
+                do {
+                    contentUri = ContentUris.withAppendedId(collection, cursor.getString(0).toLong())
+                    deleteTarget =  "${cursor.getString(2)}${cursor.getString(1)}"
+                }while (cursor.moveToNext())
+            cursor.close()
+            }
+
+            try {
+                var deleteResult: Boolean
+                if (WifiSyncServiceSettings.deviceStorageIndex == 1) {
+                    deleteTarget = "/storage/emulated/0/${deleteTarget}"
+                    Log.d("Delete Name: ", deleteTarget)
+                    deleteResult = File(deleteTarget).delete()
+                    Log.d("Delete result:", deleteResult.toString())
+                } else if (WifiSyncServiceSettings.deviceStorageIndex == 2) {
+                    deleteTarget = "/storage/${
+                        MediaStore.getExternalVolumeNames(applicationContext)
+                            .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
+                            }/${deleteTarget}"
+                    Log.d("Delete Name: ", deleteTarget)
+                    deleteResult = File(deleteTarget).delete()
+                    Log.d("Delete result:", deleteResult.toString())
+                } else {
+                    throw ArrayIndexOutOfBoundsException("WifiSyncServiceSettings.deviceStorageIndex is out of range.")
+                }
+            } catch (ex: Exception) {
+                Log.d("Delete PlayList", ex.message!!)
+            }
+        }
+
         private fun receivePlaylist(filePath: String, fileLength: Long, fileDateModified: Long) {
             val buffer = arrayOf(ByteArray(socketReadBufferLength), ByteArray(socketReadBufferLength))
             val readCount = IntArray(2)
@@ -898,10 +954,6 @@ class WifiSyncService : Service() {
             val separatorIndex = filePath.lastIndexOf('/') + 1
             val path = filePath.substring(0, separatorIndex)
             var name = filePath.substring(separatorIndex)
-
-            if (!name.endsWith(".m3u", ignoreCase = true)){
-                name = "$name.m3u"
-            }
 
             val values = ContentValues().apply {
                 put(MediaStore.Audio.Playlists.DISPLAY_NAME, name)
@@ -917,30 +969,9 @@ class WifiSyncService : Service() {
                         filePath
                     )
                 )
-                applicationContext.contentResolver.query(
-                    collection,
-                    arrayOf(MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.DISPLAY_NAME),
-                    "${MediaStore.Audio.Playlists.DISPLAY_NAME} = ?",
-                    arrayOf(name),
-                    null,
-                    null
-                )?.use { cursor ->
-                    // val columnIndex = cursor.getColumnIndexOrThrow("_id")
-                    while (cursor.moveToNext()) {
-                        if (!cursor.getString(1).equals(name)) {
-                            continue
-                        }
-                        val contentUri: Uri = ContentUris.withAppendedId(
-                            collection, cursor.getString(0).toLong()
-                        )
-                        Log.d("", contentUri.toString())
-                        Log.d("", cursor.getString(0))
-                        applicationContext.contentResolver.delete(contentUri, null)
-                    }
-                    cursor.close()
-                }
+
                 val item = applicationContext.contentResolver.insert(collection, values)
-                val os = contentResolver.openOutputStream(item!!, "wt")
+                val os = contentResolver.openOutputStream(item!!, "w")
                 os.use { fs: OutputStream? ->
                     writeString(syncStatusOK)
                     flushWriter()
@@ -1415,7 +1446,7 @@ class WifiSyncService : Service() {
                     writeString(syncStatusOK)
                 }
             } catch (ex: Exception) {
-                logError("sendStats", ex)
+                Log.d("sendStats", ex.message!!)
                 if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
                     throw ex
                 }
@@ -1467,17 +1498,80 @@ class WifiSyncService : Service() {
             return results
         }
 
+        private fun getPathFromUri(context: Context, uri: Uri): String? {
+            // DocumentProvider
+            // Log.e("Error:", "uri:" + uri.authority)
+            if (DocumentsContract.isDocumentUri(context, uri)) {
+                if ("com.android.externalstorage.documents" == uri.authority) { // ExternalStorageProvider
+                    val docId = DocumentsContract.getDocumentId(uri)
+                    val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }
+                        .toTypedArray()
+                    val type = split[0]
+                    return if ("primary".equals(type, ignoreCase = true)) {
+                        Environment.getExternalStorageDirectory().toString() + "/" + split[1]
+                    } else {
+                        "/stroage/" + type + "/" + split[1]
+                    }
+                } else if ("com.android.providers.downloads.documents" == uri.authority) { // DownloadsProvider
+                    val id = DocumentsContract.getDocumentId(uri)
+                    val contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), id.toLong()
+                    )
+                    return getDataColumn(context, contentUri, null, null)
+                } else if ("com.android.providers.media.documents" == uri.authority) { // MediaProvider
+                    val docId = DocumentsContract.getDocumentId(uri)
+                    val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }
+                        .toTypedArray()
+                    val type = split[0]
+                    var contentUri: Uri? = null
+                    contentUri = MediaStore.Files.getContentUri("external")
+                    val selection = "_id=?"
+                    val selectionArgs = arrayOf(
+                        split[1]
+                    )
+                    return getDataColumn(context, contentUri, selection, selectionArgs)
+                }
+            } else if ("content".equals(uri.scheme, ignoreCase = true)) { //MediaStore
+                return getDataColumn(context, uri, null, null)
+            } else if ("file".equals(uri.scheme, ignoreCase = true)) { // File
+                return uri.path
+            }
+            return null
+        }
+
+        private fun getDataColumn(
+            context: Context, uri: Uri?, selection: String?,
+            selectionArgs: Array<String>?
+        ): String? {
+            var cursor: Cursor? = null
+            val projection = arrayOf(
+                MediaStore.Files.FileColumns.DATA
+            )
+            try {
+                cursor = context.contentResolver.query(
+                    uri!!, projection, selection, selectionArgs, null
+                )
+                if (cursor != null && cursor.moveToFirst()) {
+                    val cindex = cursor.getColumnIndexOrThrow(projection[0])
+                    return cursor.getString(cindex)
+                }
+            } finally {
+                cursor?.close()
+            }
+            return null
+        }
+
         @Throws(Exception::class)
         private fun loadGoneMadStats(): ArrayList<FileStatsInfo>? {
-            val statsFile = File("/storage/emulated/0/gmmp/stats.xml")
-            if (!statsFile.exists()) {
-                FileOutputStream(statsFile).use { stream -> stream.write(0) }
-            }
+            val sharedPref = getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
+            val uriStr = sharedPref.getString("accesseduri", "")!!
+            val targetUri = uriStr.toUri()
+
             val fileWriteWait = Object()
             val fileWriteStarted = AtomicBoolean(false)
             val fileWriteCompleted = AtomicBoolean(false)
-            val observer: FileObserver = object : FileObserver(statsFile) {
-                //            val observer: FileObserver = object : FileObserver(statsFile.path) {
+
+            val observer: FileObserver = object : FileObserver(File(getPathFromUri(applicationContext, targetUri)!!)) {
                 override fun onEvent(event: Int, path: String?) {
                     when (event) {
                         OPEN -> fileWriteStarted.set(true)
@@ -1506,11 +1600,12 @@ class WifiSyncService : Service() {
             } finally {
                 observer.stopWatching()
             }
-            FileInputStream(statsFile).use { stream ->
+            val importdb: InputStream = FileInputStream((applicationContext.contentResolver?.openFileDescriptor(targetUri, "r"))!!.fileDescriptor)
+            //FileInputStream(statsFile).use { stream ->
                 val handler = GmmpStatsXmlHandler(storage!!.storageRootPath)
-                SAXParserFactory.newInstance().newSAXParser().parse(stream, handler)
+                SAXParserFactory.newInstance().newSAXParser().parse(importdb, handler)
                 return handler.stats
-            }
+            //}
 
         }
 
@@ -1814,6 +1909,7 @@ class WifiSyncService : Service() {
         private const val syncEndOfData = ""
         private const val serverHelloPrefix = "MusicBeeWifiSyncServer/"
         private const val clientHelloVersion = "MusicBeeWifiSyncClient/1.0"
+
         fun startSynchronisation(
             context: Context,
             iteration: Int,
