@@ -9,7 +9,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -40,10 +39,7 @@ public final class ActivityMainBinding implements ViewBinding {
   public final Guideline syncHalfWidthGuideline;
 
   @NonNull
-  public final RadioButton syncPlayerGoneMad;
-
-  @NonNull
-  public final RadioButton syncPlayerPowerAmp;
+  public final CheckBox syncPlayerGoneMad;
 
   @NonNull
   public final Button syncPreviewButton;
@@ -86,21 +82,20 @@ public final class ActivityMainBinding implements ViewBinding {
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull LinearLayout syncFrom,
       @NonNull CheckBox syncFromMusicBee, @NonNull TextView syncFromPrompt,
-      @NonNull Guideline syncHalfWidthGuideline, @NonNull RadioButton syncPlayerGoneMad,
-      @NonNull RadioButton syncPlayerPowerAmp, @NonNull Button syncPreviewButton,
-      @NonNull TextView syncServerStatus, @NonNull LinearLayout syncStartButton,
-      @NonNull ImageView syncStartButtonImage, @NonNull TextView syncStartButtonText,
-      @NonNull LinearLayout syncTo, @NonNull CheckBox syncToPlayCounts,
-      @NonNull EditText syncToPlaylistPath, @NonNull CheckBox syncToPlaylists,
-      @NonNull TextView syncToPrompt, @NonNull CheckBox syncToRatings,
-      @NonNull RadioGroup syncToUsingPlayer, @NonNull TextView syncToUsingPrompt) {
+      @NonNull Guideline syncHalfWidthGuideline, @NonNull CheckBox syncPlayerGoneMad,
+      @NonNull Button syncPreviewButton, @NonNull TextView syncServerStatus,
+      @NonNull LinearLayout syncStartButton, @NonNull ImageView syncStartButtonImage,
+      @NonNull TextView syncStartButtonText, @NonNull LinearLayout syncTo,
+      @NonNull CheckBox syncToPlayCounts, @NonNull EditText syncToPlaylistPath,
+      @NonNull CheckBox syncToPlaylists, @NonNull TextView syncToPrompt,
+      @NonNull CheckBox syncToRatings, @NonNull RadioGroup syncToUsingPlayer,
+      @NonNull TextView syncToUsingPrompt) {
     this.rootView = rootView;
     this.syncFrom = syncFrom;
     this.syncFromMusicBee = syncFromMusicBee;
     this.syncFromPrompt = syncFromPrompt;
     this.syncHalfWidthGuideline = syncHalfWidthGuideline;
     this.syncPlayerGoneMad = syncPlayerGoneMad;
-    this.syncPlayerPowerAmp = syncPlayerPowerAmp;
     this.syncPreviewButton = syncPreviewButton;
     this.syncServerStatus = syncServerStatus;
     this.syncStartButton = syncStartButton;
@@ -168,14 +163,8 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       id = R.id.syncPlayerGoneMad;
-      RadioButton syncPlayerGoneMad = ViewBindings.findChildViewById(rootView, id);
+      CheckBox syncPlayerGoneMad = ViewBindings.findChildViewById(rootView, id);
       if (syncPlayerGoneMad == null) {
-        break missingId;
-      }
-
-      id = R.id.syncPlayerPowerAmp;
-      RadioButton syncPlayerPowerAmp = ViewBindings.findChildViewById(rootView, id);
-      if (syncPlayerPowerAmp == null) {
         break missingId;
       }
 
@@ -258,10 +247,10 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       return new ActivityMainBinding((ConstraintLayout) rootView, syncFrom, syncFromMusicBee,
-          syncFromPrompt, syncHalfWidthGuideline, syncPlayerGoneMad, syncPlayerPowerAmp,
-          syncPreviewButton, syncServerStatus, syncStartButton, syncStartButtonImage,
-          syncStartButtonText, syncTo, syncToPlayCounts, syncToPlaylistPath, syncToPlaylists,
-          syncToPrompt, syncToRatings, syncToUsingPlayer, syncToUsingPrompt);
+          syncFromPrompt, syncHalfWidthGuideline, syncPlayerGoneMad, syncPreviewButton,
+          syncServerStatus, syncStartButton, syncStartButtonImage, syncStartButtonText, syncTo,
+          syncToPlayCounts, syncToPlaylistPath, syncToPlaylists, syncToPrompt, syncToRatings,
+          syncToUsingPlayer, syncToUsingPrompt);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2" xmlns:ns2="http://schemas.android.com/tools">
     <plurals name="mtrl_badge_content_description">
     <item quantity="one">%d 件の新しい通知</item>
     <item quantity="other">%d 件の新しい通知</item>
@@ -33,12 +33,28 @@
     <string msgid="1656852541809559762" name="abc_toolbar_collapse_description">"折りたたむ"</string>
     <string name="actionSyncAbort">同期中断</string>
     <string name="actionSyncStart">同期開始</string>
-    <string name="already_permission">You should already have permission!</string>
     <string name="app_name">MusicBee Wifi Sync</string>
+    <string name="bottomsheet_action_collapse">ボトムシートを閉じる</string>
+    <string name="bottomsheet_action_expand">ボトムシートを開く</string>
     <string name="bottomsheet_action_expand_halfway">下半分を展開</string>
+    <string name="bottomsheet_drag_handle_clicked">ドラッグ ハンドルをダブルタップしました</string>
+    <string name="bottomsheet_drag_handle_content_description">ドラッグ ハンドル</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"応答"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"ビデオ"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"拒否"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"通話終了"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"着信"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"通話中"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"着信をスクリーニング中"</string>
     <string name="character_counter_content_description">入力済み文字数: %1$d/%2$d</string>
     <string name="character_counter_overflowed_content_description">文字数制限を超えています（%1$d/%2$d 文字）</string>
     <string name="clear_text_end_icon_content_description">テキストを消去</string>
+    <string msgid="406453423630273620" name="close_drawer">"ナビゲーションメニューを閉じる"</string>
+    <string msgid="7573152094250666567" name="close_sheet">"シートを閉じる"</string>
+    <string msgid="6083905920877235314" name="copy">"コピー"</string>
+    <string msgid="8038256446254964252" name="default_error_message">"入力値が無効です"</string>
+    <string msgid="6312721426453364202" name="default_popup_window_title">"ポップアップウィンドウ"</string>
+    <string msgid="1890207353314751437" name="dropdown_menu">"プルダウン メニュー"</string>
     <string name="errorConfigNotMatched">MusicBee can\'t match the device name to an existing configuration.</string>
     <string name="errorGrantRequired">You must grant this app access to the SD card root folder in order to function.</string>
     <string name="errorInvalidIp">This is not a valid IP address</string>
@@ -52,12 +68,17 @@
     <string name="errorSyncNonSpecific">A non-recoverable error occurred during the synchronization process. Restart the app and try again.</string>
     <string name="errorSyncParamsNoneSelected">同期する項目を1つ以上選択してください</string>
     <string name="errorSyncParamsPlayerNotSelected">MusicBeeにデータを送信するアプリを選択してください</string>
+    <string name="error_a11y_label">エラー: 無効</string>
     <string name="error_icon_content_description">エラー</string>
+    <string msgid="2427401033573778270" name="expand_button_title">"詳細設定"</string>
     <string name="exposed_dropdown_menu_content_description">プルダウン メニューを表示</string>
     <string name="icon_content_description">ダイアログ アイコン</string>
+    <string msgid="6827826412747255547" name="in_progress">"処理しています"</string>
+    <string msgid="7933458017204019916" name="indeterminate">"一部 ON"</string>
     <string name="item_view_role_description">タブ</string>
     <string name="logCopyClipboard">クリップボードにコピー</string>
     <string name="material_clock_toggle_content_description">午前または午後を選択</string>
+    <string name="material_hour_24h_suffix">%1$s 時間</string>
     <string name="material_hour_selection">時刻を選択してください</string>
     <string name="material_hour_suffix">%1$s時</string>
     <string name="material_minute_selection">分を選択</string>
@@ -74,21 +95,29 @@
     <string name="menuWifiPlaylistSync">プレイリスト同期</string>
     <string name="menuWifiSyncLog">エラーログ</string>
     <string name="mtrl_badge_numberless_content_description">新しい通知</string>
+    <string name="mtrl_checkbox_state_description_checked">オン</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">一部オン</string>
+    <string name="mtrl_checkbox_state_description_unchecked">オフ</string>
     <string name="mtrl_chip_close_icon_content_description">%1$s を削除します</string>
-    <string name="mtrl_exceed_max_badge_number_content_description">%1$d 件以上の新しい通知</string>
+    <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">%1$d 件以上の新しい通知</string>
     <string name="mtrl_picker_a11y_next_month">翌月に変更</string>
     <string name="mtrl_picker_a11y_prev_month">前月に変更</string>
+    <string name="mtrl_picker_announce_current_range_selection">開始日の選択: %1$s – 終了日の選択: %2$s</string>
     <string name="mtrl_picker_announce_current_selection">現在の選択: %1$s</string>
-    <string name="mtrl_picker_confirm">@android:string/ok</string>
+    <string name="mtrl_picker_announce_current_selection_none">なし</string>
+    <string name="mtrl_picker_cancel">キャンセル</string>
+    <string name="mtrl_picker_confirm">OK</string>
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">日付を選択してください</string>
     <string name="mtrl_picker_date_header_unselected">選択した日付</string>
-    <string name="mtrl_picker_day_of_week_column_header">曜日の列: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
+    <string name="mtrl_picker_end_date_description">終了日 %1$s</string>
     <string name="mtrl_picker_invalid_format">形式が無効です。</string>
     <string name="mtrl_picker_invalid_format_example">例: %1$s</string>
     <string name="mtrl_picker_invalid_format_use">使用: %1$s</string>
     <string name="mtrl_picker_invalid_range">範囲が無効です。</string>
-    <string name="mtrl_picker_navigate_to_year_description">%1$s 年に移動</string>
+    <string name="mtrl_picker_navigate_to_current_year_description">現在の年（%1$d）に移動</string>
+    <string name="mtrl_picker_navigate_to_year_description">%1$d 年に移動</string>
     <string name="mtrl_picker_out_of_range">範囲外: %1$s</string>
     <string name="mtrl_picker_range_header_only_end_selected">開始日～%1$s</string>
     <string name="mtrl_picker_range_header_only_start_selected">%1$s～終了日</string>
@@ -96,30 +125,45 @@
     <string name="mtrl_picker_range_header_title">期間を選択してください</string>
     <string name="mtrl_picker_range_header_unselected">開始日～終了日</string>
     <string name="mtrl_picker_save">保存</string>
+    <string name="mtrl_picker_start_date_description">開始日 %1$s</string>
     <string name="mtrl_picker_text_input_date_hint">日付</string>
     <string name="mtrl_picker_text_input_date_range_end_hint">終了日</string>
     <string name="mtrl_picker_text_input_date_range_start_hint">開始日</string>
     <string name="mtrl_picker_text_input_day_abbr">d</string>
     <string name="mtrl_picker_text_input_month_abbr">m</string>
     <string name="mtrl_picker_text_input_year_abbr">y</string>
+    <string name="mtrl_picker_today_description">今日（%1$s）</string>
     <string name="mtrl_picker_toggle_to_calendar_input_mode">カレンダー入力モードに切り替え</string>
-    <string name="mtrl_picker_toggle_to_day_selection">タップすると、日の選択に切り替わります</string>
+    <string name="mtrl_picker_toggle_to_day_selection">タップするとカレンダー表示に切り替わります</string>
     <string name="mtrl_picker_toggle_to_text_input_mode">テキスト入力モードに切り替え</string>
-    <string name="mtrl_picker_toggle_to_year_selection">タップすると、年の選択に切り替わります</string>
+    <string name="mtrl_picker_toggle_to_year_selection">タップすると年表示に切り替わります</string>
+    <string name="mtrl_timepicker_cancel">キャンセル</string>
+    <string name="mtrl_timepicker_confirm">OK</string>
     <string msgid="6301633601645100427" name="nav_app_bar_navigate_up_description">"上へ移動"</string>
     <string msgid="7456070600745802113" name="nav_app_bar_open_drawer_description">"ナビゲーション ドロワーを開く"</string>
+    <string msgid="542007171693138492" name="navigation_menu">"ナビゲーションメニュー"</string>
+    <string msgid="6610465462668679431" name="not_selected">"未選択"</string>
+    <string msgid="6573031135582639649" name="not_set">"未設定"</string>
+    <string msgid="875452955155264703" name="off">"オフ"</string>
+    <string msgid="8655164131929253426" name="on">"オン"</string>
     <string name="password_toggle_content_description">パスワードを表示</string>
+    <string msgid="6685851473431805375" name="preference_copied">"「<ns1:g id="SUMMARY">%1$s</ns1:g>」をクリップボードにコピーしました。"</string>
+    <string msgid="5941395253238309765" name="range_end">"範囲の末尾"</string>
+    <string msgid="7097486360902471446" name="range_start">"範囲の先頭"</string>
     <string name="reverseSyncFailed">WARNING: %s will not sync.</string>
     <string name="reverseSyncFilesWarning1">1 ファイル</string>
     <string name="reverseSyncFilesWarningN">%d ファイル</string>
     <string name="reverseSyncWarnings">WARNING: %s with errors.</string>
     <string msgid="6264217191555673260" name="search_menu_title">"検索"</string>
+    <string name="searchview_clear_text_content_description">テキストを消去</string>
+    <string name="searchview_navigation_content_description">戻る</string>
+    <string msgid="6043586758067023" name="selected">"選択済み"</string>
     <string name="settingsDebugMode">デバッグログの有効化</string>
     <string name="settingsDeviceNamePrompt">デバイス名：</string>
     <string name="settingsGrantAccess">Grant Access</string>
     <string name="settingsLocate">サーバに接続</string>
     <string name="settingsLocateServerInfo0">このアプリを使う前に、MusicBeeと有線接続をして少なくとも1度同期しておいてください</string>
-    <string name="settingsLocateServerInfo1">Step 1. Ensure PCでMusicBeeを実行しておいてください.そして、デバイスのWifiを有効にしておいてください.</string>
+    <string name="settingsLocateServerInfo1">Step 1. PCでMusicBeeを実行しておいてください.そして、デバイスのWifiを有効にしておいてください.</string>
     <string name="settingsLocateServerInfo2">さらにPCの設定でMusicBeeをファイアフォールを超えて通信可能にしておいてください.</string>
     <string name="settingsLocateServerInfo3">Step 2. 音楽ファイルの保存先を選択してください：</string>
     <string name="settingsLocateServerInfo4">:</string>
@@ -129,7 +173,10 @@
     <string name="settingsStorageSdCard1">SD Card (1)</string>
     <string name="settingsStorageSdCard2">SD Card (2)</string>
     <string name="settingsStorageSettingsPrompt">音楽ファイルの保存場所を選択してください：</string>
+    <string name="side_sheet_accessibility_pane_title">サイドシート</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="9167775378838880170" name="summary_collapsed_preference_list">"<ns1:g id="CURRENT_ITEMS">%1$s</ns1:g>、<ns1:g id="ADDED_ITEMS">%2$s</ns1:g>"</string>
+    <string msgid="2561197295334830845" name="switch_role">"切り替える"</string>
     <string name="syncCancel">キャンセル</string>
     <string name="syncCancelled">同期をキャンセルしました</string>
     <string name="syncCompleted">MusicBeeとの同期は正常終了しました</string>
@@ -142,6 +189,7 @@
     <string name="syncFailUnknownReason">原因不明</string>
     <string name="syncFileActionCopy">コピー中：%s</string>
     <string name="syncFileActionDelete">削除中：%s</string>
+    <string name="syncFileActionReSync">再同期中 : %s</string>
     <string name="syncFromDefault">MusicBeeでの設定通りに</string>
     <string name="syncFromPrompt">Sync from computer:</string>
     <string name="syncMore">もう一度同期</string>
@@ -164,6 +212,8 @@
     <string name="syncToPrompt">Reverse Sync to computer:</string>
     <string name="syncToRatings">レート</string>
     <string name="syncToUsingPlayer">from player:</string>
+    <string msgid="1672349317127674378" name="tab">"タブ"</string>
+    <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g>パーセント。"</string>
     <string name="title_activity_settings">MusicBee Wifi Sync</string>
     <string name="title_activity_settings2">設定</string>
     <string name="title_activity_sync_playlists">プレイリストの同期</string>
@@ -171,4 +221,8 @@
     <string name="title_activity_sync_status">同期状態</string>
     <string name="title_activity_view_error_log">エラーログ</string>
     <string name="title_channel_name">Wifi Syncの状態</string>
+    <string msgid="3765533235322692011" name="tooltip_description">"ツールチップ"</string>
+    <string msgid="3124740595719787496" name="tooltip_label">"ツールチップを表示"</string>
+    <string msgid="3140233346420563315" name="v7_preference_off">"OFF"</string>
+    <string msgid="89551595707643515" name="v7_preference_on">"ON"</string>
 </resources>

@@ -5,16 +5,13 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.*
-import android.database.ContentObserver
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.FileObserver
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
@@ -34,7 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.xml.parsers.SAXParserFactory
-
 
 class WifiSyncService : Service() {
     private val syncFileScanCount = AtomicInteger(0)
@@ -754,10 +750,10 @@ class WifiSyncService : Service() {
                     put(MediaStore.Audio.Media.MIME_TYPE, mimetype)
                     put(MediaStore.Audio.Media.IS_PENDING, false)
                 }
-//                val audioCollection = MediaStore.Audio.Media.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[1])
                 val audioCollection = MediaStore.Audio.Media.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1])
                 var os: OutputStream? = null
-                var breakFlg = false
+                var deleteFlg = false
+                var hitFlg = false
                 try {
                     applicationContext.contentResolver.query(
                         audioCollection,
@@ -779,17 +775,36 @@ class WifiSyncService : Service() {
                             val contentUri: Uri = ContentUris.withAppendedId(
                                 audioCollection, cursor.getString(0).toLong()
                             )
+                            hitFlg = true
                             Log.d("", contentUri.toString())
                             Log.d("", cursor.getString(0))
-                            applicationContext.contentResolver.delete(contentUri, null)
-                            breakFlg = true
+                            if (applicationContext.contentResolver.delete(contentUri, null) > 0) {
+                                deleteFlg = true
+                                break
+                            }
                         }
                         cursor.close()
                     }
                 }catch (ex: Exception) {
                     logError("receiveFile", ex, "file=$filePath")
                 } finally {
-                    if (!breakFlg) {
+                    if (!deleteFlg and hitFlg) {
+                        // Fileを使って削除を試みる
+                        if (deleteByFile()) {
+                            // なんとか消せた成功
+                            syncProgressMessage.set(
+                                String.format(
+                                    getString(R.string.syncFileActionReSync),
+                                    filePath
+                                )
+                            )
+                            writeString(syncStatusOK)
+                            flushWriter()
+                        } else {
+                            // File使っても失敗
+                            Log.d("receiveFile:", "何をやっても消せなかった！")
+                        }
+                    } else if (hitFlg) {
                         syncProgressMessage.set(
                             String.format(
                                 getString(R.string.syncFileActionReSync),
@@ -798,8 +813,8 @@ class WifiSyncService : Service() {
                         )
                         writeString(syncStatusOK)
                         flushWriter()
-                        // return
                     }
+                    // hitFlgがfalseは新規コピーになるからここはスルー
                 }
 
                 try {
@@ -849,7 +864,7 @@ class WifiSyncService : Service() {
                     //     put(MediaStore.Audio.Media.IS_PENDING, false)
                     // }, null, null)
                     // contentResolver.update(mediaUri, values, null, null)
-                    if (!breakFlg) {
+                    if (deleteFlg) {
                         os?.close()
                     }
                 }
