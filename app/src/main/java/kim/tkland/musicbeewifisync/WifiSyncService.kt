@@ -737,6 +737,7 @@ class WifiSyncService : Service() {
                         playlistname = "$playlistname.m3u"
                     }
                     deleteOldPlayList(playlistname, playListCollection)
+                    Thread.sleep(500)
                     receivePlaylist(filePath, fileLength, fileDateModified)
                     return
                 } else {
