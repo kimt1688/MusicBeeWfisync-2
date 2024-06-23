@@ -886,7 +886,7 @@ class WifiSyncService : Service() {
 
         private fun deleteOldPlayList(playListName: String, collection: Uri) {
             var contentUri: Uri? = null
-            var kayPlayListName = playListName.substring(playListName.lastIndexOf('/') + 1)
+            val kayPlayListName = playListName.substring(playListName.lastIndexOf('/') + 1)
 
             applicationContext.contentResolver.query(
                 collection,
@@ -916,7 +916,7 @@ class WifiSyncService : Service() {
             val waitWrite = AutoResetEvent(true)
             val separatorIndex = filePath.lastIndexOf('/') + 1
             val path = filePath.substring(0, separatorIndex)
-            var name = filePath.substring(separatorIndex)
+            val name = filePath.substring(separatorIndex)
 
             val values = ContentValues().apply {
                 put(MediaStore.Audio.Playlists.DISPLAY_NAME, name)
@@ -1156,8 +1156,8 @@ class WifiSyncService : Service() {
         }
 
         private fun filePathToUri(filePath: String): Uri? {
-            var target = ""
             try {
+                val target: String
                 if (WifiSyncServiceSettings.deviceStorageIndex == 1) {
                     target = "/storage/emulated/0/${filePath}"
                     Log.d("Delete Name: ", target)
@@ -1171,7 +1171,7 @@ class WifiSyncService : Service() {
                     throw ArrayIndexOutOfBoundsException("WifiSyncServiceSettings.deviceStorageIndex is out of range.")
                 }
             } catch (ex: Exception) {
-                Log.d("filePathToUri", ex.message!!)
+                //Log.d("filePathToUri", ex.message!!)
                 return null
             }
 
@@ -1198,65 +1198,6 @@ class WifiSyncService : Service() {
                 } while (cursor.moveToNext())
                 cursor.close()
             }
-            val return_uri = ContentUris.withAppendedId(
-                MediaStore.Audio.Media.getContentUri("external"),
-                id
-            )
-            return return_uri
-        }
-
-        private fun folderPathToUri(filePath: String): Uri? {
-            var target = ""
-            try {
-                if (WifiSyncServiceSettings.deviceStorageIndex == 1) {
-                    target = "/storage/emulated/0/${filePath}"
-                    Log.d("Delete Name: ", target)
-                } else if (WifiSyncServiceSettings.deviceStorageIndex == 2) {
-                    target = "/storage/${
-                        MediaStore.getExternalVolumeNames(applicationContext)
-                            .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
-                    }/${filePath}"
-                    Log.d("Delete Name: ", target)
-                } else {
-                    throw ArrayIndexOutOfBoundsException("WifiSyncServiceSettings.deviceStorageIndex is out of range.")
-                }
-            } catch (ex: Exception) {
-                Log.d("folderPathToUri", ex.message!!)
-                return null
-            }
-
-            // targetの下、最下部のフォルダまで、再帰処理して、すべて探索する
-            // 深い階層のフォルダから順に並べて配列化する
-            // folderPathToUri()の戻り値はarray<Uri?>とする
-
-            var id: Long = 0
-            val cr = context.contentResolver
-
-            val basePath = filePath.substring(0, filePath.length -1)
-            val displayName = basePath.substring(basePath.lastIndexOf('/') + 1)
-            val relativePath = basePath.substring(0, basePath.lastIndexOf('/') + 1)
-            Log.d("Delete Folder", "RELATIVE_PATH = $relativePath : DISPLAY_NAME = $displayName")
-
-            val uri = MediaStore.Files.getContentUri("external")
-            val projection = arrayOf(MediaStore.Files.FileColumns._ID, MediaStore.Files.FileColumns.RELATIVE_PATH, MediaStore.Files.FileColumns.DISPLAY_NAME)
-            val selection =
-                "${MediaStore.Files.FileColumns.RELATIVE_PATH} = ? and ${MediaStore.Files.FileColumns.DISPLAY_NAME} = ?"
-            val selectionArgs = arrayOf(relativePath, displayName)
-            // val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
-
-            val cursor = cr.query(
-                uri, projection, selection, selectionArgs, null
-            )
-
-            if (cursor != null) {
-                cursor.moveToFirst()
-                do {
-                    val idIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
-                    id = cursor.getString(idIndex).toLong()
-                } while (cursor.moveToNext())
-                cursor.close()
-            }
-
             val return_uri = ContentUris.withAppendedId(
                 MediaStore.Audio.Media.getContentUri("external"),
                 id
@@ -1336,7 +1277,7 @@ class WifiSyncService : Service() {
                             folderPath
                         )
                     )
-                    if (!storage!!.deleteFolder(applicationContext as WifiSyncApp, folderPathToUri(folderPath)!!)) {
+                    if (!storage!!.deleteFolder(folderPath)) {
                         status = syncStatusFAIL
                     }
                 } catch (ex: Exception) {
@@ -2417,27 +2358,28 @@ internal class FileStorageAccess(
         }
     }
 
-    fun deleteFolder(app: WifiSyncApp, fileUri: Uri): Boolean {
+    fun deleteFolder(app: WifiSyncApp, uris: Array<Uri>): Boolean {
         try {
-            val deleteList = arrayOf(fileUri)
-            Log.d("targetUri:", "Delete target Uri: $fileUri")
+            for (uri in uris) {
+                val deleteList = arrayOf(uri)
+                Log.d("targetUri:", "Delete target Uri: $uri")
 
-            var activity: Activity? = null
-            do {
-                Thread.sleep(50)
-                activity = app.currentActivity
-            } while (activity == null)
+                var activity: Activity? = null
+                do {
+                    Thread.sleep(50)
+                    activity = app.currentActivity
+                } while (activity == null)
 
-            try {
-                MainActivity.delete(activity, deleteList, 777)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return false
+                try {
+                    MainActivity.delete(activity, deleteList, 777)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    return false
+                }
+                return true
             }
-            return true
         } catch (e: Exception) {
             Log.d("deleteFile:", e.message!!)
-
         }
         return false
     }
