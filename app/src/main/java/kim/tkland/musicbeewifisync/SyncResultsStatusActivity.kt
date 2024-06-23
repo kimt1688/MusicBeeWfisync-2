@@ -1,17 +1,27 @@
 package kim.tkland.musicbeewifisync
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
+import android.content.IntentSender.SendIntentException
+import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuCompat
 import com.google.android.material.snackbar.Snackbar
+import java.util.Collections
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     private var syncProgressBar: ProgressBar? = null
@@ -38,8 +48,8 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                     if (WifiSyncService.syncPercentCompleted.get() == -1) {
                         showEndOfSyncInformation()
                     } else {
-                        syncProgressMessage?.let{it.setText(WifiSyncService.syncProgressMessage.get())}
-                        syncProgressBar?.let{it.setProgress(WifiSyncService.syncPercentCompleted.get())}
+                        syncProgressMessage?.text = WifiSyncService.syncProgressMessage.get()
+                        syncProgressBar?.progress = WifiSyncService.syncPercentCompleted.get()
                         timerHandler!!.postDelayed(this, 300)
                     }
                 } catch (ex: Exception) {
@@ -57,6 +67,8 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         super.onDestroy()
     }
 
+    @SuppressLint("MissingSuperCall")
+    @Deprecated("This method has been deprecated in favor of using the\n      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.\n      The OnBackPressedDispatcher controls how back button events are dispatched\n      to one or more {@link OnBackPressedCallback} objects.")
     override fun onBackPressed() {
         // disable back button
     }

@@ -1,130 +1,130 @@
 [
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/layout_activity_sync_status.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/layout/activity_sync_status.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/layout_activity_main.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_main.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-xxxhdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-xxxhdpi/ic_launcher_foreground.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/layout_activity_sync_status.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_sync_status.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/layout_activity_sync_preview.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/layout/activity_sync_preview.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-hdpi_ic_launcher_foreground.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-hdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-mdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-mdpi/ic_launcher_foreground.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-xxhdpi/ic_launcher.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-mdpi_ic_launcher_foreground.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-mdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/layout_activity_playlist_sync.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/layout/activity_playlist_sync.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-xxxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-mdpi/ic_launcher.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-xhdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-xhdpi/ic_launcher_foreground.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-hdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-hdpi/ic_launcher_foreground.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/layout_activity_settings.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_settings.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/layout_row_item_sync_playlist_selector.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/row_item_sync_playlist_selector.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-xxhdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-hdpi/ic_launcher.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/menu_menu_main.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/menu/menu_main.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/menu_menu_sync_status.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/menu/menu_sync_status.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-xhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/layout_row_item_sync_playlist_selector.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/layout/row_item_sync_playlist_selector.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/menu_menu_settings.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/menu/menu_settings.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/menu_menu_main.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/menu/menu_main.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/layout_activity_sync_preview.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_sync_preview.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/layout_activity_view_error_log.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/layout/activity_view_error_log.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/drawable_ic_launcher_round.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/drawable/ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/drawable_ic_launcher_background.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/drawable/ic_launcher_background.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/layout_activity_playlist_sync.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_playlist_sync.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-xxhdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-xxhdpi/ic_launcher_foreground.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-mdpi/ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/layout_row_item_sync_results.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/row_item_sync_results.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/menu_menu_settings.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/menu/menu_settings.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-xxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/menu_menu_sync_status.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/menu/menu_sync_status.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/drawable_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/drawable/ic_launcher_round.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-xhdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/layout_activity_main.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/layout/activity_main.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/drawable_ic_arrow_back.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/drawable/ic_arrow_back.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-hdpi/ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/drawable_ic_arrow_back.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/drawable/ic_arrow_back.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/drawable_ic_launcher_background.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/layout_activity_settings.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/layout/activity_settings.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/layout_activity_view_error_log.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_view_error_log.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/drawable_ic_arrow_forward.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/drawable/ic_arrow_forward.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/drawable_ic_arrow_forward.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/drawable/ic_arrow_forward.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-35:/layout_row_item_sync_results.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-37:/layout/row_item_sync_results.xml"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-71:/mipmap-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-73:/mipmap-xxxhdpi/ic_launcher_foreground.png"
     }
 ]

@@ -159,7 +159,8 @@
                     android:id="@+id/syncPlayerGoneMad"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:checked="true"
+                    android:clickable="true"
+                    android:onClick="onGoneMADCheckClick"
                     android:text="GoneMAD"
                     android:textSize="20sp" />
 

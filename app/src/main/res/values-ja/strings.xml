@@ -9,7 +9,7 @@
     <string name="title_channel_name">Wifi Syncの状態</string>
     <string name="syncNotificationInfo">ファイルとプレイリストをMusicBeeから同期する。</string>
     <string name="settingsLocateServerInfo0">このアプリを使う前に、MusicBeeと有線接続をして少なくとも1度同期しておいてください</string>
-    <string name="settingsLocateServerInfo1">Step 1. Ensure PCでMusicBeeを実行しておいてください.そして、デバイスのWifiを有効にしておいてください.</string>
+    <string name="settingsLocateServerInfo1">Step 1. PCでMusicBeeを実行しておいてください.そして、デバイスのWifiを有効にしておいてください.</string>
     <string name="settingsLocateServerInfo2">さらにPCの設定でMusicBeeをファイアフォールを超えて通信可能にしておいてください.</string>
     <string name="settingsLocateServerInfo3">Step 2. 音楽ファイルの保存先を選択してください：</string>
     <string name="settingsLocateServerInfo4">:</string>

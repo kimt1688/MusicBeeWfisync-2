@@ -1,25 +1,28 @@
 package kim.tkland.musicbeewifisync
 
+import android.app.Activity
 import android.app.ActivityManager.TaskDescription
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RadioGroup
-import android.widget.TextView.OnEditorActionListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.net.toUri
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuCompat
+import java.util.Collections
 
 
 class MainActivity : WifiSyncBaseActivity() {
@@ -30,8 +33,7 @@ class MainActivity : WifiSyncBaseActivity() {
     private var syncStartButton: LinearLayout? = null
     private var serverStatusThread: Thread? = null
     private var syncPlayerGoneMad: CheckBox? = null
-    private val PICK_XML_FILE = 75
-    private var isGotAccessPermission: Boolean = false
+    private val PERMISSION_READ_EXTERNAL_STORAGE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +59,6 @@ class MainActivity : WifiSyncBaseActivity() {
             startActivity(intent)
         } else {
             setContentView(R.layout.activity_main)
-            // PermissionsHandler.demandInternalStorageAccessPermissions(this)
             syncPreviewButton = findViewById(R.id.syncPreviewButton)
             syncStartButton = findViewById(R.id.syncStartButton)
             syncToPlaylists = findViewById(R.id.syncToPlaylists)
@@ -72,14 +73,10 @@ class MainActivity : WifiSyncBaseActivity() {
             val syncToRatings = findViewById<CheckBox>(R.id.syncToRatings)
             val syncToPlayCounts = findViewById<CheckBox>(R.id.syncToPlayCounts)
             val syncToUsingPlayer = findViewById<RadioGroup>(R.id.syncToUsingPlayer)
-            val reverseSyncPlayer = findViewById<CheckBox>(R.id.syncPlayerGoneMad)
-            var playlistsSupported = true
-            //if (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) {
-            playlistsSupported = true
+            val playlistsSupported = true
             syncToUsingPlayer.check(R.id.syncPlayerGoneMad)
-            //}
             syncToUsingPlayer.setOnCheckedChangeListener { _, _ ->
-                if (reverseSyncPlayer.isChecked) {
+                if (syncPlayerGoneMad!!.isChecked) {
                     WifiSyncServiceSettings.reverseSyncPlaylistsPath = "/gmmp/playlists"
                     WifiSyncServiceSettings.reverseSyncPlayer =
                         WifiSyncServiceSettings.PLAYER_GONEMAD
@@ -89,18 +86,18 @@ class MainActivity : WifiSyncBaseActivity() {
             }
             setPlaylistsEnabled(playlistsSupported)
             syncToPlaylists?.let {
-                it.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, _ ->
+                it.setOnCheckedChangeListener { _, _ ->
                     WifiSyncServiceSettings.reverseSyncPlaylists = syncToPlaylists?.isChecked!!
                     WifiSyncServiceSettings.saveSettings(mainWindow)
-                })
+                }
             }
             syncToPlaylistsPath?.let {
-                it.setOnEditorActionListener(OnEditorActionListener { _, _, _ ->
+                it.setOnEditorActionListener { _, _, _ ->
                     WifiSyncServiceSettings.reverseSyncPlaylistsPath =
                         syncToPlaylistsPath?.getText()?.toString()!!
                     WifiSyncServiceSettings.saveSettings(mainWindow)
                     false
-                })
+                }
             }
             syncToRatings.isChecked = WifiSyncServiceSettings.reverseSyncRatings
             syncToRatings.setOnCheckedChangeListener { _, _ ->
@@ -112,9 +109,23 @@ class MainActivity : WifiSyncBaseActivity() {
                 WifiSyncServiceSettings.reverseSyncPlayCounts = syncToPlayCounts.isChecked
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
-            if (syncPlayerGoneMad!!.isChecked)
-                WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+
+            (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD).also { syncPlayerGoneMad!!.isChecked = it }
             checkServerStatus()
+        }
+        val sharedPref = getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
+        val uriStr = sharedPref.getString("accesseduri", "")
+        if (uriStr.isNullOrEmpty()) {
+            launcher.launch(setLaunchIntent())
+        }
+        requestPermissionForReadWrite(this)
+
+        if (!MediaStore.canManageMedia(this)) {
+            startActivity(
+                Intent(android.provider.Settings.ACTION_REQUEST_MANAGE_MEDIA)
+                    .setData(Uri.parse("package:${packageName}"))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
         }
     }
 
@@ -161,20 +172,52 @@ class MainActivity : WifiSyncBaseActivity() {
         } else {
             // アクティビティ結果OK
             try {
-                result.data?.data?.also { uri : Uri ->
-                    contentResolver.takePersistableUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    }
+                val mUri = result.data?.data
+                clearAllPersistedUriPermissions(applicationContext)
+                contentResolver.takePersistableUriPermission(
+                    mUri!!, Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                val preferences = applicationContext.getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", Context.MODE_PRIVATE)
+                preferences.edit().putString("accesseduri", mUri.toString()).commit()
             } catch (e: Exception) {
+                Log.d("launcher", e.message!!)
             }
         }
+    }
+
+    private fun clearAllPersistedUriPermissions(context: Context) {
+        try {
+            val contentResolver = context.contentResolver
+            for (uriPermission in contentResolver.persistedUriPermissions) {
+                applicationContext.contentResolver.releasePersistableUriPermission(
+                    /* uri = */       uriPermission.uri,
+                    /* modeFlags = */ Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            }
+        } catch (e: Throwable) {
+            // just to be safe...
+            e.printStackTrace()
+        }
+    }
+
+    private fun requestPermissionForReadWrite(context: Context) {
+        ActivityCompat.requestPermissions(
+            context as Activity,
+            arrayOf(
+                android.Manifest.permission.READ_MEDIA_AUDIO,
+                android.Manifest.permission.MANAGE_MEDIA,
+                android.Manifest.permission.ACCESS_MEDIA_LOCATION,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ), PERMISSION_READ_EXTERNAL_STORAGE
+        )
     }
 
     private fun setLaunchIntent(): Intent {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "text/xml"
-            putExtra(DocumentsContract.EXTRA_INITIAL_URI, "/storage/emulated/0/gmmp/".toUri())
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, "/storage/emulated/0/gmmp")
         }
         return intent
     }
@@ -184,7 +227,6 @@ class MainActivity : WifiSyncBaseActivity() {
             syncPreviewButton!!.isEnabled = false
             try {
                 WifiSyncServiceSettings.syncCustomFiles = false
-                launcher.launch(setLaunchIntent())
                 syncPreview = true
                 WifiSyncService.startSynchronisation(this, 0, true, false)
             } finally {
@@ -199,7 +241,6 @@ class MainActivity : WifiSyncBaseActivity() {
             try {
                 WifiSyncServiceSettings.syncCustomFiles = false
                 syncPreview = false
-                launcher.launch(setLaunchIntent())
                 WifiSyncService.startSynchronisation(this, 0, false, false)
             }catch (ex:Exception){
                 Log.d("onSyncStartButtonClick", ex.message!!)
@@ -207,6 +248,12 @@ class MainActivity : WifiSyncBaseActivity() {
                 syncStartButton!!.isEnabled = true
             }
         }
+    }
+
+    fun onGoneMADCheckClick(view: View) {
+        if (syncPlayerGoneMad!!.isChecked) {
+            WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+        } else WifiSyncServiceSettings.reverseSyncPlayer = 0
     }
 
     private val isConfigOK: Boolean
@@ -272,7 +319,40 @@ class MainActivity : WifiSyncBaseActivity() {
         serverStatusThread!!.start()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return super.onOptionsItemSelected(item)
+    companion object {
+        @Throws(
+            //SecurityException::class,
+            //SendIntentException::class,
+            //IllegalArgumentException::class
+            Exception::class
+        )
+        fun delete(activity: Activity, uriList: Array<Uri>, requestCode: Int) {
+            val resolver = activity.contentResolver
+
+            // WARNING: if the URI isn't a MediaStore Uri and specifically
+            // only for media files (images, videos, audio) then the request
+            // will throw an IllegalArgumentException, with the message:
+            // 'All requested items must be referenced by specific ID'
+
+            // No need to handle 'onActivityResult' callback, when the system returns
+            // from the user permission prompt the files will be already deleted.
+            // Multiple 'owned' and 'not-owned' files can be combined in the
+            // same batch request. The system will automatically delete them
+            // using the same prompt dialog, making the experience homogeneous.
+
+            val list: MutableList<Uri?> = ArrayList()
+            Collections.addAll(list, *uriList)
+
+            val pendingIntent = MediaStore.createDeleteRequest(resolver, list)
+            activity.startIntentSenderForResult(
+                pendingIntent.intentSender,
+                requestCode,
+                null,
+                0,
+                0,
+                0,
+                null
+            )
+        }
     }
 }

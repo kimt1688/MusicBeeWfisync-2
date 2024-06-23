@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 81,
-      "versionName": "2.5.0",
+      "versionCode": 89,
+      "versionName": "2.5.7",
       "outputFile": "app-debug.apk"
     }
   ],
