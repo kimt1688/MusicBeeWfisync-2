@@ -1,18 +1,27 @@
 package kim.tkland.musicbeewifisync
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
+import android.content.IntentSender.SendIntentException
+import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuCompat
 import com.google.android.material.snackbar.Snackbar
+import java.util.Collections
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     private var syncProgressBar: ProgressBar? = null
