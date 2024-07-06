@@ -321,6 +321,7 @@ class MainActivity : WifiSyncBaseActivity() {
         serverStatusThread!!.start()
     }
 
+    /*
     companion object {
         @Throws(
             //SecurityException::class,
@@ -386,4 +387,5 @@ class MainActivity : WifiSyncBaseActivity() {
             )
         }
     }
+     */
 }

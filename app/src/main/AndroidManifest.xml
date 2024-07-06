@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="kim.tkland.musicbeewifisync">
-    <uses-permission android:name="android.permission.MANAGE_MEDIA" />
+    xmlns:tools="http://schemas.android.com/tools"
+    package="kim.tkland.musicbeewifisync"
+    tools:ignore="ImpliedTouchscreenHardware,MissingLeanbackLauncher,MissingLeanbackSupport">
+    <uses-permission android:name="android.permission.MANAGE_MEDIA"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
@@ -20,6 +23,7 @@
 
         <service
             android:name="kim.tkland.musicbeewifisync.WifiSyncService"
+            android:foregroundServiceType="dataSync"
             android:exported="false" />
 
         <activity

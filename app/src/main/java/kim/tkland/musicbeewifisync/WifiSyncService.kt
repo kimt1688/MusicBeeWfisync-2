@@ -1,12 +1,13 @@
 package kim.tkland.musicbeewifisync
 
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.*
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -88,7 +89,7 @@ class WifiSyncService : Service() {
             pendingStopIntent
         )
         builder.addAction(stopAction)
-        startForeground(FOREGROUND_ID, builder.build())
+        startForeground(FOREGROUND_ID, builder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -833,7 +834,7 @@ class WifiSyncService : Service() {
                 }finally {
                     //values.clear()
                     //values = ContentValues().apply {
-                    //    put(MediaStore.Audio.Media.IS_PENDING, true)
+                    //    put(MediaStore.Audio.Media.IS_PENDING, false)
                     //}
                     //contentResolver.update(contentUri!!, values, null, null)
                     os?.close()
@@ -987,9 +988,9 @@ class WifiSyncService : Service() {
                 }
                 //values.clear()
                 //values = ContentValues().apply {
-                //    put(MediaStore.Audio.Media.IS_PENDING, true)
+                //    put(MediaStore.Audio.Media.IS_PENDING, false)
                 //}
-                //contentResolver.update(contentUri!!, values, null, null)
+                //contentResolver.update(contentUri, values, null)
             } catch (ex: Exception) {
                 logError("receivePlaylist", ex.toString())
             } finally {
@@ -1172,38 +1173,22 @@ class WifiSyncService : Service() {
             flushWriter()
         }
 
-        private fun filePathToUri(filePath: String): Uri? {
-            try {
-                val target: String
-                if (WifiSyncServiceSettings.deviceStorageIndex == 1) {
-                    target = "/storage/emulated/0/${filePath}"
-                    Log.d("Delete Name: ", target)
-                } else if (WifiSyncServiceSettings.deviceStorageIndex == 2) {
-                    target = "/storage/${
-                        MediaStore.getExternalVolumeNames(applicationContext)
-                            .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
-                    }/${filePath}"
-                    Log.d("Delete Name: ", target)
-                } else {
-                    throw ArrayIndexOutOfBoundsException("WifiSyncServiceSettings.deviceStorageIndex is out of range.")
-                }
-            } catch (ex: Exception) {
-                //Log.d("filePathToUri", ex.message!!)
-                return null
-            }
-
+        private fun filePathToUri(filePath: String): Uri {
             var id: Long = 0
             val cr = context.contentResolver
 
             val uri = MediaStore.Files.getContentUri("external")
             val projection =
-                arrayOf(MediaStore.Files.FileColumns._ID, MediaStore.Files.FileColumns.DISPLAY_NAME)
-            val selection = MediaStore.Files.FileColumns.DISPLAY_NAME
-            val selectionArgs = arrayOf(filePath.substring(filePath.lastIndexOf('/') + 1))
+                arrayOf(MediaStore.Files.FileColumns._ID, MediaStore.Files.FileColumns.DISPLAY_NAME, MediaStore.Files.FileColumns.RELATIVE_PATH)
+            //val selection = MediaStore.Files.FileColumns.DISPLAY_NAME
+            val selectionArgs = arrayOf(
+                filePath.substring(filePath.lastIndexOf('/') + 1),
+                filePath.substring(0, filePath.lastIndexOf('/') + 1),
+            )
 
             val cursor = cr.query(
                 uri, projection,
-                "$selection = ?", selectionArgs, null
+                "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ? and ${MediaStore.Files.FileColumns.RELATIVE_PATH} = ?", selectionArgs, null
             )
 
             if (cursor != null) {
@@ -1225,14 +1210,15 @@ class WifiSyncService : Service() {
         private fun deleteFiles() {
             syncPercentCompleted.set(readShort().toInt())
             readToEndOfCommand()
-            var status: String = syncStatusOK
+            val status: String = syncStatusOK
+            var deleteUriList: MutableList<Uri> = ArrayList()
             while (true) {
                 val filePath = readString()
                 if (filePath.isEmpty()) {
                     break
                 }
                 if (WifiSyncServiceSettings.debugMode) {
-                    logInfo("deleteFiles", "Delete: $filePath")
+                    Log.d("deleteFiles", "Delete: $filePath")
                 }
                 var failMessage: String? = null
                 try {
@@ -1245,13 +1231,19 @@ class WifiSyncService : Service() {
                     if (WifiSyncServiceSettings.debugMode) {
                         logInfo("deleteFiles", "Call deleteFile: $filePath")
                     }
-                    val _application  = (application as WifiSyncApp)
-                    if (!storage!!.deleteFile(_application, filePathToUri(filePath)!!)) {
-                        status = syncStatusFAIL
-                        failMessage = getString(R.string.syncFailUnknownReason)
-                    }
+                    //val _application  = (application as WifiSyncApp)
+                    //if (!storage!!.deleteFile(_application, filePathToUri(filePath)!!)) {
+                    //    status = syncStatusFAIL
+                    //    failMessage = getString(R.string.syncFailUnknownReason)
+                    //}
+                    deleteUriList.add(filePathToUri(filePath))
                     writeString(status)
                     flushWriter()
+                    if (deleteUriList.size > 50) {
+                        val app = (application as WifiSyncApp)
+                        storage!!.deleteFile(app, deleteUriList)
+                        deleteUriList = ArrayList()
+                    }
                 } catch (ex: Exception) {
                     logError("deleteFile", ex, "file=$filePath")
                     if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
@@ -1270,6 +1262,10 @@ class WifiSyncService : Service() {
                         )
                     )
                 }
+            }
+            if (deleteUriList.size > 0) {
+                val app = (application as WifiSyncApp)
+                storage!!.deleteFile(app, deleteUriList)
             }
         }
 
@@ -2311,19 +2307,11 @@ internal class FileStorageAccess(
         return false
     }
 
-    fun deleteFile(app: WifiSyncApp, fileUri: Uri): Boolean {
+    fun deleteFile(app: WifiSyncApp, fileUris: List<Uri>): Boolean {
         try {
-            val deleteList = arrayOf(fileUri)
-            Log.d("targetUri:", "Delete target Uri: $fileUri")
-
-            var activity: Activity? = null
-            do {
-                 Thread.sleep(/* millis = */ 100)
-                 activity = app.currentActivity
-            } while (activity == null)
-
             try {
-                MainActivity.delete(activity, deleteList, 777)
+                Log.d("deleteFile", "Called deleteFile, Urls:${fileUris.size}")
+                app.delete(fileUris.toTypedArray(), 777)
             } catch (e: Exception) {
                 e.printStackTrace()
                 return false
@@ -2341,14 +2329,8 @@ internal class FileStorageAccess(
             val updateList = arrayOf(fileUri)
             Log.d("targetUri:", "Update target Uri: $fileUri")
 
-            var activity: Activity? = null
-            do {
-                Thread.sleep(/* millis = */ 100)
-                activity = app.currentActivity
-            } while (activity == null)
-
             try {
-                MainActivity.update(activity, updateList, 888)
+                app.update(updateList, 888)
             } catch (e: Exception) {
                 e.printStackTrace()
                 return false
