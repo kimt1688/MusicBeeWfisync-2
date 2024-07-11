@@ -6,7 +6,6 @@ import android.app.Application.ActivityLifecycleCallbacks
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import kotlinx.coroutines.sync.Mutex
 import java.lang.Thread.sleep
 import java.util.Collections
 
@@ -79,7 +78,7 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
                 0,
                 null
             )
-            sleep(1000)
+            sleep(300)
         }
     }
 }

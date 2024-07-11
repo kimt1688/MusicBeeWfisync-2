@@ -118,6 +118,9 @@ class MainActivity : WifiSyncBaseActivity() {
             if (uriStr.isNullOrEmpty()) {
                 launcher.launch(setLaunchIntent())
             }
+        } else {
+            syncPlayerGoneMad!!.isChecked = false
+            syncPlayerGoneMad!!.isEnabled = false
         }
 
         requestPermissionForReadWrite(this)
@@ -320,72 +323,4 @@ class MainActivity : WifiSyncBaseActivity() {
         }
         serverStatusThread!!.start()
     }
-
-    /*
-    companion object {
-        @Throws(
-            //SecurityException::class,
-            //SendIntentException::class,
-            //IllegalArgumentException::class
-            Exception::class
-        )
-        fun delete(activity: Activity, uriList: Array<Uri>, requestCode: Int) {
-            val resolver = activity.contentResolver
-
-            // WARNING: if the URI isn't a MediaStore Uri and specifically
-            // only for media files (images, videos, audio) then the request
-            // will throw an IllegalArgumentException, with the message:
-            // 'All requested items must be referenced by specific ID'
-
-            // No need to handle 'onActivityResult' callback, when the system returns
-            // from the user permission prompt the files will be already deleted.
-            // Multiple 'owned' and 'not-owned' files can be combined in the
-            // same batch request. The system will automatically delete them
-            // using the same prompt dialog, making the experience homogeneous.
-
-            val list: MutableList<Uri?> = ArrayList()
-            Collections.addAll(list, *uriList)
-
-            val pendingIntent = MediaStore.createDeleteRequest(resolver, list)
-            activity.startIntentSenderForResult(
-                pendingIntent.intentSender,
-                requestCode,
-                null,
-                0,
-                0,
-                0,
-                null
-            )
-        }
-
-        fun update(activity: Activity, uriList: Array<Uri>, requestCode: Int) {
-            val resolver = activity.contentResolver
-
-            // WARNING: if the URI isn't a MediaStore Uri and specifically
-            // only for media files (images, videos, audio) then the request
-            // will throw an IllegalArgumentException, with the message:
-            // 'All requested items must be referenced by specific ID'
-
-            // No need to handle 'onActivityResult' callback, when the system returns
-            // from the user permission prompt the files will be already deleted.
-            // Multiple 'owned' and 'not-owned' files can be combined in the
-            // same batch request. The system will automatically delete them
-            // using the same prompt dialog, making the experience homogeneous.
-
-            val list: MutableList<Uri?> = ArrayList()
-            Collections.addAll(list, *uriList)
-
-            val pendingIntent = MediaStore.createWriteRequest(resolver, list)
-            activity.startIntentSenderForResult(
-                pendingIntent.intentSender,
-                requestCode,
-                null,
-                0,
-                0,
-                0,
-                null
-            )
-        }
-    }
-     */
 }
