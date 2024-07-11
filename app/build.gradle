@@ -7,8 +7,8 @@ android {
     defaultConfig {
         applicationId "kim.tkland.musicbeewifisync"
         minSdk 34
-        versionCode 94
-        versionName '2.6.1'
+        versionCode 96
+        versionName '2.6.3'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -17,6 +17,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            android.buildTypes.release.ndk.debugSymbolLevel = 'SYMBOL_TABLE'
         }
     }
     compileOptions {
@@ -33,6 +34,7 @@ android {
         jvmTarget = '1.8'
     }
     namespace 'kim.tkland.musicbeewifisync'
+    ndkVersion '27.0.11902837 rc2'
 }
 
 dependencies {

@@ -114,13 +114,16 @@ class MainActivity : WifiSyncBaseActivity() {
         }
         val sharedPref = getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
         val uriStr = sharedPref.getString("accesseduri", "")
-        if (File("/storage/emulated/0/gmmp/stats.xml").exists()) {
+        val stats = File("/storage/emulated/0/gmmp/stats.xml")
+        if (stats.exists()) {
             if (uriStr.isNullOrEmpty()) {
                 launcher.launch(setLaunchIntent())
             }
         } else {
+            /* 2024/7/12 RELEASE まで封印
             syncPlayerGoneMad!!.isChecked = false
             syncPlayerGoneMad!!.isEnabled = false
+             */
         }
 
         requestPermissionForReadWrite(this)

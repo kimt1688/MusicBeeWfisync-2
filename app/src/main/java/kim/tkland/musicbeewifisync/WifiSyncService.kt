@@ -1364,6 +1364,7 @@ class WifiSyncService : Service() {
         @Throws(Exception::class)
         private fun sendStats() {
             readToEndOfCommand()
+
             try {
                 var cachedStatsLookup: FileStatsMap
                 val statsCacheFile = File(filesDir, "CachedStats.dat")
@@ -1387,6 +1388,12 @@ class WifiSyncService : Service() {
                             }
                         }
                     }
+                }
+                if (settingsReverseSyncPlayer == 0) {
+                    writeString(syncEndOfData)
+                    writeString(syncStatusOK)
+                    flushWriter()
+                    return
                 }
                 var latestStats: ArrayList<FileStatsInfo>? = null
                 when (settingsReverseSyncPlayer) {
