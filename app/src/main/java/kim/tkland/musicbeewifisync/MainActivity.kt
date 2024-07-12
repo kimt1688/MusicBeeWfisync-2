@@ -237,6 +237,8 @@ class MainActivity : WifiSyncBaseActivity() {
                 WifiSyncServiceSettings.syncCustomFiles = false
                 syncPreview = true
                 WifiSyncService.startSynchronisation(this, 0, true, false)
+            }catch (ex:Exception){
+                Log.d("onSyncPreviewButtonClick", ex.message!!)
             } finally {
                 syncPreviewButton!!.isEnabled = true
             }
