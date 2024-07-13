@@ -3,12 +3,14 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdk 34
+    namespace 'kim.tkland.musicbeewifisync'
+    ndkVersion '27.0.11902837 rc2'
 
     defaultConfig {
         applicationId "kim.tkland.musicbeewifisync"
-        minSdk 33
-        versionCode 90
-        versionName '2.5.8'
+        minSdk 34
+        versionCode 97
+        versionName '2.6.4'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -17,6 +19,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            android.buildTypes.release.ndk.debugSymbolLevel = 'SYMBOL_TABLE'
         }
     }
     compileOptions {
@@ -32,8 +35,6 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    namespace 'kim.tkland.musicbeewifisync'
-
 }
 
 dependencies {
@@ -52,20 +53,21 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect:2.0.0'
     implementation 'androidx.leanback:leanback:1.0.0'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    testImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    testImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.2'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.3'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3'
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.activity:activity-ktx:1.9.0"
-    implementation 'androidx.fragment:fragment-ktx:1.8.0'
+    implementation 'androidx.fragment:fragment-ktx:1.8.1'
     implementation "androidx.compose.runtime:runtime:1.6.8"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1'
     implementation "androidx.activity:activity-compose:1.9.0"
     implementation "androidx.preference:preference-ktx:1.2.1"
     implementation "androidx.documentfile:documentfile:1.0.1"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
     def composeBom = platform('androidx.compose:compose-bom:2024.06.00')
     implementation composeBom
     androidTestImplementation composeBom

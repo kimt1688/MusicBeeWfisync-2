@@ -17,7 +17,6 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuCompat
 
@@ -107,6 +106,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         }
         // パーミッションの付与確認
+        /*
         if (allPermissionsGranted()) {
             // Toast.makeText(this,"既にパーミッションが許可されています", Toast.LENGTH_LONG).show()
         } else {
@@ -114,6 +114,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
                 this, REQUIRED_PERMISSION, REQUEST_CODE_PERMISSION
             )
         }
+         */
     }
 
     companion object {
