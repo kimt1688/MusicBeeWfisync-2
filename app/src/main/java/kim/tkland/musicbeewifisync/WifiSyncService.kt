@@ -1,5 +1,7 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.attr.mimeType
+import android.R.attr.name
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -30,11 +32,13 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.DefaultHandler
 import java.io.*
 import java.net.*
+import java.nio.file.Files.size
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.xml.parsers.SAXParserFactory
+
 
 class WifiSyncService : Service() {
     private val syncFileScanCount = AtomicInteger(0)
@@ -1594,6 +1598,7 @@ class WifiSyncService : Service() {
             return null
         }
 
+        @SuppressLint("Recycle")
         @Throws(Exception::class)
         private fun loadGoneMadStats(): ArrayList<FileStatsInfo>? {
             val sharedPref = getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
@@ -1633,13 +1638,18 @@ class WifiSyncService : Service() {
             } finally {
                 observer.stopWatching()
             }
-            val importdb: InputStream = FileInputStream((applicationContext.contentResolver?.openFileDescriptor(targetUri, "r"))!!.fileDescriptor)
-            //FileInputStream(statsFile).use { stream ->
-                val handler = GmmpStatsXmlHandler(storage!!.storageRootPath)
-                SAXParserFactory.newInstance().newSAXParser().parse(importdb, handler)
-                return handler.stats
-            //}
 
+            lateinit var importdb: InputStream
+            val fcd = contentResolver.openFileDescriptor(targetUri,"r")
+            if (fcd != null) {
+                FileInputStream(fcd.fileDescriptor).also { importdb = it }
+                importdb.use {
+                    val handler = GmmpStatsXmlHandler(storage!!.storageRootPath)
+                    SAXParserFactory.newInstance().newSAXParser().parse(it, handler)
+                    return handler.stats
+                }
+            }
+            return null
         }
 
         inner class GmmpStatsXmlHandler internal constructor(val storageRootPath: String) :

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.ActivityManager.TaskDescription
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.DocumentsContract
@@ -112,22 +113,25 @@ class MainActivity : WifiSyncBaseActivity() {
             (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD).also { syncPlayerGoneMad!!.isChecked = it }
             checkServerStatus()
         }
-        val sharedPref = getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
-        val uriStr = sharedPref.getString("accesseduri", "")
-        val stats = File("/storage/emulated/0/gmmp/stats.xml")
-        if (stats.exists()) {
-            if (uriStr.isNullOrEmpty()) {
-                launcher.launch(setLaunchIntent())
-            }
-        } else {
-            /* 2024/7/12 RELEASE まで封印
+
+        if (checkSelfPermission(android.Manifest.permission.MANAGE_MEDIA) == PackageManager.PERMISSION_DENIED) {
+                requestPermissionForReadWrite(this)
+
+                val sharedPref =
+                    getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
+                val uriStr = sharedPref.getString("accesseduri", "")
+                val stats = File("/storage/emulated/0/gmmp/stats.xml")
+                if (stats.exists()) {
+                    if (uriStr.isNullOrEmpty()) {
+                        launcher.launch(setLaunchIntent())
+                    }
+                } else {
+                    /* 2024/7/12 RELEASE まで封印
             syncPlayerGoneMad!!.isChecked = false
             syncPlayerGoneMad!!.isEnabled = false
              */
-        }
-
-        requestPermissionForReadWrite(this)
-
+                }
+            }
         if (!MediaStore.canManageMedia(this)) {
             startActivity(
                 Intent(android.provider.Settings.ACTION_REQUEST_MANAGE_MEDIA)
