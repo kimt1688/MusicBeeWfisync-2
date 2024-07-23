@@ -4,48 +4,49 @@ import android.R
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
-import android.os.Build
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.*
 
+
 internal object Dialog {
     @JvmStatic
     fun showOkCancel(parentActivity: Activity, prompt: String?): Int {
-        val dialogWait = java.lang.Object()
+        val dialogWait = Object()
         val result = AtomicInteger()
-        parentActivity.runOnUiThread(object : Runnable {
-            override fun run() {
-                val errorDialog = AlertDialog.Builder(parentActivity)
-                errorDialog.setMessage(prompt)
-                errorDialog.setNegativeButton(
-                    R.string.cancel,
-                    DialogInterface.OnClickListener { _, _ ->
-                        result.set(R.string.cancel)
+        parentActivity.runOnUiThread {
+            val errorDialog = AlertDialog.Builder(parentActivity)
+            errorDialog.setMessage(prompt)
+            errorDialog.setNegativeButton(
+                R.string.cancel,
+                DialogInterface.OnClickListener { _, _ ->
+                    result.set(R.string.cancel)
+                    synchronized(dialogWait) { dialogWait.notifyAll() }
+                })
+            errorDialog.setPositiveButton(
+                R.string.ok,
+                object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface, which: Int) {
+                        result.set(R.string.ok)
                         synchronized(dialogWait) { dialogWait.notifyAll() }
-                    })
-                errorDialog.setPositiveButton(
-                    R.string.ok,
-                    object : DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface, which: Int) {
-                            result.set(R.string.ok)
-                            synchronized(dialogWait) { dialogWait.notifyAll() }
-                        }
-                    })
-                errorDialog.setCancelable(false)
-                errorDialog.show()
-            }
-        })
+                    }
+                })
+            errorDialog.setCancelable(false)
+            errorDialog.show()
+        }
         synchronized(dialogWait) {
             try {
                 dialogWait.wait()
             } catch (ex: Exception) {
+                Log.d("showOkCancel", ex.message!!)
             }
         }
         return result.get()
@@ -65,6 +66,11 @@ internal object ErrorHandler {
             try {
                 //folderPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
                 val file = File(folderPath, "MusicBeeWifiSyncErrorLog.txt")
+                try {
+                    FileOutputStream(file).channel.truncate(0).close()
+                } catch (e: IOException) { /* log and ignore */
+                    Log.d("ErrorHandler", e.message!!)
+                }
                 fileHandler = FileHandler(file.path)
                 fileHandler!!.formatter = LogFormatter()
                 logger.addHandler(fileHandler as Handler)
@@ -80,7 +86,7 @@ internal object ErrorHandler {
             try {
                 val errorLog = File(folderPath, "MusicBeeWifiSyncErrorLog.txt")
                 FileInputStream(errorLog).use { stream ->
-                    val buffer: ByteArray = ByteArray(errorLog.length().toInt())
+                    val buffer = ByteArray(errorLog.length().toInt())
                     stream.read(buffer, 0, buffer.size)
                     return String(buffer, StandardCharsets.UTF_8)
                 }
@@ -123,7 +129,7 @@ internal object ErrorHandler {
         }
     }
 
-    private class LogFormatter() : SimpleFormatter() {
+    private class LogFormatter : SimpleFormatter() {
         private var writeHeader = true
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
         private val timeFormat = SimpleDateFormat("HH:mm:ss")
@@ -143,7 +149,7 @@ internal object ErrorHandler {
     }
 }
 
-internal class CaseInsensitiveMap() : HashMap<String, String?>() {
+internal class CaseInsensitiveMap : HashMap<String, String?>() {
     override fun put(key: String, value: String?): String? {
         return super.put(key.lowercase(), value)
     }

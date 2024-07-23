@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,15 +19,15 @@ class ViewErrorLogActivity : AppCompatActivity() {
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
         errorText = findViewById(R.id.errorText)
-        errorText?.let{it.setMovementMethod(ScrollingMovementMethod())}
+        errorText?.let{ it.movementMethod = ScrollingMovementMethod() }
         val thread = Thread {
             val errorLog = ErrorHandler.log
             runOnUiThread {
-                if (errorLog == null || errorLog.length == 0) {
-                    errorText?.let{it.setText(R.string.errorNone)}
+                if (errorLog.isNullOrEmpty()) {
+                    errorText?.let{ it.text = R.string.errorNone.toString() }
                     findViewById<View>(R.id.copyToClipboardButton).isEnabled = false
                 } else {
-                    errorText?.let{it.setText(errorLog)}
+                    errorText?.let{ it.text = errorLog }
                 }
             }
         }
@@ -57,6 +58,7 @@ class ViewErrorLogActivity : AppCompatActivity() {
                 )
             )
         } catch (ex: Exception) {
+            Log.d("copyToClipboardButton_Click", ex.message!!)
         }
     }
 }

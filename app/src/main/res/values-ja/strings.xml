@@ -81,5 +81,7 @@
     <string name="menuWifiFullSync">完全同期</string>
     <string name="menuWifiPlaylistSync">プレイリスト同期</string>
     <string name="errorInvalidIp">This is not a valid IP address</string>
+    <string name="statsSelect">Statsファイル選択</string>
+    <string name="statsSelectMessage">GoneMADのstats.xmlファイルを選択して下さい.</string>
     <!-- Strings used for fragments for navigation -->
 </resources>
