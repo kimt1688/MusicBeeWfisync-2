@@ -3,8 +3,10 @@ package kim.tkland.musicbeewifisync
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.storage.StorageManager
 import android.provider.DocumentsContract
 import android.util.Log
 import android.view.Menu
@@ -23,6 +25,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuCompat
 import java.io.File
+
 
 class SettingsActivity : WifiSyncBaseActivity() {
     private var initialSetup = false
@@ -165,6 +168,18 @@ class SettingsActivity : WifiSyncBaseActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (initialSetup) {
+            // ここでファイルの追加処理か？ 2024/7/26 7:33
+            // OnCreate()でコケたのでここに移動
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                listNewFiles()
+            }
+
+        }
+    }
+
     // アクティビティの結果に対するコールバックの登録
     private val launcher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -221,7 +236,6 @@ class SettingsActivity : WifiSyncBaseActivity() {
                 this,
                 arrayOf(
                     android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                    android.Manifest.permission.MANAGE_MEDIA,
                     android.Manifest.permission.ACCESS_MEDIA_LOCATION
                 ), PERMISSION_READ_EXTERNAL_STORAGE
             )
@@ -354,5 +368,62 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    // 有線 Syncのファイルを見つけて登録する
+    // ストレージの選択が終わっていないので、すべての外部ストレージ（内部ストレージ、SDカード）のMusicフォルダの下を全検索する
+    private fun broadcastNewFiles(file: File) {
+        val intent =
+            Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        intent.setData(Uri.fromFile(file))
+        sendBroadcast(intent)
+    }
+
+    private fun listNewFiles() {
+        // val storages = getExternalVolumeNames(applicationContext) // 検索対象ボリューム
+        val sm = applicationContext.getSystemService(StorageManager::class.java)
+        val svl = sm.storageVolumes
+        for (sv in svl) {
+            // val dir: File = File(storage)
+            // Log.d("ExternalStorageName:", Files.getContentUri(storage).toString())
+            if (sv.directory != null) {
+                val path = "${sv.directory!!.absolutePath}/Music/"
+                Log.d("listNewFiles", path)
+                val thread = Thread(
+                    GetMusicFiles(File(path))
+                )
+                thread.start()
+            }
+            //Log.d("StorageVolume", sv.directory?.absolutePath.toString())
+            //Log.d("StorageVolume", sv.getDescription(this))
+        }
+    }
+
+    private inner class GetMusicFiles(
+        private val file: File
+    ) : Runnable {
+        override fun run() {
+            searchFilesInDirectory(file)
+        }
+    }
+
+    private fun searchFilesInDirectory(dir: File) {
+        val files: Array<File>? = dir.listFiles()
+
+        if (files != null) {
+            if (files.isNotEmpty()) {
+                //ファイルが存在していた時のみ処理を行う
+                for (f in files) {
+                    if (f.isDirectory()) {
+                        //ディレクトリの場合再帰的に検索する
+                        searchFilesInDirectory(f)
+                    } else {
+                        broadcastNewFiles(f)
+                    }
+
+                }
+            }
+        }
+        return
     }
 }
