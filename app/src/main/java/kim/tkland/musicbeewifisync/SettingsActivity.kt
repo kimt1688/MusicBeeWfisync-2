@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.storage.StorageManager
 import android.provider.DocumentsContract
 import android.util.Log
@@ -20,11 +22,14 @@ import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuCompat
+import kotlinx.coroutines.runBlocking
 import java.io.File
+import java.util.ArrayList
 
 
 class SettingsActivity : WifiSyncBaseActivity() {
@@ -99,6 +104,11 @@ class SettingsActivity : WifiSyncBaseActivity() {
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = true
             debugMode?.let { it.visibility = View.GONE }
+            // ここでファイルの追加処理か？ 2024/7/30 5:30
+            // OnStart()で複数回Toastが出たのでここに戻す
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                listNewFiles()
+            }
 
             // ここでパミッションチェックか？2024/7/20 8:20
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -165,18 +175,6 @@ class SettingsActivity : WifiSyncBaseActivity() {
             if (!Build.MODEL.equals(WifiSyncServiceSettings.deviceName, ignoreCase = true)) {
                 showNoConfigMatchedSettings()
             }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (initialSetup) {
-            // ここでファイルの追加処理か？ 2024/7/26 7:33
-            // OnCreate()でコケたのでここに移動
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                listNewFiles()
-            }
-
         }
     }
 
@@ -383,47 +381,60 @@ class SettingsActivity : WifiSyncBaseActivity() {
         // val storages = getExternalVolumeNames(applicationContext) // 検索対象ボリューム
         val sm = applicationContext.getSystemService(StorageManager::class.java)
         val svl = sm.storageVolumes
-        for (sv in svl) {
-            // val dir: File = File(storage)
-            // Log.d("ExternalStorageName:", Files.getContentUri(storage).toString())
-            if (sv.directory != null) {
-                val path = "${sv.directory!!.absolutePath}/Music/"
-                Log.d("listNewFiles", path)
-                val thread = Thread(
-                    GetMusicFiles(File(path))
-                )
-                thread.start()
+        var thread: Thread? = null
+        Toast.makeText(applicationContext, "start adding index to MediaStore.", Toast.LENGTH_LONG).show()
+        runBlocking {
+            for (sv in svl) {
+                // val dir: File = File(storage)
+                // Log.d("ExternalStorageName:", Files.getContentUri(storage).toString())
+                    if (sv.directory != null) {
+                        val path = "${sv.directory!!.absolutePath}/Music/"
+                        Log.d("listNewFiles", path)
+                        thread = Thread(
+                            GetMusicFiles(File(path))
+                        )
+                        thread!!.start()
+                    }
+                //Log.d("StorageVolume", sv.directory?.absolutePath.toString())
+                //Log.d("StorageVolume", sv.getDescription(this))
             }
-            //Log.d("StorageVolume", sv.directory?.absolutePath.toString())
-            //Log.d("StorageVolume", sv.getDescription(this))
         }
+        Toast.makeText(applicationContext, "end adding index to MediaStore.", Toast.LENGTH_LONG).show()
+        //while (thread!!.isAlive()) {
+        //    Thread.sleep(1000)
+        //}
+        //Toast.makeText(applicationContext, "end adding index to MediaStore.", Toast.LENGTH_LONG).show()
     }
 
-    private inner class GetMusicFiles(
-        private val file: File
-    ) : Runnable {
+    private inner class GetMusicFiles(private val file: File) : Thread() {
+        val targetList:MutableList<File> = ArrayList()
+
         override fun run() {
             searchFilesInDirectory(file)
+            for(file in targetList)
+                broadcastNewFiles(file)
         }
-    }
 
-    private fun searchFilesInDirectory(dir: File) {
-        val files: Array<File>? = dir.listFiles()
+        private fun searchFilesInDirectory(dir: File) {
+            val files: Array<File>? = dir.listFiles()
 
-        if (files != null) {
-            if (files.isNotEmpty()) {
-                //ファイルが存在していた時のみ処理を行う
-                for (f in files) {
-                    if (f.isDirectory()) {
-                        //ディレクトリの場合再帰的に検索する
-                        searchFilesInDirectory(f)
-                    } else {
-                        broadcastNewFiles(f)
+            if (files != null) {
+                if (files.isNotEmpty()) {
+                    //ファイルが存在していた時のみ処理を行う
+                    for (f in files) {
+                        if (f.isDirectory()) {
+                            //ディレクトリの場合再帰的に検索する
+                            searchFilesInDirectory(f)
+                        } else {
+                            // broadcastNewFiles(f)
+                            targetList.add(f)
+                            return
+                        }
+
                     }
-
                 }
             }
+            return
         }
-        return
     }
 }
