@@ -8,11 +8,12 @@ android {
 
     defaultConfig {
         applicationId "kim.tkland.musicbeewifisync"
-        minSdk 34
-        versionCode 97
-        versionName '2.6.4'
+        minSdk 31
+        versionCode 101
+        versionName '2.6.8'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        targetSdk 34
     }
 
     buildTypes {
@@ -35,6 +36,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildToolsVersion '34.0.0'
 }
 
 dependencies {
@@ -56,15 +58,15 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.3'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.4'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4'
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "androidx.activity:activity-ktx:1.9.0"
-    implementation 'androidx.fragment:fragment-ktx:1.8.1'
+    implementation "androidx.activity:activity-ktx:1.9.1"
+    implementation 'androidx.fragment:fragment-ktx:1.8.2'
     implementation "androidx.compose.runtime:runtime:1.6.8"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1'
-    implementation "androidx.activity:activity-compose:1.9.0"
+    implementation "androidx.activity:activity-compose:1.9.1"
     implementation "androidx.preference:preference-ktx:1.2.1"
     implementation "androidx.documentfile:documentfile:1.0.1"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'

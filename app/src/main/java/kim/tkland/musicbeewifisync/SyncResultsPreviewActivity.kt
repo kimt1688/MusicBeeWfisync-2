@@ -97,7 +97,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                                 )
                             )
                             previewErrorMessage.visibility = View.VISIBLE
-                            syncExcludeErrors?.let{it.setVisibility(View.VISIBLE)}
+                            syncExcludeErrors?.let{ it.visibility = View.VISIBLE }
                         } else if (failedCount > 0) {
                             previewErrorMessage.setTextColor(errorColor)
                             previewErrorMessage.text = String.format(
@@ -108,10 +108,10 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                                 )
                             )
                             previewErrorMessage.visibility = View.VISIBLE
-                            syncExcludeErrors?.let{it.setVisibility(View.INVISIBLE)}
+                            syncExcludeErrors?.let{ it.visibility = View.INVISIBLE }
                         } else {
                             previewErrorMessage.visibility = View.GONE
-                            syncExcludeErrors?.let{it.setVisibility(View.GONE)}
+                            syncExcludeErrors?.let{ it.visibility = View.GONE }
                         }
                         if (previewToDataCount > 0 && previewFromDataCount == 0 && okCount == 0 && warningCount == 0) {
                             disableProceedSyncButton()

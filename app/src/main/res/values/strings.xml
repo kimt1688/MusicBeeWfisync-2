@@ -81,6 +81,9 @@
     <string name="menuWifiFullSync">Full Sync</string>
     <string name="menuWifiPlaylistSync">Playlist Sync</string>
     <string name="errorInvalidIp">This is not a valid IP address</string>
+    <string name="statsSelect">Select Stats</string>
+    <string name="statsSelectMessage">Select GoneMAD\'s stats.xml file.</string>
+
     <!-- Strings used for fragments for navigation -->
 
 </resources>

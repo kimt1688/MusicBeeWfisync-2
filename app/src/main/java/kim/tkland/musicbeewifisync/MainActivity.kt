@@ -1,13 +1,9 @@
 package kim.tkland.musicbeewifisync
 
-import android.app.Activity
 import android.app.ActivityManager.TaskDescription
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
@@ -17,13 +13,8 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RadioGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuCompat
-import java.io.File
-import java.util.Collections
-
 
 class MainActivity : WifiSyncBaseActivity() {
     private var syncPreview = false
@@ -33,7 +24,6 @@ class MainActivity : WifiSyncBaseActivity() {
     private var syncStartButton: LinearLayout? = null
     private var serverStatusThread: Thread? = null
     private var syncPlayerGoneMad: CheckBox? = null
-    private val PERMISSION_READ_EXTERNAL_STORAGE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,24 +104,6 @@ class MainActivity : WifiSyncBaseActivity() {
             checkServerStatus()
         }
 
-        if (checkSelfPermission(android.Manifest.permission.MANAGE_MEDIA) == PackageManager.PERMISSION_DENIED) {
-                requestPermissionForReadWrite(this)
-
-                val sharedPref =
-                    getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
-                val uriStr = sharedPref.getString("accesseduri", "")
-                val stats = File("/storage/emulated/0/gmmp/stats.xml")
-                if (stats.exists()) {
-                    if (uriStr.isNullOrEmpty()) {
-                        launcher.launch(setLaunchIntent())
-                    }
-                } else {
-                    /* 2024/7/12 RELEASE まで封印
-            syncPlayerGoneMad!!.isChecked = false
-            syncPlayerGoneMad!!.isEnabled = false
-             */
-                }
-            }
         if (!MediaStore.canManageMedia(this)) {
             startActivity(
                 Intent(android.provider.Settings.ACTION_REQUEST_MANAGE_MEDIA)
@@ -170,68 +142,6 @@ class MainActivity : WifiSyncBaseActivity() {
         // playlistSyncMenuItem.isCheckable = false
         // playlistSyncMenuItem.isChecked = false
         return true
-    }
-
-    // アクティビティの結果に対するコールバックの登録
-    private val launcher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        Log.d("registerForActivityResult(result)", result.toString())
-
-        if (result.resultCode != RESULT_OK) {
-            // アクティビティ結果NG
-            return@registerForActivityResult
-        } else {
-            // アクティビティ結果OK
-            try {
-                val mUri = result.data?.data
-                clearAllPersistedUriPermissions(applicationContext)
-                contentResolver.takePersistableUriPermission(
-                    mUri!!, Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                )
-                val preferences = applicationContext.getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", Context.MODE_PRIVATE)
-                preferences.edit().putString("accesseduri", mUri.toString()).commit()
-            } catch (e: Exception) {
-                Log.d("launcher", e.message!!)
-            }
-        }
-    }
-
-    private fun clearAllPersistedUriPermissions(context: Context) {
-        try {
-            val contentResolver = context.contentResolver
-            for (uriPermission in contentResolver.persistedUriPermissions) {
-                applicationContext.contentResolver.releasePersistableUriPermission(
-                    /* uri = */       uriPermission.uri,
-                    /* modeFlags = */ Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                )
-            }
-        } catch (e: Throwable) {
-            // just to be safe...
-            e.printStackTrace()
-        }
-    }
-
-    private fun requestPermissionForReadWrite(context: Context) {
-        ActivityCompat.requestPermissions(
-            context as Activity,
-            arrayOf(
-                android.Manifest.permission.READ_MEDIA_AUDIO,
-                android.Manifest.permission.MANAGE_MEDIA,
-                android.Manifest.permission.ACCESS_MEDIA_LOCATION,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-            ), PERMISSION_READ_EXTERNAL_STORAGE
-        )
-    }
-
-    private fun setLaunchIntent(): Intent {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "text/xml"
-            putExtra(DocumentsContract.EXTRA_INITIAL_URI, "/storage/emulated/0/gmmp")
-        }
-        return intent
     }
 
     fun onSyncPreviewButtonClick(view: View) {

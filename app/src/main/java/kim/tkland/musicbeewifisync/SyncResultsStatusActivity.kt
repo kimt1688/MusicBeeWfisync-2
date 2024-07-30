@@ -1,27 +1,19 @@
 package kim.tkland.musicbeewifisync
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
-import android.content.IntentSender.SendIntentException
-import android.media.MediaScannerConnection
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuCompat
 import com.google.android.material.snackbar.Snackbar
-import java.util.Collections
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     private var syncProgressBar: ProgressBar? = null
@@ -30,7 +22,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     private var syncFailedResults: ListView? = null
     private var syncProgressMessage: TextView? = null
     private var stopSyncButton: Button? = null
-    private val timerHandler: Handler? = Handler(Looper.getMainLooper())
+    private val timerHandler: Handler = Handler(Looper.getMainLooper())
     private var timerRunnable: Runnable? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,19 +42,19 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                     } else {
                         syncProgressMessage?.text = WifiSyncService.syncProgressMessage.get()
                         syncProgressBar?.progress = WifiSyncService.syncPercentCompleted.get()
-                        timerHandler!!.postDelayed(this, 300)
+                        timerHandler.postDelayed(this, 300)
                     }
                 } catch (ex: Exception) {
                     ErrorHandler.logError("startProgress", ex)
                 }
             }
         }
-        timerHandler!!.postDelayed(timerRunnable!!, 300)
+        timerHandler.postDelayed(timerRunnable!!, 300)
     }
 
     override fun onDestroy() {
         WifiSyncService.resultsActivityReady.reset()
-        timerHandler?.removeCallbacks(timerRunnable!!)
+        timerHandler.removeCallbacks(timerRunnable!!)
         mainWindow = null
         super.onDestroy()
     }
@@ -120,7 +112,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         syncProgressBar!!.visibility = View.INVISIBLE
         syncWaitIndicator!!.visibility = View.INVISIBLE
         syncProgressMessage!!.visibility = View.GONE
-        timerHandler?.removeCallbacks(timerRunnable!!)
+        timerHandler.removeCallbacks(timerRunnable!!)
         stopSyncButton!!.text = getString(R.string.syncMore)
     }
 
@@ -166,6 +158,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                 params.setMargins(0, 0, 0, stopSyncButton!!.height)
                 snackbarView.layoutParams = params
             } catch (ex: Exception) {
+                Log.d("showEndOfSyncInformation", ex.message!!)
             }
             snackbar.show()
         } else if (errorMessageId == R.string.syncCancelled) {

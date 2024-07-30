@@ -1,9 +1,16 @@
 package kim.tkland.musicbeewifisync
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.storage.StorageManager
+import android.provider.DocumentsContract
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,9 +23,14 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuCompat
+import kotlinx.coroutines.runBlocking
+import java.io.File
+import java.util.ArrayList
+
 
 class SettingsActivity : WifiSyncBaseActivity() {
     private var initialSetup = false
@@ -27,35 +39,38 @@ class SettingsActivity : WifiSyncBaseActivity() {
     private var settingsLocateServerNoConfig: TextView? = null
     private var settingsStorageOptions: RadioGroup? = null
     private var settingsStorageSdCard1: RadioButton? = null
-    private var settingsStorageSdCard2: RadioButton? = null
+    // private var settingsStorageSdCard2: RadioButton? = null
     private var settingsGrantAccessButton: Button? = null
     private var settingsDebugMode: CheckBox? = null
     private var settingsDeviceNamePrompt: TextView? = null
     private var settingsDeviceName: EditText? = null
-    private var settingsServerIpOverride: EditText? = null
+    private val PERMISSION_READ_EXTERNAL_STORAGE = 1000
+    // private var settingsServerIpOverride: EditText? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         // PermissionsHandler.demandInternalStorageAccessPermissions(this)
-        initialSetup = WifiSyncServiceSettings.defaultIpAddressValue.length == 0
+        initialSetup = WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()
         locateServerButton = findViewById(R.id.locateServerButton)
         settingsWaitIndicator = findViewById(R.id.settingsWaitIndicator)
         settingsLocateServerNoConfig = findViewById(R.id.settingsLocateServerNoConfig)
         val settingsStoragePrompt = findViewById<TextView>(R.id.settingsStoragePrompt)
         settingsStorageOptions = findViewById(R.id.settingsStorageOptions)
-        settingsStorageOptions?.let{it.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { _, _ -> showGrantAccessButton() })}
+        settingsStorageOptions?.let { it.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { _, _ -> showGrantAccessButton() }) }
         val settingsStorageInternal = findViewById<RadioButton>(R.id.settingsStorageInternal)
         settingsStorageSdCard1 = findViewById(R.id.settingsStorageSdCard1)
         settingsGrantAccessButton = findViewById(R.id.settingsGrantAccessButton)
         settingsDebugMode = findViewById(R.id.settingsDebugMode)
         settingsDebugMode?.setChecked(WifiSyncServiceSettings.debugMode)
-        settingsDebugMode?.let{it.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, _ ->
-            WifiSyncServiceSettings.debugMode = settingsDebugMode?.isChecked!!
-        })}
+        settingsDebugMode?.let {
+            it.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, _ ->
+                WifiSyncServiceSettings.debugMode = settingsDebugMode?.isChecked!!
+            })
+        }
         settingsDeviceNamePrompt = findViewById(R.id.settingsDeviceNamePrompt)
         settingsDeviceName = findViewById(R.id.settingsDeviceName)
         val externalSdCardCount = getExternalFilesDirs(null).size - 1
-        var sdCard1:RadioButton? = settingsStorageSdCard1
+        var sdCard1: RadioButton? = settingsStorageSdCard1
         //var sdCard2:RadioButton? = settingsStorageSdCard2
         if (externalSdCardCount == 0) {
             settingsStorageInternal.isChecked = true
@@ -63,7 +78,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
             //sdCard2?.let{it.setVisibility(View.GONE)}
         } else {
             if (externalSdCardCount == 1) {
-                if (WifiSyncServiceSettings.deviceStorageIndex ==2) {
+                if (WifiSyncServiceSettings.deviceStorageIndex == 2) {
                     sdCard1?.setChecked(true)
                     //sdCard2?.let{it.setVisibility(View.GONE)}
                 } else {
@@ -77,7 +92,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
                 }
             } else {
                 settingsStorageInternal.isChecked = false
-                WifiSyncServiceSettings.deviceStorageIndex =1
+                WifiSyncServiceSettings.deviceStorageIndex = 1
                 sdCard1?.setText(R.string.settingsStorageSdCard1)
                 //sdCard2?.let{it.setText(R.string.settingsStorageSdCard2)}
                 //sdCard2?.let{it.setVisibility(View.VISIBLE)}
@@ -88,7 +103,63 @@ class SettingsActivity : WifiSyncBaseActivity() {
         var serverButton: Button? = locateServerButton
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = true
-            debugMode?.let{it.setVisibility(View.GONE)}
+            debugMode?.let { it.visibility = View.GONE }
+            // ここでファイルの追加処理か？ 2024/7/30 5:30
+            // OnStart()で複数回Toastが出たのでここに戻す
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                listNewFiles()
+            }
+
+            // ここでパミッションチェックか？2024/7/20 8:20
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_DENIED) {
+                    requestPermissionForReadWrite()
+
+                    val sharedPref =
+                        getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
+                    val uriStr = sharedPref.getString("accesseduri", "")
+                    val stats = File("/storage/emulated/0/gmmp/stats.xml")
+                    if (stats.exists()) {
+                        if (uriStr.isNullOrEmpty()) {
+                            //launcher.launch(setLaunchIntent())
+                            AlertDialog.Builder(this)
+                                .setTitle(R.string.statsSelect)
+                                .setMessage(R.string.statsSelectMessage)
+                                .setPositiveButton("OK") { _, _ ->
+                                    // OKボタン押下時に実行したい処理を記述
+                                    launcher.launch(setLaunchIntent())
+                                }
+                                .create()
+                                .show()
+
+
+                        }
+                    }
+                }
+            } else {
+                if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                    requestPermissionForReadWrite()
+
+                    val sharedPref =
+                        getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
+                    val uriStr = sharedPref.getString("accesseduri", "")
+                    val stats = File("/storage/emulated/0/gmmp/stats.xml")
+                    if (stats.exists()) {
+                        //launcher.launch(setLaunchIntent())
+                        if (uriStr.isNullOrEmpty()) {
+                            AlertDialog.Builder(this)
+                                .setTitle(R.string.statsSelect)
+                                .setMessage(R.string.statsSelectMessage)
+                                .setPositiveButton("OK") { _, _ ->
+                                    // OKボタン押下時に実行したい処理を記述
+                                    launcher.launch(setLaunchIntent())
+                                }
+                                .create()
+                                .show()
+                        }
+                    }
+                }
+            }
         } else {
             val actionBar = supportActionBar
             if (actionBar != null) {
@@ -98,37 +169,87 @@ class SettingsActivity : WifiSyncBaseActivity() {
             findViewById<View>(R.id.settingsInfo0).visibility = View.GONE
             findViewById<View>(R.id.settingsInfo1).visibility = View.GONE
             findViewById<View>(R.id.settingsInfo2).visibility = View.GONE
-            serverButton?.let{it.setVisibility(View.GONE)}
-            debugMode?.let{it.setVisibility(View.VISIBLE)}
+            serverButton?.let { it.visibility = View.GONE }
+            debugMode?.let { it.visibility = View.VISIBLE }
             settingsStoragePrompt.setText(R.string.settingsStorageSettingsPrompt)
             if (!Build.MODEL.equals(WifiSyncServiceSettings.deviceName, ignoreCase = true)) {
                 showNoConfigMatchedSettings()
             }
         }
-        // パーミッションの付与確認
-        /*
-        if (allPermissionsGranted()) {
-            // Toast.makeText(this,"既にパーミッションが許可されています", Toast.LENGTH_LONG).show()
+    }
+
+    // アクティビティの結果に対するコールバックの登録
+    private val launcher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        Log.d("registerForActivityResult(result)", result.toString())
+
+        if (result.resultCode != RESULT_OK) {
+            // アクティビティ結果NG
+            return@registerForActivityResult
+        } else {
+            // アクティビティ結果OK
+            try {
+                val mUri = result.data?.data
+                clearAllPersistedUriPermissions(applicationContext)
+                contentResolver.takePersistableUriPermission(
+                    mUri!!, Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                val preferences = applicationContext.getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", Context.MODE_PRIVATE)
+                preferences.edit().putString("accesseduri", mUri.toString()).commit()
+            } catch (e: Exception) {
+                Log.d("launcher", e.message!!)
+            }
+        }
+    }
+
+    private fun clearAllPersistedUriPermissions(context: Context) {
+        try {
+            val contentResolver = context.contentResolver
+            for (uriPermission in contentResolver.persistedUriPermissions) {
+                applicationContext.contentResolver.releasePersistableUriPermission(
+                    /* uri = */       uriPermission.uri,
+                    /* modeFlags = */ Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            }
+        } catch (e: Throwable) {
+            // just to be safe...
+            e.printStackTrace()
+        }
+    }
+
+    private fun requestPermissionForReadWrite() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.READ_MEDIA_AUDIO,
+                    android.Manifest.permission.MANAGE_MEDIA,
+                    android.Manifest.permission.ACCESS_MEDIA_LOCATION
+                ), PERMISSION_READ_EXTERNAL_STORAGE
+            )
         } else {
             ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSION, REQUEST_CODE_PERMISSION
+                this,
+                arrayOf(
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.ACCESS_MEDIA_LOCATION
+                ), PERMISSION_READ_EXTERNAL_STORAGE
             )
         }
-         */
     }
 
-    companion object {
-        private const val REQUEST_CODE_PERMISSION = 1
-        private val REQUIRED_PERMISSION =
-             arrayOf(android.Manifest.permission.READ_MEDIA_AUDIO)
+    private fun setLaunchIntent(): Intent {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/xml"
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, "/storage/emulated/0/gmmp")
+        }
+        return intent
     }
 
-    /** 全てのパーミッションｋが許可されているかのチェック */
-    private fun allPermissionsGranted() = REQUIRED_PERMISSION.all {
-        ContextCompat.checkSelfPermission(
-            baseContext, it) == PackageManager.PERMISSION_GRANTED
-    }
-
+    /*
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -148,7 +269,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         }
     }
-
+     */
     override fun onDestroy() {
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = false
@@ -245,5 +366,75 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    // 有線 Syncのファイルを見つけて登録する
+    // ストレージの選択が終わっていないので、すべての外部ストレージ（内部ストレージ、SDカード）のMusicフォルダの下を全検索する
+    private fun broadcastNewFiles(file: File) {
+        val intent =
+            Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        intent.setData(Uri.fromFile(file))
+        sendBroadcast(intent)
+    }
+
+    private fun listNewFiles() {
+        // val storages = getExternalVolumeNames(applicationContext) // 検索対象ボリューム
+        val sm = applicationContext.getSystemService(StorageManager::class.java)
+        val svl = sm.storageVolumes
+        var thread: Thread? = null
+        Toast.makeText(applicationContext, "start adding index to MediaStore.", Toast.LENGTH_LONG).show()
+        runBlocking {
+            for (sv in svl) {
+                // val dir: File = File(storage)
+                // Log.d("ExternalStorageName:", Files.getContentUri(storage).toString())
+                    if (sv.directory != null) {
+                        val path = "${sv.directory!!.absolutePath}/Music/"
+                        Log.d("listNewFiles", path)
+                        thread = Thread(
+                            GetMusicFiles(File(path))
+                        )
+                        thread!!.start()
+                    }
+                //Log.d("StorageVolume", sv.directory?.absolutePath.toString())
+                //Log.d("StorageVolume", sv.getDescription(this))
+            }
+        }
+        Toast.makeText(applicationContext, "end adding index to MediaStore.", Toast.LENGTH_LONG).show()
+        //while (thread!!.isAlive()) {
+        //    Thread.sleep(1000)
+        //}
+        //Toast.makeText(applicationContext, "end adding index to MediaStore.", Toast.LENGTH_LONG).show()
+    }
+
+    private inner class GetMusicFiles(private val file: File) : Thread() {
+        val targetList:MutableList<File> = ArrayList()
+
+        override fun run() {
+            searchFilesInDirectory(file)
+            for(file in targetList)
+                broadcastNewFiles(file)
+        }
+
+        private fun searchFilesInDirectory(dir: File) {
+            val files: Array<File>? = dir.listFiles()
+
+            if (files != null) {
+                if (files.isNotEmpty()) {
+                    //ファイルが存在していた時のみ処理を行う
+                    for (f in files) {
+                        if (f.isDirectory()) {
+                            //ディレクトリの場合再帰的に検索する
+                            searchFilesInDirectory(f)
+                        } else {
+                            // broadcastNewFiles(f)
+                            targetList.add(f)
+                            return
+                        }
+
+                    }
+                }
+            }
+            return
+        }
     }
 }
