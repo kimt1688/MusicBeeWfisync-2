@@ -106,9 +106,8 @@ class SettingsActivity : WifiSyncBaseActivity() {
             debugMode?.let { it.visibility = View.GONE }
             // ここでファイルの追加処理か？ 2024/7/30 5:30
             // OnStart()で複数回Toastが出たのでここに戻す
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                listNewFiles()
-            }
+            // 2024/8/1 Android14で報告があったのでOS分岐をなくす
+            listNewFiles()
 
             // ここでパミッションチェックか？2024/7/20 8:20
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
