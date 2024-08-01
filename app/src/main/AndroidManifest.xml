@@ -13,6 +13,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" android:minSdkVersion="34" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <queries>
+        <package android:name="com.maxmpz.audioplayer" />
+    </queries>
 
     <application
         android:name="kim.tkland.musicbeewifisync.WifiSyncApp"

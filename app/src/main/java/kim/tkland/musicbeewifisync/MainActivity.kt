@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuCompat
@@ -23,7 +24,9 @@ class MainActivity : WifiSyncBaseActivity() {
     private var syncPreviewButton: Button? = null
     private var syncStartButton: LinearLayout? = null
     private var serverStatusThread: Thread? = null
-    private var syncPlayerGoneMad: CheckBox? = null
+    private var syncPlayerGoneMad: RadioButton? = null
+    private var syncPlayerPoweramp: RadioButton? = null
+    private var syncPlayerNone: RadioButton? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +56,9 @@ class MainActivity : WifiSyncBaseActivity() {
             syncStartButton = findViewById(R.id.syncStartButton)
             syncToPlaylists = findViewById(R.id.syncToPlaylists)
             syncToPlaylistsPath = findViewById(R.id.syncToPlaylistPath)
-            syncPlayerGoneMad = findViewById(R.id.syncPlayerGoneMad)
+            syncPlayerGoneMad = findViewById(R.id.reverceFromGoneMAD)
+            syncPlayerPoweramp = findViewById(R.id.reverceFromPoweramp)
+            syncPlayerNone = findViewById(R.id.reverceFromNone)
             val syncFromMusicBee = findViewById<CheckBox>(R.id.syncFromMusicBee)
             syncFromMusicBee.isChecked = WifiSyncServiceSettings.syncFromMusicBee
             syncFromMusicBee.setOnCheckedChangeListener { _, _ ->
@@ -64,7 +69,7 @@ class MainActivity : WifiSyncBaseActivity() {
             val syncToPlayCounts = findViewById<CheckBox>(R.id.syncToPlayCounts)
             val syncToUsingPlayer = findViewById<RadioGroup>(R.id.syncToUsingPlayer)
             val playlistsSupported = true
-            syncToUsingPlayer.check(R.id.syncPlayerGoneMad)
+            syncToUsingPlayer.check(R.id.reverceFromGoneMAD)
             syncToUsingPlayer.setOnCheckedChangeListener { _, _ ->
                 if (syncPlayerGoneMad!!.isChecked) {
                     WifiSyncServiceSettings.reverseSyncPlaylistsPath = "/gmmp/playlists"
@@ -175,10 +180,17 @@ class MainActivity : WifiSyncBaseActivity() {
     }
 
     fun onGoneMADCheckClick(view: View) {
-        if (syncPlayerGoneMad!!.isChecked) {
-            WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
-        } else WifiSyncServiceSettings.reverseSyncPlayer = 0
+        WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
     }
+
+    fun onPowerampCheckClick(view: View) {
+        WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
+    }
+
+    fun onNoneCheckClick(view: View) {
+        WifiSyncServiceSettings.reverseSyncPlayer = 0
+    }
+
 
     private val isConfigOK: Boolean
         get () {
@@ -195,6 +207,8 @@ class MainActivity : WifiSyncBaseActivity() {
             } else {
                 if (syncPlayerGoneMad!!.isChecked)
                     WifiSyncServiceSettings.reverseSyncPlayer = 1
+                else if (syncPlayerPoweramp!!.isChecked)
+                    WifiSyncServiceSettings.reverseSyncPlayer = 2
                 else
                     WifiSyncServiceSettings.reverseSyncPlayer = 0
             }

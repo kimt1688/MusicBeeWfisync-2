@@ -153,17 +153,44 @@
                 android:layout_marginStart="40dp"
                 android:layout_marginEnd="15dp"
                 android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/syncToUsingPrompt">
+                app:layout_constraintTop_toBottomOf="@+id/syncToUsingPrompt"/>
 
-                <CheckBox
-                    android:id="@+id/syncPlayerGoneMad"
+            <RadioGroup
+                android:id="@+id/reverceSyncPlayer"
+                android:layout_width="match_parent"
+                android:layout_height="124dp"
+                android:visibility="visible"
+                tools:visibility="visible" >
+
+                <RadioButton
+                    android:id="@+id/reverceFromPoweramp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
+                    android:layout_marginLeft="43dp"
+                    android:layout_marginTop="5dp"
+                    android:onClick="onPowerampCheckClick"
+                    android:text="Poweramp"
+                    android:textSize="20sp" />
+
+                <RadioButton
+                    android:id="@+id/reverceFromGoneMAD"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="43dp"
+                    android:layout_marginTop="5dp"
                     android:onClick="onGoneMADCheckClick"
                     android:text="GoneMAD"
                     android:textSize="20sp" />
 
+                <RadioButton
+                    android:id="@+id/reverceFromNone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="43dp"
+                    android:layout_marginTop="5dp"
+                    android:onClick="onNoneCheckClick"
+                    android:text="None"
+                    android:textSize="20sp" />
             </RadioGroup>
         </LinearLayout>
     </ScrollView>

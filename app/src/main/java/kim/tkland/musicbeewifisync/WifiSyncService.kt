@@ -36,7 +36,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.xml.parsers.SAXParserFactory
-
+import com.maxmpz.poweramp.player.*
+import com.maxmpz.poweramp.player.PowerampAPI.*
+import com.maxmpz.poweramp.player.TableDefs.*
+import com.maxmpz.poweramp.plugin.*
 
 class WifiSyncService : Service() {
     private val syncFileScanCount = AtomicInteger(0)
@@ -1491,16 +1494,17 @@ class WifiSyncService : Service() {
             val results = ArrayList<FileStatsInfo>()
             val contentResolver = contentResolver
             val projection = arrayOf(
-                "folders.path",
-                "folder_files.name",
-                "folder_files.rating",
-                "folder_files.played_times",
-                "folder_files.played_at"
+                Folders.PATH,
+                Files.NAME,
+                Files.RATING,
+                Files.PLAYED_TIMES,
+                Files.PLAYED_AT
             )
             contentResolver.query(
-                Uri.parse("content://com.maxmpz.audioplayer.data/files"),
+                //Uri.parse("content://com.maxmpz.audioplayer.data/files"),
+                PowerampAPI.ROOT_URI.buildUpon().appendEncodedPath("files").build(),
                 projection,
-                null,
+                "folder_files.played_times > 0",
                 null,
                 null
             ).use { cursor ->
