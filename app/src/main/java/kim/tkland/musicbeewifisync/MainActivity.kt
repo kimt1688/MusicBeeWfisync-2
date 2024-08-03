@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.View
@@ -68,8 +69,16 @@ class MainActivity : WifiSyncBaseActivity() {
             val syncToRatings = findViewById<CheckBox>(R.id.syncToRatings)
             val syncToPlayCounts = findViewById<CheckBox>(R.id.syncToPlayCounts)
             val syncToUsingPlayer = findViewById<RadioGroup>(R.id.syncToUsingPlayer)
-            val playlistsSupported = true
+            var playlistsSupported = false
             syncToUsingPlayer.check(R.id.reverceFromGoneMAD)
+            when (WifiSyncServiceSettings.reverseSyncPlayer) {
+                WifiSyncServiceSettings.PLAYER_GONEMAD -> {
+                    playlistsSupported = true
+                    syncToUsingPlayer.check(R.id.reverceFromGoneMAD)
+                }
+                WifiSyncServiceSettings.PLAYER_POWERAMP -> syncToUsingPlayer.check(R.id.reverceFromPoweramp)
+                0 -> syncToUsingPlayer.check(R.id.reverceFromNone)
+            }
             syncToUsingPlayer.setOnCheckedChangeListener { _, _ ->
                 if (syncPlayerGoneMad!!.isChecked) {
                     WifiSyncServiceSettings.reverseSyncPlaylistsPath = "/gmmp/playlists"
@@ -105,13 +114,12 @@ class MainActivity : WifiSyncBaseActivity() {
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
 
-            (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD).also { syncPlayerGoneMad!!.isChecked = it }
             checkServerStatus()
         }
 
         if (!MediaStore.canManageMedia(this)) {
             startActivity(
-                Intent(android.provider.Settings.ACTION_REQUEST_MANAGE_MEDIA)
+                Intent(Settings.ACTION_REQUEST_MANAGE_MEDIA)
                     .setData(Uri.parse("package:${packageName}"))
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )

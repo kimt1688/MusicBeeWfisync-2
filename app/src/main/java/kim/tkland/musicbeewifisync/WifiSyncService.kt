@@ -53,11 +53,11 @@ class WifiSyncService : Service() {
     private var settingsSyncCustomFiles = false
     private var settingsSyncDeleteUnselectedFiles = false
     private var settingsSyncCustomPlaylistNames: ArrayList<String>? = null
-    private var settingsReverseSyncPlayer = 1
+    private var settingsReverseSyncPlayer = 2
     private var settingsReverseSyncPlaylists = false
     private var settingsReverseSyncPlaylistsPath: String? = null
     private var settingsReverseSyncRatings = false
-    private var settingsReverseSyncPlayCounts = false
+    private var settingsReverseSyncPlayCounts = true
     private var syncWorkerThread: Thread? = null
     private var storage: FileStorageAccess? = null
     override fun onBind(intent: Intent): IBinder? {
@@ -1196,11 +1196,13 @@ class WifiSyncService : Service() {
             )
 
             if (cursor != null) {
-                cursor.moveToFirst()
-                do {
-                    val idIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
-                    id = cursor.getString(idIndex).toLong()
-                } while (cursor.moveToNext())
+                if (cursor.count > 0) {
+                    cursor.moveToFirst()
+                    do {
+                        val idIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
+                        id = cursor.getString(idIndex).toLong()
+                    } while (cursor.moveToNext())
+                }
                 cursor.close()
             }
             val return_uri = ContentUris.withAppendedId(
@@ -2325,14 +2327,15 @@ internal class FileStorageAccess(
     fun deleteFile(app: WifiSyncApp, fileUris: List<Uri>): Boolean {
         try {
             try {
-                app.delete(fileUris.toTypedArray(), -777)
-                for (uri in fileUris) {
+                app.delete(fileUris.toTypedArray(), 777)
+                /*                for (uri in fileUris) {
                     val file:File? = uriToFile(app , uri)
                     if (file!!.path.indexOf("Music/") > 0) {
                         val filePath = file.path.substring(file.path.indexOf("Music/"))
                         deleteFile(filePath)
                     }
                 }
+                 */
             } catch (e: Exception) {
                 e.printStackTrace()
                 return false
@@ -2357,9 +2360,11 @@ internal class FileStorageAccess(
             val cursor =
                 contentResolver.query(uri, arrayOf(MediaStore.MediaColumns.DATA), null, null, null)
             if (cursor != null) {
-                cursor.moveToFirst()
-                path = cursor.getString(0)
-                cursor.close()
+                if (cursor.count > 0) {
+                    cursor.moveToFirst()
+                    path = cursor.getString(0)
+                    cursor.close()
+                }
             }
         }
         return if (null == path) null else File(path)
@@ -2707,12 +2712,12 @@ internal object WifiSyncServiceSettings {
     val syncCustomPlaylistNames = ArrayList<String>()
     const val PLAYER_GONEMAD = 1
     const val PLAYER_POWERAMP = 2
-    var reverseSyncPlayer = 1
-    var reverseSyncPlaylists = true
+    var reverseSyncPlayer = 2
+    var reverseSyncPlaylists = false
     var reverseSyncPlaylistsPath = ""
     var reverseSyncRatings = false
-    var reverseSyncPlayCounts = false
-    var debugMode = false
+    var reverseSyncPlayCounts = true
+    var debugMode = true
     var permissionsUpgraded = false
     fun loadSettings(context: Context) {
         defaultIpAddressValue = ""

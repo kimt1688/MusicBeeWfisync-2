@@ -104,10 +104,6 @@ class SettingsActivity : WifiSyncBaseActivity() {
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = true
             debugMode?.let { it.visibility = View.GONE }
-            // ここでファイルの追加処理か？ 2024/7/30 5:30
-            // OnStart()で複数回Toastが出たのでここに戻す
-            // 2024/8/1 Android14で報告があったのでOS分岐をなくす
-            listNewFiles()
 
             // ここでパミッションチェックか？2024/7/20 8:20
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -159,6 +155,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
                     }
                 }
             }
+
         } else {
             val actionBar = supportActionBar
             if (actionBar != null) {
@@ -174,6 +171,18 @@ class SettingsActivity : WifiSyncBaseActivity() {
             if (!Build.MODEL.equals(WifiSyncServiceSettings.deviceName, ignoreCase = true)) {
                 showNoConfigMatchedSettings()
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (initialSetup) {
+            // ここでファイルの追加処理か？ 2024/7/30 5:30
+            // OnStart()で複数回Toastが出たのでここに戻す
+            // 2024/8/1 Android14で報告があったのでOS分岐をなくす
+            // 2024/8/3 ストレージパーミッションが必要かもしれないからパーミッション追加の後にしてみる
+            // 2024/8/3 8:50 onCreate()でファイルがリストアップされないのでここに戻す
+            listNewFiles()
         }
     }
 
