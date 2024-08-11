@@ -28,6 +28,8 @@ class MainActivity : WifiSyncBaseActivity() {
     private var syncPlayerGoneMad: RadioButton? = null
     private var syncPlayerPoweramp: RadioButton? = null
     private var syncPlayerNone: RadioButton? = null
+    private var syncToPlayCounts: CheckBox? = null
+    private var syncToRatings: CheckBox? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +68,8 @@ class MainActivity : WifiSyncBaseActivity() {
                 WifiSyncServiceSettings.syncFromMusicBee = syncFromMusicBee.isChecked
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
-            val syncToRatings = findViewById<CheckBox>(R.id.syncToRatings)
-            val syncToPlayCounts = findViewById<CheckBox>(R.id.syncToPlayCounts)
+            syncToRatings = findViewById<CheckBox>(R.id.syncToRatings)
+            syncToPlayCounts = findViewById<CheckBox>(R.id.syncToPlayCounts)
             val syncToUsingPlayer = findViewById<RadioGroup>(R.id.syncToUsingPlayer)
             var playlistsSupported = false
             syncToUsingPlayer.check(R.id.reverceFromGoneMAD)
@@ -76,7 +78,10 @@ class MainActivity : WifiSyncBaseActivity() {
                     playlistsSupported = true
                     syncToUsingPlayer.check(R.id.reverceFromGoneMAD)
                 }
-                WifiSyncServiceSettings.PLAYER_POWERAMP -> syncToUsingPlayer.check(R.id.reverceFromPoweramp)
+                WifiSyncServiceSettings.PLAYER_POWERAMP -> {
+                    playlistsSupported = false
+                    syncToUsingPlayer.check(R.id.reverceFromPoweramp)
+                }
                 0 -> syncToUsingPlayer.check(R.id.reverceFromNone)
             }
             syncToUsingPlayer.setOnCheckedChangeListener { _, _ ->
@@ -103,14 +108,14 @@ class MainActivity : WifiSyncBaseActivity() {
                     false
                 }
             }
-            syncToRatings.isChecked = WifiSyncServiceSettings.reverseSyncRatings
-            syncToRatings.setOnCheckedChangeListener { _, _ ->
-                WifiSyncServiceSettings.reverseSyncRatings = syncToRatings.isChecked
+            syncToRatings?.isChecked = WifiSyncServiceSettings.reverseSyncRatings
+            syncToRatings?.setOnCheckedChangeListener { _, _ ->
+                WifiSyncServiceSettings.reverseSyncRatings = syncToRatings!!.isChecked
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
-            syncToPlayCounts.isChecked = WifiSyncServiceSettings.reverseSyncPlayCounts
-            syncToPlayCounts.setOnCheckedChangeListener { _, _ ->
-                WifiSyncServiceSettings.reverseSyncPlayCounts = syncToPlayCounts.isChecked
+            syncToPlayCounts?.isChecked = WifiSyncServiceSettings.reverseSyncPlayCounts
+            syncToPlayCounts?.setOnCheckedChangeListener { _, _ ->
+                WifiSyncServiceSettings.reverseSyncPlayCounts = syncToPlayCounts!!.isChecked
                 WifiSyncServiceSettings.saveSettings(mainWindow)
             }
 
@@ -189,14 +194,23 @@ class MainActivity : WifiSyncBaseActivity() {
 
     fun onGoneMADCheckClick(view: View) {
         WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+        syncToPlayCounts!!.isEnabled = true
+        syncToRatings!!.isEnabled = true
+        setPlaylistsEnabled(true)
     }
 
     fun onPowerampCheckClick(view: View) {
         WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
+        syncToPlayCounts!!.isEnabled = true
+        syncToRatings!!.isEnabled = true
+        setPlaylistsEnabled(false)
     }
 
     fun onNoneCheckClick(view: View) {
         WifiSyncServiceSettings.reverseSyncPlayer = 0
+        syncToPlayCounts!!.isEnabled = false
+        syncToRatings!!.isEnabled = false
+        setPlaylistsEnabled(false)
     }
 
 

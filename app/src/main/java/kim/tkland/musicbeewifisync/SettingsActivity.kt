@@ -1,13 +1,12 @@
 package kim.tkland.musicbeewifisync
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.os.storage.StorageManager
 import android.provider.DocumentsContract
 import android.util.Log
@@ -27,10 +26,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
-import java.util.ArrayList
-
+import kotlin.collections.ArrayList
 
 class SettingsActivity : WifiSyncBaseActivity() {
     private var initialSetup = false
@@ -99,60 +100,50 @@ class SettingsActivity : WifiSyncBaseActivity() {
                 //sdCard2?.let{it.setChecked(WifiSyncServiceSettings.deviceStorageIndex == 2)}
             }
         }
-        var debugMode: CheckBox? = settingsDebugMode
-        var serverButton: Button? = locateServerButton
+        val debugMode: CheckBox? = settingsDebugMode
+        val serverButton: Button? = locateServerButton
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = true
             debugMode?.let { it.visibility = View.GONE }
 
             // ここでパミッションチェックか？2024/7/20 8:20
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_DENIED) {
+                if (checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_DENIED) {
                     requestPermissionForReadWrite()
-
-                    val sharedPref =
-                        getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
-                    val uriStr = sharedPref.getString("accesseduri", "")
-                    val stats = File("/storage/emulated/0/gmmp/stats.xml")
-                    if (stats.exists()) {
-                        if (uriStr.isNullOrEmpty()) {
-                            //launcher.launch(setLaunchIntent())
-                            AlertDialog.Builder(this)
-                                .setTitle(R.string.statsSelect)
-                                .setMessage(R.string.statsSelectMessage)
-                                .setPositiveButton("OK") { _, _ ->
-                                    // OKボタン押下時に実行したい処理を記述
-                                    launcher.launch(setLaunchIntent())
-                                }
-                                .create()
-                                .show()
-
-
-                        }
-                    }
                 }
             } else {
-                if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
                     requestPermissionForReadWrite()
-
-                    val sharedPref =
-                        getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
-                    val uriStr = sharedPref.getString("accesseduri", "")
-                    val stats = File("/storage/emulated/0/gmmp/stats.xml")
-                    if (stats.exists()) {
-                        //launcher.launch(setLaunchIntent())
-                        if (uriStr.isNullOrEmpty()) {
-                            AlertDialog.Builder(this)
-                                .setTitle(R.string.statsSelect)
-                                .setMessage(R.string.statsSelectMessage)
-                                .setPositiveButton("OK") { _, _ ->
-                                    // OKボタン押下時に実行したい処理を記述
+                }
+            }
+            val sharedPref =
+                getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
+            val uriStr = sharedPref.getString("accesseduri", "")
+            val stats = File("/storage/emulated/0/gmmp/stats.xml")
+            if (stats.exists()) {
+                if (uriStr.isNullOrEmpty()) {
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.statsSelect)
+                        .setMessage(R.string.statsSelectMessage)
+                        .setPositiveButton("OK") { _, _ ->
+                            // OKボタン押下時に実行したい処理を記述
+                            val job = CoroutineScope(Dispatchers.Default).launch {
                                     launcher.launch(setLaunchIntent())
-                                }
-                                .create()
-                                .show()
+                            }
+                            while (!job.isCompleted) {
+                                Thread.sleep(500)
+                            }
+                            // ここでファイルの追加処理か？ 2024/7/30 5:30
+                            // OnStart()で複数回Toastが出たのでここに戻す
+                            // 2024/8/1 Android14で報告があったのでOS分岐をなくす
+                            // 2024/8/3 ストレージパーミッションが必要かもしれないからパーミッション追加の後にしてみる
+                            // 2024/8/3 8:50 onCreate()でファイルがリストアップされないのでここに戻す
+                            // 2024/8/11 8:13 onStart()でファイルがリストアップされないのでここにしてみる
+                            // 2024/8/11 11:05 launcher.launchの終了待ちをして実行、決定版か？
+                            listNewFiles()
                         }
-                    }
+                        .create()
+                        .show()
                 }
             }
 
@@ -174,24 +165,10 @@ class SettingsActivity : WifiSyncBaseActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (initialSetup) {
-            // ここでファイルの追加処理か？ 2024/7/30 5:30
-            // OnStart()で複数回Toastが出たのでここに戻す
-            // 2024/8/1 Android14で報告があったのでOS分岐をなくす
-            // 2024/8/3 ストレージパーミッションが必要かもしれないからパーミッション追加の後にしてみる
-            // 2024/8/3 8:50 onCreate()でファイルがリストアップされないのでここに戻す
-            listNewFiles()
-        }
-    }
-
     // アクティビティの結果に対するコールバックの登録
     private val launcher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        Log.d("registerForActivityResult(result)", result.toString())
-
         if (result.resultCode != RESULT_OK) {
             // アクティビティ結果NG
             return@registerForActivityResult
@@ -204,7 +181,10 @@ class SettingsActivity : WifiSyncBaseActivity() {
                     mUri!!, Intent.FLAG_GRANT_READ_URI_PERMISSION or
                             Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
-                val preferences = applicationContext.getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", Context.MODE_PRIVATE)
+                val preferences = applicationContext.getSharedPreferences(
+                    "kim.tkland.musicbeewifisync.sharedpref",
+                    MODE_PRIVATE
+                )
                 preferences.edit().putString("accesseduri", mUri.toString()).commit()
             } catch (e: Exception) {
                 Log.d("launcher", e.message!!)
@@ -383,6 +363,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
             Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
         intent.setData(Uri.fromFile(file))
         sendBroadcast(intent)
+        //Log.d("broadcastFile:", file.path)
     }
 
     private fun listNewFiles() {
@@ -415,30 +396,30 @@ class SettingsActivity : WifiSyncBaseActivity() {
     }
 
     private inner class GetMusicFiles(private val file: File) : Thread() {
-        val targetList:MutableList<File> = ArrayList()
+        // val targetList:MutableList<File> = ArrayList()
 
         override fun run() {
-            searchFilesInDirectory(file)
-            for(file in targetList)
-                broadcastNewFiles(file)
+            val fileList:MutableList<File> = ArrayList()
+            searchFilesInDirectory(file, fileList)
+            Log.d("GetMusicfiles", "search result count : ${fileList.size}")
+            for(f in fileList)
+                broadcastNewFiles(f)
         }
 
-        private fun searchFilesInDirectory(dir: File) {
+        private fun searchFilesInDirectory(dir: File, outList: MutableList<File>){
             val files: Array<File>? = dir.listFiles()
 
-            if (files != null) {
-                if (files.isNotEmpty()) {
-                    //ファイルが存在していた時のみ処理を行う
-                    for (f in files) {
-                        if (f.isDirectory()) {
-                            //ディレクトリの場合再帰的に検索する
-                            searchFilesInDirectory(f)
-                        } else {
-                            // broadcastNewFiles(f)
-                            targetList.add(f)
-                            return
-                        }
-
+            if (!files.isNullOrEmpty()) {
+                //ファイルが存在していた時のみ処理を行う
+                for (f in files) {
+                    if (f.isDirectory()) {
+                        //ディレクトリの場合再帰的に検索する
+                        searchFilesInDirectory(f, outList)
+                    } else {
+                        // broadcastNewFiles(f)
+                        outList.add(f)
+                        //Log.d("searchFiles:", f.name)
+                        //return returnlist
                     }
                 }
             }

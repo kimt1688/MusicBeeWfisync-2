@@ -336,9 +336,11 @@ class WifiSyncService : Service() {
                                                                 failedSyncFilesCount
                                                             )
                                                         }
-                                                    // TODO:pending
-                                                    // continue@loop
+                                                        // TODO:pending
+                                                        // continue@loop
                                                     }
+                                                } catch (ex: NullPointerException) {
+                                                    logError("tryStart", ex.stackTraceToString())
                                                 } catch (ex: Exception) {
                                                     logError(
                                                         "tryStart$socketFailRetryAttempts",
@@ -369,6 +371,10 @@ class WifiSyncService : Service() {
                     logError("tryStart", ex)
                 }
                 syncErrorMessageId.set(R.string.errorServerNotFound)
+                setPreviewFailed()
+            } catch (ex: NullPointerException) {
+                logError("tryStart", ex.stackTraceToString())
+                syncErrorMessageId.set(R.string.errorSyncNonSpecific)
                 setPreviewFailed()
             } catch (ex: Exception) {
                 logError("tryStart", ex)
@@ -1003,10 +1009,30 @@ class WifiSyncService : Service() {
                     fileDateModified,
                     FileStorageAccess.ACTION_ADD
                 )
+                deleteOriginalPlaylist(filePath)
             } catch (ex: Exception) {
                 Log.d("receivePlaylist", ex.stackTraceToString())
             } finally {
                 os?.close()
+            }
+        }
+
+        private fun deleteOriginalPlaylist(filePath: String){
+            val playlistextension = File(filePath).extension
+
+            // 元々のプレイリストファイルの拡張子が"m3u"だったら何もしない
+            if(playlistextension.equals("m3u", true)) {
+                return
+            }
+
+            // 元々受信したファイル名が存在する時
+            if(File("${storage!!.storageRootPath}/$filePath").exists()) {
+                // 削除する
+                val deleteUriList: MutableList<Uri> = ArrayList()
+
+                deleteUriList.add(filePathToPlaylistUri(filePath))
+                val app = (application as WifiSyncApp)
+                storage!!.deleteFile(app, deleteUriList)
             }
         }
 
@@ -1207,6 +1233,40 @@ class WifiSyncService : Service() {
             }
             val return_uri = ContentUris.withAppendedId(
                 MediaStore.Audio.Media.getContentUri("external"),
+                id
+            )
+            return return_uri
+        }
+
+        private fun filePathToPlaylistUri(filePath: String): Uri {
+            var id: Long = 0
+            val cr = context.contentResolver
+
+            val uri = MediaStore.Audio.Playlists.getContentUri("external")
+            val projection =
+                arrayOf(MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.DISPLAY_NAME, MediaStore.Audio.Playlists.RELATIVE_PATH)
+            val selectionArgs = arrayOf(
+                filePath.substring(filePath.lastIndexOf('/') + 1),
+                filePath.substring(0, filePath.lastIndexOf('/') + 1),
+            )
+
+            val cursor = cr.query(
+                uri, projection,
+                "${MediaStore.Audio.Playlists.DISPLAY_NAME} = ? and ${MediaStore.Audio.Playlists.RELATIVE_PATH} = ?", selectionArgs, null
+            )
+
+            if (cursor != null) {
+                if (cursor.count > 0) {
+                    cursor.moveToFirst()
+                    do {
+                        val idIndex = cursor.getColumnIndex(MediaStore.Audio.Playlists._ID)
+                        id = cursor.getString(idIndex).toLong()
+                    } while (cursor.moveToNext())
+                }
+                cursor.close()
+            }
+            val return_uri = ContentUris.withAppendedId(
+                MediaStore.Audio.Playlists.getContentUri("external"),
                 id
             )
             return return_uri
@@ -1506,7 +1566,7 @@ class WifiSyncService : Service() {
                 //Uri.parse("content://com.maxmpz.audioplayer.data/files"),
                 PowerampAPI.ROOT_URI.buildUpon().appendEncodedPath("files").build(),
                 projection,
-                "folder_files.played_times > 0",
+                null, //"folder_files.played_times > 0",
                 null,
                 null
             ).use { cursor ->
@@ -1600,6 +1660,9 @@ class WifiSyncService : Service() {
             val sharedPref = getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
             val uriStr = sharedPref.getString("accesseduri", "")!!
             val targetUri = uriStr.toUri()
+            if (uriStr.isEmpty()) {
+                return ArrayList()
+            }
 
             val fileWriteWait = Object()
             val fileWriteStarted = AtomicBoolean(false)
@@ -2328,14 +2391,15 @@ internal class FileStorageAccess(
         try {
             try {
                 app.delete(fileUris.toTypedArray(), 777)
-                /*                for (uri in fileUris) {
+                /*
+                for (uri in fileUris) {
                     val file:File? = uriToFile(app , uri)
                     if (file!!.path.indexOf("Music/") > 0) {
                         val filePath = file.path.substring(file.path.indexOf("Music/"))
                         deleteFile(filePath)
                     }
                 }
-                 */
+                */
             } catch (e: Exception) {
                 e.printStackTrace()
                 return false
