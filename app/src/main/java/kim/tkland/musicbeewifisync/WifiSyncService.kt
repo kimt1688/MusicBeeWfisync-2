@@ -19,6 +19,7 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider.*
 import androidx.core.net.toUri
@@ -40,6 +41,11 @@ import com.maxmpz.poweramp.player.*
 import com.maxmpz.poweramp.player.PowerampAPI.*
 import com.maxmpz.poweramp.player.TableDefs.*
 import com.maxmpz.poweramp.plugin.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class WifiSyncService : Service() {
     private val syncFileScanCount = AtomicInteger(0)
@@ -715,6 +721,7 @@ class WifiSyncService : Service() {
             }
         }
 
+        @OptIn(DelicateCoroutinesApi::class)
         @Throws(Exception::class)
         private fun receiveFile() {
             val filePath = readString()
@@ -745,6 +752,23 @@ class WifiSyncService : Service() {
                 } else {
                     mimetype = MimeTypeMap.getSingleton()
                         .getMimeTypeFromExtension(ext.lowercase(Locale.getDefault()))
+                    if (!mimetype!!.startsWith("audio", true)) {
+                        // エラーダイアログ表示、スキップ
+                        val msg: String = resources.getString(R.string.mimeTypeErrorMessage)
+                        GlobalScope.launch(Dispatchers.Main) {
+                            AlertDialog.Builder((application as WifiSyncApp).currentActivity!!)
+                                .setTitle(R.string.mimeTypeError)
+                                .setMessage("${msg}\n$filePath")
+                                .setPositiveButton("OK") { _, _ ->
+                                }
+                                .create()
+                                .show()
+                        }
+                        writeString(resources.getString(R.string.mimeTypeError))
+                        flushWriter()
+
+                        return
+                    }
                 }
                 val separatorIndex = filePath.lastIndexOf('/') + 1
                 val path = filePath.substring(0, separatorIndex)

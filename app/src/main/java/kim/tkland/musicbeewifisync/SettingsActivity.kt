@@ -4,10 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.storage.StorageManager
 import android.provider.DocumentsContract
 import android.util.Log
 import android.view.Menu
@@ -21,17 +19,11 @@ import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuCompat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.File
-import kotlin.collections.ArrayList
 
 class SettingsActivity : WifiSyncBaseActivity() {
     private var initialSetup = false
@@ -71,7 +63,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
         settingsDeviceNamePrompt = findViewById(R.id.settingsDeviceNamePrompt)
         settingsDeviceName = findViewById(R.id.settingsDeviceName)
         val externalSdCardCount = getExternalFilesDirs(null).size - 1
-        var sdCard1: RadioButton? = settingsStorageSdCard1
+        val sdCard1: RadioButton? = settingsStorageSdCard1
         //var sdCard2:RadioButton? = settingsStorageSdCard2
         if (externalSdCardCount == 0) {
             settingsStorageInternal.isChecked = true
@@ -127,12 +119,6 @@ class SettingsActivity : WifiSyncBaseActivity() {
                         .setMessage(R.string.statsSelectMessage)
                         .setPositiveButton("OK") { _, _ ->
                             // OKボタン押下時に実行したい処理を記述
-                            val job = CoroutineScope(Dispatchers.Default).launch {
-                                    launcher.launch(setLaunchIntent())
-                            }
-                            while (!job.isCompleted) {
-                                Thread.sleep(500)
-                            }
                             // ここでファイルの追加処理か？ 2024/7/30 5:30
                             // OnStart()で複数回Toastが出たのでここに戻す
                             // 2024/8/1 Android14で報告があったのでOS分岐をなくす
@@ -140,7 +126,9 @@ class SettingsActivity : WifiSyncBaseActivity() {
                             // 2024/8/3 8:50 onCreate()でファイルがリストアップされないのでここに戻す
                             // 2024/8/11 8:13 onStart()でファイルがリストアップされないのでここにしてみる
                             // 2024/8/11 11:05 launcher.launchの終了待ちをして実行、決定版か？
+                            // 2024/8/13 8:08 処理自体をブロッキングにしたのでとりあえずOK
                             listNewFiles()
+                            launcher.launch(setLaunchIntent())
                         }
                         .create()
                         .show()
@@ -212,17 +200,17 @@ class SettingsActivity : WifiSyncBaseActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
-                    android.Manifest.permission.READ_MEDIA_AUDIO,
-                    android.Manifest.permission.MANAGE_MEDIA,
-                    android.Manifest.permission.ACCESS_MEDIA_LOCATION
+                    Manifest.permission.READ_MEDIA_AUDIO,
+                    Manifest.permission.MANAGE_MEDIA,
+                    Manifest.permission.ACCESS_MEDIA_LOCATION
                 ), PERMISSION_READ_EXTERNAL_STORAGE
             )
         } else {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
-                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                    android.Manifest.permission.ACCESS_MEDIA_LOCATION
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.ACCESS_MEDIA_LOCATION
                 ), PERMISSION_READ_EXTERNAL_STORAGE
             )
         }
@@ -237,27 +225,6 @@ class SettingsActivity : WifiSyncBaseActivity() {
         return intent
     }
 
-    /*
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_PERMISSION) {
-            if (allPermissionsGranted()) {
-                // Toast.makeText(this, "パーミッションが許可されました。", Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(
-                    this,
-                    "パーミッションが許可されませんでした。(-_-;)",
-                    Toast.LENGTH_LONG
-                ).show()
-                finish()
-            }
-        }
-    }
-     */
     override fun onDestroy() {
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = false
@@ -354,76 +321,5 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    // 有線 Syncのファイルを見つけて登録する
-    // ストレージの選択が終わっていないので、すべての外部ストレージ（内部ストレージ、SDカード）のMusicフォルダの下を全検索する
-    private fun broadcastNewFiles(file: File) {
-        val intent =
-            Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-        intent.setData(Uri.fromFile(file))
-        sendBroadcast(intent)
-        //Log.d("broadcastFile:", file.path)
-    }
-
-    private fun listNewFiles() {
-        // val storages = getExternalVolumeNames(applicationContext) // 検索対象ボリューム
-        val sm = applicationContext.getSystemService(StorageManager::class.java)
-        val svl = sm.storageVolumes
-        var thread: Thread? = null
-        Toast.makeText(applicationContext, "start adding index to MediaStore.", Toast.LENGTH_LONG).show()
-        runBlocking {
-            for (sv in svl) {
-                // val dir: File = File(storage)
-                // Log.d("ExternalStorageName:", Files.getContentUri(storage).toString())
-                    if (sv.directory != null) {
-                        val path = "${sv.directory!!.absolutePath}/Music/"
-                        Log.d("listNewFiles", path)
-                        thread = Thread(
-                            GetMusicFiles(File(path))
-                        )
-                        thread!!.start()
-                    }
-                //Log.d("StorageVolume", sv.directory?.absolutePath.toString())
-                //Log.d("StorageVolume", sv.getDescription(this))
-            }
-        }
-        Toast.makeText(applicationContext, "end adding index to MediaStore.", Toast.LENGTH_LONG).show()
-        //while (thread!!.isAlive()) {
-        //    Thread.sleep(1000)
-        //}
-        //Toast.makeText(applicationContext, "end adding index to MediaStore.", Toast.LENGTH_LONG).show()
-    }
-
-    private inner class GetMusicFiles(private val file: File) : Thread() {
-        // val targetList:MutableList<File> = ArrayList()
-
-        override fun run() {
-            val fileList:MutableList<File> = ArrayList()
-            searchFilesInDirectory(file, fileList)
-            Log.d("GetMusicfiles", "search result count : ${fileList.size}")
-            for(f in fileList)
-                broadcastNewFiles(f)
-        }
-
-        private fun searchFilesInDirectory(dir: File, outList: MutableList<File>){
-            val files: Array<File>? = dir.listFiles()
-
-            if (!files.isNullOrEmpty()) {
-                //ファイルが存在していた時のみ処理を行う
-                for (f in files) {
-                    if (f.isDirectory()) {
-                        //ディレクトリの場合再帰的に検索する
-                        searchFilesInDirectory(f, outList)
-                    } else {
-                        // broadcastNewFiles(f)
-                        outList.add(f)
-                        //Log.d("searchFiles:", f.name)
-                        //return returnlist
-                    }
-                }
-            }
-            return
-        }
     }
 }

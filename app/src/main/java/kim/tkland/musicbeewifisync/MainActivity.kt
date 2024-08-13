@@ -1,6 +1,7 @@
 package kim.tkland.musicbeewifisync
 
 import android.app.ActivityManager.TaskDescription
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
@@ -213,6 +215,23 @@ class MainActivity : WifiSyncBaseActivity() {
         setPlaylistsEnabled(false)
     }
 
+    fun onFullScanMenuItemClick(item: MenuItem): Boolean {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.progressDialogTitle)
+            .setMessage(R.string.alertDialogMessage)
+            .setPositiveButton("OK") { dialog: DialogInterface, _ ->
+                // OKボタン押下時に実行したい処理を記述
+                listNewFiles()
+                dialog.dismiss()
+            }
+            .setNeutralButton("Cancel") { dialog: DialogInterface, _ ->
+                // クリックしたときの処理
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+        return true
+    }
 
     private val isConfigOK: Boolean
         get () {

@@ -83,7 +83,12 @@
     <string name="errorInvalidIp">This is not a valid IP address</string>
     <string name="statsSelect">Select Stats</string>
     <string name="statsSelectMessage">Select GoneMAD\'s stats.xml file.</string>
-
+    <string name="mimeTypeError">MIME Type Error</string>
+    <string name="mimeTypeErrorMessage">Album artwork should be set to embedded.</string>
+    <string name="menuFullScanFiles">regist MediaStore</string>
+    <string name="progressDialogTitle">MusicBee Wifi Sync</string>
+    <string name="alertDialogMessage">Register files modified by Wired Sync in the MediaStore</string>
+    <string name="progressDialogMessage">Registering files modified by Wired Sync in the MediaStore…</string>
     <!-- Strings used for fragments for navigation -->
 
 </resources>

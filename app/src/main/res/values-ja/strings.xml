@@ -83,5 +83,12 @@
     <string name="errorInvalidIp">This is not a valid IP address</string>
     <string name="statsSelect">Statsファイル選択</string>
     <string name="statsSelectMessage">GoneMADのstats.xmlファイルを選択して下さい.</string>
+    <string name="mimeTypeError">MIME Type エラー</string>
+    <string name="mimeTypeErrorMessage">アルバムアートワークは埋め込みの設定にして下さい</string>
+    <string name="menuFullScanFiles">MediaStoreに登録</string>
+    <string name="progressDialogTitle">MusicBee Wifi Sync</string>
+    <string name="alertDialogMessage">有線Syncでの変更をMediaStoreに登録します</string>
+    <string name="progressDialogMessage">有線Syncでの変更をMediaStoreに登録しています…</string>
+
     <!-- Strings used for fragments for navigation -->
 </resources>
