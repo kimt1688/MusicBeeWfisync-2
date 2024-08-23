@@ -1452,7 +1452,18 @@ class WifiSyncService : Service() {
 
             try {
                 var cachedStatsLookup: FileStatsMap
-                val statsCacheFile = File(filesDir, "CachedStats.dat")
+                val statsCacheFile: File
+                when (settingsReverseSyncPlayer) {
+                    WifiSyncServiceSettings.PLAYER_GONEMAD -> {
+                        statsCacheFile = File(filesDir, "CachedStatsG.dat")
+                    }
+                    WifiSyncServiceSettings.PLAYER_POWERAMP -> {
+                        statsCacheFile = File(filesDir, "CachedStatsP.dat")
+                    }
+                    else -> {
+                        statsCacheFile = File(filesDir, "CachedStats.dat")
+                    }
+                }
                 val statsCachedFileExists = (statsCacheFile.exists())
                 if (!statsCachedFileExists) {
                     cachedStatsLookup = FileStatsMap(0)

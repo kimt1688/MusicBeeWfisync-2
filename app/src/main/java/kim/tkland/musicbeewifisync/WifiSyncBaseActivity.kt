@@ -8,6 +8,8 @@ import android.os.storage.StorageManager
 import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 abstract class WifiSyncBaseActivity : AppCompatActivity() {
@@ -72,32 +74,37 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
         var thread: Thread? = null
         progressDialog = ProgressDialog((application as WifiSyncApp).currentActivity)
         progressDialog!!.setTitle(R.string.progressDialogTitle)
-        progressDialog!!.setMessage("Registering files modified by Wired Sync in the MediaStore…")
+        progressDialog!!.setMessage(resources.getString(R.string.progressDialogMessage))
         progressDialog!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
         progressDialog!!.setCancelable(false)
         progressDialog!!.show()
-        thread = Thread(
-            GetMusicFiles()
-        )
-        thread.start()
+        progressDialog!!.run {
+            thread = Thread(
+                GetMusicFiles()
+            )
+            thread!!.start()
+        }
+
     }
 
     protected inner class GetMusicFiles() : Thread() {
         override fun run() {
-            val sm = applicationContext.getSystemService(StorageManager::class.java)
-            val svl = sm.storageVolumes
-            for (sv in svl) {
-                if (sv.directory != null) {
-                    val path = "${sv.directory!!.absolutePath}/Music/"
-                    searchFilesInDirectory(File(path))
+            runBlocking() {
+                val sm = applicationContext.getSystemService(StorageManager::class.java)
+                val svl = sm.storageVolumes
+                for (sv in svl) {
+                    if (sv.directory != null) {
+                        val path = "${sv.directory!!.absolutePath}/Music/"
+                        searchFilesInDirectory(File(path))
+                    }
                 }
             }
+
             progressDialog!!.dismiss()
         }
 
-        private fun searchFilesInDirectory(dir: File){
+        private fun searchFilesInDirectory(dir: File) {
             val files: Array<File>? = dir.listFiles()
-
             if (!files.isNullOrEmpty()) {
                 //ファイルが存在していた時のみ処理を行う
                 for (f in files) {
@@ -105,14 +112,11 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
                         //ディレクトリの場合再帰的に検索する
                         searchFilesInDirectory(f)
                     } else {
-                        // broadcastNewFiles(f)
-                        //outList.add(f)
-                        //Log.d("searchFiles:", f.name)
                         MediaScannerConnection.scanFile(applicationContext, arrayOf(f.path), null, null)
+                        return
                     }
                 }
             }
-            return
         }
     }
 }
