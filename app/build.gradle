@@ -2,18 +2,18 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace 'kim.tkland.musicbeewifisync'
     ndkVersion '27.0.11902837 rc2'
 
     defaultConfig {
         applicationId "kim.tkland.musicbeewifisync"
         minSdk 31
-        versionCode 107
-        versionName '2.7.5'
+        versionCode 108
+        versionName '2.7.6'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-        targetSdk 34
+        targetSdk 35
     }
 
     buildTypes {
@@ -36,7 +36,6 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    buildToolsVersion '34.0.0'
 }
 
 dependencies {

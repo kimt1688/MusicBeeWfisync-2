@@ -256,7 +256,8 @@ class MainActivity : WifiSyncBaseActivity() {
             return if (message == null) {
                 true
             } else {
-                val builder = AlertDialog.Builder(mainWindow?.applicationContext!!)
+                val builder = AlertDialog.Builder(mainWindow!!)
+                //val builder = AlertDialog.Builder(mainWindow?.applicationContext!!)
                 builder.setTitle(getString(R.string.syncErrorHeader))
                 builder.setMessage(message)
                 builder.setIcon(android.R.drawable.ic_dialog_alert)
