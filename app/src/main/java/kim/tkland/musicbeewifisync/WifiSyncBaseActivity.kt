@@ -1,14 +1,14 @@
 package kim.tkland.musicbeewifisync
 
 import android.app.ProgressDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.media.MediaScannerConnection
 import android.os.Bundle
 import android.os.storage.StorageManager
-import android.util.Log
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
@@ -67,6 +67,24 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun onFullScanMenuItemClick(item: MenuItem): Boolean {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.progressDialogTitle)
+            .setMessage(R.string.alertDialogMessage)
+            .setPositiveButton("OK") { dialog: DialogInterface, _ ->
+                // OKボタン押下時に実行したい処理を記述
+                listNewFiles()
+                dialog.dismiss()
+            }
+            .setNeutralButton("Cancel") { dialog: DialogInterface, _ ->
+                // クリックしたときの処理
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+        return true
     }
 
     // 有線 Syncのファイルを見つけて登録する

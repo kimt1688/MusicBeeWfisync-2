@@ -9,8 +9,8 @@ android {
     defaultConfig {
         applicationId "kim.tkland.musicbeewifisync"
         minSdk 31
-        versionCode 108
-        versionName '2.7.6'
+        versionCode 109
+        versionName '2.7.7'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         targetSdk 35
@@ -50,17 +50,17 @@ dependencies {
     implementation 'androidx.compose.ui:ui-tooling:1.6.8'
     implementation 'androidx.compose.ui:ui-tooling-preview:1.6.8'
     implementation 'androidx.compose.ui:ui:1.6.8'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.0.10'
-    implementation 'org.jetbrains.kotlin:kotlin-reflect:2.0.10'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.0.20'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:2.0.20'
     implementation 'androidx.leanback:leanback:1.0.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'androidx.test.espresso:espresso-core:3.6.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.10"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.20'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.4'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4'
     implementation 'androidx.core:core-ktx:1.13.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.10"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.20'
     implementation "androidx.activity:activity-ktx:1.9.1"
     implementation 'androidx.fragment:fragment-ktx:1.8.2'
     implementation "androidx.compose.runtime:runtime:1.6.8"
@@ -70,8 +70,8 @@ dependencies {
     implementation "androidx.documentfile:documentfile:1.0.1"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
     def composeBom = platform('androidx.compose:compose-bom:2024.06.00')
-    implementation composeBom
-    androidTestImplementation composeBom
+    implementation 'androidx.compose:compose-bom:2024.08.00'
+    androidTestImplementation 'androidx.compose:compose-bom:2024.08.00'
 }
 repositories {
     mavenCentral()

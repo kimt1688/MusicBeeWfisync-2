@@ -61,7 +61,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
         return true
     }
 
-    fun onSyncPlaylistsPreviewButton_Click() {
+    fun onSyncPlaylistsPreviewButton_Click(view: View) {
         syncPlaylistsPreviewButton!!.isEnabled = false
         try {
             if (setSyncParameters()) {
