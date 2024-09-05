@@ -41,7 +41,6 @@ import com.maxmpz.poweramp.player.*
 import com.maxmpz.poweramp.player.PowerampAPI.*
 import com.maxmpz.poweramp.player.TableDefs.*
 import com.maxmpz.poweramp.plugin.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
