@@ -736,7 +736,7 @@ class WifiSyncService : Service() {
             val waitWrite = AutoResetEvent(true)
             var cursor: Cursor? = null
             if (WifiSyncServiceSettings.debugMode) {
-                Log.d("receiveFile", "Receive: $filePath")
+                Log.i("receiveFile", "Receive: $filePath")
             }
             try {
                 val contentResolver = applicationContext.contentResolver
@@ -860,11 +860,6 @@ class WifiSyncService : Service() {
                         }
                     }
                 }finally {
-                    //values.clear()
-                    //values = ContentValues().apply {
-                    //    put(MediaStore.Audio.Media.IS_PENDING, false)
-                    //}
-                    //contentResolver.update(contentUri!!, values, null, null)
                     os?.close()
                 }
                 writeString(syncStatusOK)
@@ -924,8 +919,9 @@ class WifiSyncService : Service() {
             if (!File(filePath).extension.equals("m3u", ignoreCase = true)){
                 playlistname = "$playlistname.m3u"
             }
-            //Log.d("receivePlaylist:", "Name:${playlistname}")
-            //Log.d("receivePlaylist:", "Path:${path}")
+            if (WifiSyncServiceSettings.debugMode) {
+                Log.i("receivePlaylist", "Receive: $filePath")
+            }
 
             syncProgressMessage.set(
                 String.format(
@@ -1019,11 +1015,6 @@ class WifiSyncService : Service() {
                         thread.interrupt()
                     }
                 }
-                //values.clear()
-                //values = ContentValues().apply {
-                //    put(MediaStore.Audio.Media.IS_PENDING, false)
-                //}
-                //contentResolver.update(contentUri, values, null)
                 writeString(syncStatusOK)
                 flushWriter()
                 storage!!.scanFile(
@@ -2018,8 +2009,10 @@ class WifiSyncService : Service() {
         @Volatile
         var syncFromResults: ArrayList<SyncResultsInfo>? = null
         val waitSyncResults = AutoResetEvent(false)
-        private const val socketConnectTimeout = 10000000
-        private const val socketReadTimeout = 30000000
+        private const val socketConnectTimeout = Int.MAX_VALUE
+        //private const val socketConnectTimeout = 10000000
+        private const val socketReadTimeout = Int.MAX_VALUE
+        //private const val socketReadTimeout = 30000000
         private const val socketReadBufferLength = 131072
         private const val FOREGROUND_ID = 2938
         private const val serverPort = 27304
@@ -2425,15 +2418,6 @@ internal class FileStorageAccess(
         try {
             try {
                 app.delete(fileUris.toTypedArray(), 777)
-                /*
-                for (uri in fileUris) {
-                    val file:File? = uriToFile(app , uri)
-                    if (file!!.path.indexOf("Music/") > 0) {
-                        val filePath = file.path.substring(file.path.indexOf("Music/"))
-                        deleteFile(filePath)
-                    }
-                }
-                */
             } catch (e: Exception) {
                 e.printStackTrace()
                 return false
