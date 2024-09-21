@@ -3,14 +3,14 @@ package kim.tkland.musicbeewifisync
 import android.app.Activity
 import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
-import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Process
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
 import android.provider.MediaStore
 import java.lang.Thread.sleep
 import java.util.Collections
+
 
 val lockd = Any()
 val locku = Any()
@@ -19,6 +19,10 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
     @JvmField
     var currentActivity: Activity? = null
     override fun onCreate() {
+        StrictMode.setVmPolicy(VmPolicy.Builder()
+            .detectUnsafeIntentLaunch()
+            .build()
+        )
         super.onCreate()
         registerActivityLifecycleCallbacks(this)
     }
