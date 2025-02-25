@@ -9,8 +9,6 @@ import android.content.*
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -23,7 +21,6 @@ import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationCompat
-import androidx.core.content.FileProvider.*
 import androidx.core.net.toUri
 import androidx.core.os.BundleCompat
 import androidx.documentfile.provider.DocumentFile
@@ -45,8 +42,10 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.BufferedInputStream
-import java.sql.SQLException
+import kotlin.experimental.and
+import kotlin.math.max
 
 class WifiSyncService : Service() {
     private val syncFileScanCount = AtomicInteger(0)
@@ -165,7 +164,6 @@ class WifiSyncService : Service() {
         Runnable {
         private var clientSocket: Socket? = null
         private var socketInputStream: InputStream? = null
-        private var dataBufferedReader: BufferedReader? = null
         private var socketStreamReader: DataInputStream? = null
         private var socketOutputStream: OutputStream? = null
         private var socketStreamWriter: DataOutputStream? = null
@@ -248,8 +246,6 @@ class WifiSyncService : Service() {
                                             DataOutputStream(bufferedSocketOutputStream).use { socketStreamWriter ->
                                                 this.socketInputStream = socketInputStream
                                                 this.socketStreamReader = socketStreamReader
-                                                this.dataBufferedReader = BufferedReader(InputStreamReader(socketStreamReader, Charsets.UTF_8))
-                                                // this.dataBufferedReader = BufferedReader(InputStreamReader(socketInputStream, Charsets.UTF_8))
                                                 this.socketOutputStream = socketOutputStream
                                                 this.socketStreamWriter = socketStreamWriter
                                                 var failedSyncFilesCount = 0
@@ -462,7 +458,7 @@ class WifiSyncService : Service() {
 
         @Throws(SocketException::class)
         private fun readToEndOfCommand() = try {
-            while (socketStreamReader!!.read() != 27) {}
+            while (socketStreamReader!!.read() != 0x1B) {}
         } catch (ex: Exception) {
             throw SocketException(ex.toString())
         }
@@ -487,20 +483,123 @@ class WifiSyncService : Service() {
             }
         }
 
+        @OptIn(ExperimentalStdlibApi::class, ExperimentalUnsignedTypes::class)
+        /*
+        length: Boolean -> 最初の有効バイトを長さとみる（省略時false）
+         */
+        private fun readString2(length: Boolean = false): String {
+            val text = runBlocking {
+                try {
+                    var index = 0
+                    var buffer = UByteArray(socketReadBufferLength)
+                    var format = HexFormat {
+                        upperCase = true
+                        bytes {
+                            bytePrefix = "0x"
+                            bytesPerGroup = 1
+                            groupSeparator = " "
+                            bytesPerLine = 16
+                        }
+                    }
+                    var isFirst = true
+                    var returnLength = 0
+                    while (true) {
+                        if (returnLength > 0 && (index == returnLength)) {
+                            break
+                        }
+                        if (isFirst && length && returnLength == 0) {
+                            returnLength = socketStreamReader!!.readShort().toInt()
+                            isFirst = false
+                            if (returnLength == 0) {
+                                break
+                            }
+                            continue
+                        }
+                        var b = socketStreamReader!!.readUnsignedByte()
+                        if ((b.toUByte() and 0b10000000.toUByte()) == 0.toUByte()) {
+                            // 1バイト文字, 0x00-0x1Fを除く
+                            if (b.toInt() == 0) {
+                                if (index > 0) {
+                                    break
+                                }
+                            }
+                            else if (b < 0x20 && index == 0) {
+                                continue
+                            } else if (b < 0x20) {
+                                break
+                            }
+                            buffer[index++] = b.toUByte()
+                        } else if ((b.toUByte() and 0b11000000.toUByte()) > 0.toUByte()) {
+                            // 2バイト文字の1バイト目、もう1バイト読み込む
+                            var b2 = socketStreamReader!!.readUnsignedByte()
+                            buffer[index++] = b.toUByte()
+                            buffer[index++] = b2.toUByte()
+                        } else if ((b.toUByte() and 0b11100000.toUByte()) > 0.toUByte()) {
+                            // 3バイト文字の1バイト目、あと2バイト読み込む
+                            buffer[index++] = b.toUByte()
+                            b = socketStreamReader!!.readUnsignedByte()
+                            // Log.d("UTFDataFormatException", "Byte b = ${b.toHexString(format)}")
+                            buffer[index++] = b.toUByte()
+                            b = socketStreamReader!!.readUnsignedByte()
+                            // Log.d("UTFDataFormatException", "Byte b = ${b.toHexString(format)}")
+                            buffer[index++] = b.toUByte()
+                        } else {
+                            // 読み捨て？
+                            // Log.d("UTFDataFormatException", "Byte b = ${b.toHexString(format)}")
+                        }
+                    }
+                    //Log.d("UTFDataFormatException", "index = ${index}")
+                    //Log.d("UTFDataFormatException", "buffer = ${buffer.toHexString(format)}")
+                    //return buffer.toString(Charsets.UTF_8)
+                    var retString: String
+                    if (length) {
+                        if (returnLength == 0) {
+                            // 空文字を返す
+                            retString = ""
+                            // 先頭から2バイト文字の処理をしてしまっている
+                            /*val os = ByteArrayOutputStream(max(index, buffer[0].toInt()))
+                            os.write(buffer.asByteArray(), 1, max(index, buffer[0].toInt()))
+                            retString = os.toString("UTF-8")*/
+                        } else {
+                            val os = ByteArrayOutputStream(returnLength)
+                            os.write(buffer.asByteArray(), 0, returnLength)
+                            retString = os.toString("UTF-8")
+                        }
+                    } else {
+                        retString = String(buffer.asByteArray(), Charsets.UTF_8)
+                    }
+                    //Log.d("UTFDataFormatException", "retString = ${retString}")
+                    retString
+                } catch (eofex: EOFException) {
+                    Log.d("readString2()", "EOF Exception occurred.")
+                    ""
+                } catch (toex: SocketTimeoutException) {
+                    Log.d("readString2()", "Timeout Exception occurred.")
+                    ""
+                }
+            }
+            return text
+        }
+
         @OptIn(ExperimentalStdlibApi::class)
         @Throws(SocketException::class)
         private fun readString(): String {
+            var retval: String = ""
             try {
-                val retval = socketStreamReader!!.readUTF()
-                logInfo("readString()", retval)
-                return retval
+                retval = socketStreamReader!!.readUTF()
+                //logInfo("readString()", retval)
                 // return socketStreamReader!!.readUTF()
+            } catch (udfe: UTFDataFormatException) {
+                // TODO
+                logInfo("readString()", udfe.stackTraceToString())
+                throw SocketException(udfe.toString())
+
             } catch (ex: Exception) {
                 logInfo("readString()", ex.stackTraceToString())
                 throw SocketException(ex.toString())
             }
+            return retval
         }
-
         /*
         @OptIn(ExperimentalStdlibApi::class)
         private fun readString(): String {
@@ -781,7 +880,8 @@ class WifiSyncService : Service() {
         @OptIn(DelicateCoroutinesApi::class)
         @Throws(Exception::class)
         private fun receiveFile() {
-            val filePath = readString()
+            val filePath = readString2(true)
+            Log.d("receiveFile()", "receive target filePath = $filePath")
             val fileLength = readLong()
             val fileDateModified = readLong()
             var contentUri: Uri? = null
@@ -886,6 +986,7 @@ class WifiSyncService : Service() {
                         //storage!!.updateFile(application as WifiSyncApp, contentUri!!)
                         os = contentResolver.openOutputStream(contentUri!!, "w")!!
                     }
+                    logInfo("receiveFile()", "start write thread.")
                     os.use{fs: OutputStream? ->
                         writeString(syncStatusOK)
                         flushWriter()
@@ -921,6 +1022,7 @@ class WifiSyncService : Service() {
                 }finally {
                     os?.close()
                 }
+                logInfo("receiveFile()", "end write thread.")
                 writeString(syncStatusOK)
                 flushWriter()
                 storage!!.scanFile(
@@ -1402,7 +1504,7 @@ class WifiSyncService : Service() {
             val status: String = syncStatusOK
             var deleteUriList: MutableList<Uri> = ArrayList()
             while (true) {
-                val filePath = readString()
+                val filePath = readString2(true)
                 if (filePath.isEmpty()) {
                     break
                 }
@@ -1951,12 +2053,16 @@ class WifiSyncService : Service() {
                 readLong() //deltaSpace =
                 readLong() //estimatedBytesSendToDevice =
                 while (true) {
-                    val action = readString()
+                    //val action = readString()
+                    val action = readString2(true)
                     if (action.isEmpty()) {
                         break
                     }
-                    val estimatedSize = readString()
-                    val targetFilename = readString()
+                    //val estimatedSize = readString()
+                    val estimatedSize = readString2(true)
+                    val targetFilename = readString2(true)
+                    //val targetFilename = readString()
+
                     results.add(SyncResultsInfo(action, targetFilename, estimatedSize))
                 }
                 showSyncPreviewResults(results, syncStatusOK)
@@ -2123,7 +2229,8 @@ class WifiSyncService : Service() {
         private const val socketReadTimeout = 0
         //private const val socketReadTimeout = 30000000
         private const val socketTextReadBufferLength = 16384
-        private const val socketReadBufferLength = 131072
+        private const val socketReadBufferLength = 262144
+        //private const val socketReadBufferLength = 131072
         private const val FOREGROUND_ID = 2938
         private const val serverPort = 27304
         private const val intentNameDefaultIpAddressValue = "defaultIpAddressValue"
