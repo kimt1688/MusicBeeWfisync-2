@@ -531,15 +531,24 @@ class WifiSyncService : Service() {
                             buffer[index++] = b.toUByte()
                         } else if ((b.toUByte() and 0b11000000.toUByte()) > 0.toUByte()) {
                             // 2バイト文字の1バイト目、もう1バイト読み込む
-                            var b2 = socketStreamReader!!.readUnsignedByte()
                             buffer[index++] = b.toUByte()
+                            if (returnLength > 0 && (index == returnLength)) {
+                                break
+                            }
+                            var b2 = socketStreamReader!!.readUnsignedByte()
                             buffer[index++] = b2.toUByte()
                         } else if ((b.toUByte() and 0b11100000.toUByte()) > 0.toUByte()) {
                             // 3バイト文字の1バイト目、あと2バイト読み込む
                             buffer[index++] = b.toUByte()
+                            if (returnLength > 0 && (index == returnLength)) {
+                                break
+                            }
                             b = socketStreamReader!!.readUnsignedByte()
                             // Log.d("UTFDataFormatException", "Byte b = ${b.toHexString(format)}")
                             buffer[index++] = b.toUByte()
+                            if (returnLength > 0 && (index == returnLength)) {
+                                break
+                            }
                             b = socketStreamReader!!.readUnsignedByte()
                             // Log.d("UTFDataFormatException", "Byte b = ${b.toHexString(format)}")
                             buffer[index++] = b.toUByte()
