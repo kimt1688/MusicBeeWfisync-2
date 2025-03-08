@@ -19,7 +19,6 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
@@ -43,12 +42,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.BufferedInputStream
-import java.nio.charset.Charset
-import kotlin.collections.asByteArray
-import kotlin.experimental.and
-import kotlin.math.max
 
 class WifiSyncService : Service() {
     private val syncFileScanCount = AtomicInteger(0)
@@ -643,7 +637,6 @@ class WifiSyncService : Service() {
                 for (i in 0 until length) {
                     socketStreamWriter!!.write(ary[i].toInt())
                 }
-                // socketStreamWriter!!.writeBytes(value)
                 // socketStreamWriter!!.writeUTF(value)
             } catch (ex: Exception) {
                 throw SocketException(ex.toString())
@@ -826,23 +819,18 @@ class WifiSyncService : Service() {
         private fun getFiles(folderPath: String, includeSubFolders: Boolean) {
             val contentResolver = applicationContext.contentResolver
             val projection = arrayOf(
-                //MediaStore.Files.FileColumns.DATA,
-                //MediaStore.Files.FileColumns.DATE_MODIFIED
                 MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.DATE_MODIFIED
             )
             val storageRootPathLength = storage!!.storageRootPath.length + 1
             val folderUrl = storage!!.getFileUrl(folderPath)
-            //val selection = "${MediaStore.Files.FileColumns.DATE_MODIFIED} > 0"
             val selection = "${MediaStore.Audio.Media.DATE_MODIFIED} > 0"
             if (WifiSyncServiceSettings.debugMode) {
                 logInfo("getFiles", "Get: $folderPath,url=$folderUrl, inc=$includeSubFolders")
-                // logInfo("getFiles: DATA: ", MediaStore.Files.FileColumns.DATA)
                 logInfo("getFiles: selection: ", selection)
             }
             try {
                 val cursor: Cursor? = contentResolver.query(
-                    //MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL),
                     MediaStore.Audio.Media.getContentUri(
                         MediaStore.getExternalVolumeNames(context)
                             .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
@@ -850,7 +838,7 @@ class WifiSyncService : Service() {
                     projection,
                     selection,
                     null, // arrayOf(folderUrl, null),
-                    "")
+                    null)
                 if (cursor == null) {
                     // logInfo("getFiles", "no cursor")
                 } else {
@@ -871,15 +859,11 @@ class WifiSyncService : Service() {
                     }
                     val urlColumnIndex: Int =
                         cursor.getColumnIndex(MediaStore.Audio.Media.DATA)
-                        // cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)
                     val dateModifiedColumnIndex: Int =
                         cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED)
-                        // cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED)
                     cursor.moveToFirst()
-                    while (cursor.moveToNext()) {
+                     do {
                         val url: String = cursor.getString(urlColumnIndex)
-                        //logInfo("Data", url)
-                        //logInfo("DATE_MODIFIED", cursor.getLong(dateModifiedColumnIndex).toString())
                         if (!url.startsWith(folderUrl, true)) {
                             continue
                         }
@@ -890,8 +874,9 @@ class WifiSyncService : Service() {
                             }
                         }
                         writeString(url.substring(storageRootPathLength))
+                        Log.d("getFiles()", "url.subString() = ${url.substring(storageRootPathLength)}")
                         writeLong(cursor.getLong(dateModifiedColumnIndex))
-                    }
+                    } while (cursor.moveToNext())
                 }
                 cursor!!.close()
             } finally {
@@ -955,6 +940,7 @@ class WifiSyncService : Service() {
                     put(MediaStore.Audio.Media.DISPLAY_NAME, name)
                     put(MediaStore.Audio.Media.RELATIVE_PATH, path)
                     put(MediaStore.Audio.Media.MIME_TYPE, mimetype)
+                    put(MediaStore.Audio.Media.DATE_MODIFIED, fileDateModified)
                     put(MediaStore.Audio.Media.IS_PENDING, false)
                 }
 
@@ -970,6 +956,9 @@ class WifiSyncService : Service() {
                         )
                     )
 
+                    val cursor_path = path.uppercase()
+                    val cursor_name = name.uppercase()
+
                     cursor = applicationContext.contentResolver.query(
                         audioCollection,
                         arrayOf(
@@ -978,17 +967,18 @@ class WifiSyncService : Service() {
                             MediaStore.Audio.Media.DISPLAY_NAME,
                             MediaStore.Audio.Media.DATE_MODIFIED
                         ),
-                        "${MediaStore.Audio.Media.RELATIVE_PATH} = ? AND ${MediaStore.Audio.Media.DISPLAY_NAME} = ? AND ${MediaStore.Audio.Media.DATE_MODIFIED} > 0",
-                        arrayOf(path, name),
+                        "UPPER(${MediaStore.Audio.Media.RELATIVE_PATH}) = ? AND UPPER(${MediaStore.Audio.Media.DISPLAY_NAME}) = ? AND MediaStore.Audio.Media.DATE_MODIFIED <= ?",
+                        arrayOf(cursor_path, cursor_name, fileDateModified.toString()),
                         null,
                         null)
                     if (cursor != null) {
+                        var cnt = cursor.count
+                        Log.d("ReceiveFile", "getFileCursorCount = $cnt")
                         if (cursor.count == 1) {
                             cursor.moveToFirst()
                             contentUri =
                                 ContentUris.withAppendedId(audioCollection, cursor.getLong(0))
                             Log.d("UpdateContentUri:", contentUri.toString())
-
                             storage!!.updateFile(application as WifiSyncApp, contentUri)
                         }
                     }
@@ -1005,9 +995,9 @@ class WifiSyncService : Service() {
                     } else {
                         contentUri = applicationContext.contentResolver.insert(audioCollection, values)
                         //storage!!.updateFile(application as WifiSyncApp, contentUri!!)
-                        os = contentResolver.openOutputStream(contentUri!!, "w")!!
+                        os = contentResolver.openOutputStream(contentUri!!, "wt")!!
                     }
-                    logInfo("receiveFile()", "start write thread.")
+                    //logInfo("receiveFile()", "start write thread.")
                     os.use{fs: OutputStream? ->
                         writeString(syncStatusOK)
                         flushWriter()
@@ -1043,7 +1033,7 @@ class WifiSyncService : Service() {
                 }finally {
                     os?.close()
                 }
-                logInfo("receiveFile()", "end write thread.")
+                //logInfo("receiveFile()", "end write thread.")
                 writeString(syncStatusOK)
                 flushWriter()
                 storage!!.scanFile(
@@ -1166,7 +1156,7 @@ class WifiSyncService : Service() {
                         contentUri = contentResolver.insert(playListCollection, values, null)
                         //storage!!.updateFile(application as WifiSyncApp, contentUri!!)
                         Log.d("Update ContentUri", "after contentResolver.insert()")
-                        os = contentResolver.openOutputStream(contentUri!!, "w")!!
+                        os = contentResolver.openOutputStream(contentUri!!, "wt")!!
                     }
 
                     os.use { fs: OutputStream ->

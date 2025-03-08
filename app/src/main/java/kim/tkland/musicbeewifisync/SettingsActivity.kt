@@ -1,6 +1,7 @@
 package kim.tkland.musicbeewifisync
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,6 +12,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
@@ -18,12 +21,14 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuCompat
 import java.io.File
+import androidx.core.content.edit
 
 class SettingsActivity : WifiSyncBaseActivity() {
     private var initialSetup = false
@@ -151,6 +156,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
                 showNoConfigMatchedSettings()
             }
         }
+        setActivityRoot(this)
     }
 
     // アクティビティの結果に対するコールバックの登録
@@ -173,7 +179,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
                     "kim.tkland.musicbeewifisync.sharedpref",
                     MODE_PRIVATE
                 )
-                preferences.edit().putString("accesseduri", mUri.toString()).commit()
+                preferences.edit(commit = true) { putString("accesseduri", mUri.toString()) }
             } catch (e: Exception) {
                 Log.d("launcher", e.message!!)
             }
@@ -321,5 +327,18 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun setActivityRoot(c: Activity) {
+        var v: View = (c.findViewById<ViewGroup>(android.R.id.content)!!).getChildAt(0)
+
+        var sv = ScrollView(c)
+        var lp = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        sv.setLayoutParams(lp)
+
+        (v.parent as ViewGroup).removeAllViews()
+
+        sv.addView(v);
+        c.addContentView(sv, lp);
     }
 }
