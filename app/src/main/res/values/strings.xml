@@ -16,7 +16,7 @@
     <string name="settingsStorageSettingsPrompt">Select the storage for your files:</string>
     <string name="settingsStorageInternal">Internal Storage</string>
     <string name="settingsStorageExternal">Removable SD Card</string>
-    <string name="settingsStorageSdCard1">Removable SD Card (1)</string>
+    <string name="settingsStorageSdCard1">Removable SD Card</string>
     <string name="settingsStorageSdCard2">Removable SD Card (2)</string>
     <string name="settingsSelectSdCard">Select the SD Card root folder</string>
     <string name="settingsGrantAccess">Grant Access</string>
@@ -89,6 +89,8 @@
     <string name="progressDialogTitle">MusicBee Wifi Sync</string>
     <string name="alertDialogMessage">Register files modified by Wired Sync in the MediaStore</string>
     <string name="progressDialogMessage">Registering files modified by Wired Sync in the MediaStore…</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <!-- Strings used for fragments for navigation -->
 
 </resources>

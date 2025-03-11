@@ -2,7 +2,6 @@ package kim.tkland.musicbeewifisync
 
 import android.app.ActivityManager.TaskDescription
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
@@ -17,6 +16,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuCompat
+import androidx.core.net.toUri
 
 class MainActivity : WifiSyncBaseActivity() {
     private var syncPreview = false
@@ -125,7 +125,7 @@ class MainActivity : WifiSyncBaseActivity() {
         if (!MediaStore.canManageMedia(this)) {
             startActivity(
                 Intent(Settings.ACTION_REQUEST_MANAGE_MEDIA)
-                    .setData(Uri.parse("package:${packageName}"))
+                    .setData("package:${packageName}".toUri())
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         }
@@ -156,7 +156,7 @@ class MainActivity : WifiSyncBaseActivity() {
         val fullSyncItem = menu.findItem(R.id.fullSyncMenuItem)
         fullSyncItem.isCheckable = true
         fullSyncItem.isChecked = true
-        val playlistSyncMenuItem = menu.findItem(R.id.playlistSyncMenuItem)
+        // val playlistSyncMenuItem = menu.findItem(R.id.playlistSyncMenuItem)
         // playlistSyncMenuItem.isCheckable = false
         // playlistSyncMenuItem.isChecked = false
         return true
@@ -237,7 +237,6 @@ class MainActivity : WifiSyncBaseActivity() {
                 true
             } else {
                 val builder = AlertDialog.Builder(mainWindow!!)
-                //val builder = AlertDialog.Builder(mainWindow?.applicationContext!!)
                 builder.setTitle(getString(R.string.syncErrorHeader))
                 builder.setMessage(message)
                 builder.setIcon(android.R.drawable.ic_dialog_alert)

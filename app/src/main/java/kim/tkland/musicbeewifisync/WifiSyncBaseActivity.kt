@@ -100,7 +100,7 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
             thread = Thread(
                 GetMusicFiles()
             )
-            thread!!.start()
+            thread.start()
         }
 
     }

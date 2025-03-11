@@ -16,7 +16,7 @@
     <string name="settingsStorageSettingsPrompt">Selecione o armazenamento:</string>
     <string name="settingsStorageInternal">Armazenamento Interno</string>
     <string name="settingsStorageExternal">Cartão SD</string>
-    <string name="settingsStorageSdCard1">Cartão SD (1)</string>
+    <string name="settingsStorageSdCard1">Cartão SD</string>
     <string name="settingsStorageSdCard2">Cartão SD (2)</string>
     <string name="settingsSelectSdCard">Selecione a pasta raiz do Cartão SD</string>
     <string name="settingsGrantAccess">Conceder Acesso</string>
@@ -90,5 +90,7 @@
     <string name="progressDialogTitle">MusicBee Wifi Sync</string>
     <string name="alertDialogMessage">Register files modified by Wired Sync in the MediaStore</string>
     <string name="progressDialogMessage">Registering files modified by Wired Sync in the MediaStore…</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

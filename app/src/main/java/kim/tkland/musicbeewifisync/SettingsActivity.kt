@@ -37,17 +37,14 @@ class SettingsActivity : WifiSyncBaseActivity() {
     private var settingsLocateServerNoConfig: TextView? = null
     private var settingsStorageOptions: RadioGroup? = null
     private var settingsStorageSdCard1: RadioButton? = null
-    // private var settingsStorageSdCard2: RadioButton? = null
     private var settingsGrantAccessButton: Button? = null
     private var settingsDebugMode: CheckBox? = null
     private var settingsDeviceNamePrompt: TextView? = null
     private var settingsDeviceName: EditText? = null
     private val PERMISSION_READ_EXTERNAL_STORAGE = 1000
-    // private var settingsServerIpOverride: EditText? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        // PermissionsHandler.demandInternalStorageAccessPermissions(this)
         initialSetup = WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()
         locateServerButton = findViewById(R.id.locateServerButton)
         settingsWaitIndicator = findViewById(R.id.settingsWaitIndicator)
@@ -69,32 +66,20 @@ class SettingsActivity : WifiSyncBaseActivity() {
         settingsDeviceName = findViewById(R.id.settingsDeviceName)
         val externalSdCardCount = getExternalFilesDirs(null).size - 1
         val sdCard1: RadioButton? = settingsStorageSdCard1
-        //var sdCard2:RadioButton? = settingsStorageSdCard2
         if (externalSdCardCount == 0) {
             settingsStorageInternal.isChecked = true
             sdCard1?.setChecked(false)
-            //sdCard2?.let{it.setVisibility(View.GONE)}
         } else {
             if (externalSdCardCount == 1) {
                 if (WifiSyncServiceSettings.deviceStorageIndex == 2) {
                     sdCard1?.setChecked(true)
-                    //sdCard2?.let{it.setVisibility(View.GONE)}
                 } else {
                     settingsStorageInternal.isChecked = true
-                    //if (WifiSyncServiceSettings.deviceStorageIndex ==0) {
-                    //sdCard1?.setText(R.string.settingsStorageSdCard1)
-                    //sdCard2?.let{it.setText(R.string.settingsStorageSdCard2)}
-                    //sdCard2?.let{it.setEnabled(false)}
-                    //sdCard2?.let{it.setVisibility(View.VISIBLE)
-                    //}
                 }
             } else {
                 settingsStorageInternal.isChecked = false
                 WifiSyncServiceSettings.deviceStorageIndex = 1
                 sdCard1?.setText(R.string.settingsStorageSdCard1)
-                //sdCard2?.let{it.setText(R.string.settingsStorageSdCard2)}
-                //sdCard2?.let{it.setVisibility(View.VISIBLE)}
-                //sdCard2?.let{it.setChecked(WifiSyncServiceSettings.deviceStorageIndex == 2)}
             }
         }
         val debugMode: CheckBox? = settingsDebugMode
@@ -237,8 +222,6 @@ class SettingsActivity : WifiSyncBaseActivity() {
         } else {
             WifiSyncServiceSettings.deviceStorageIndex =
                 if (settingsStorageSdCard1!!.isChecked) 2 else 1
-//                if (settingsStorageSdCard1!!.isChecked) 1 else 0
-//                if (settingsStorageSdCard1!!.isChecked) 1 else if (settingsStorageSdCard2!!.isChecked) 2 else 0
             WifiSyncServiceSettings.saveSettings(this)
         }
         super.onDestroy()
@@ -265,8 +248,6 @@ class SettingsActivity : WifiSyncBaseActivity() {
         settingsLocateServerNoConfig!!.visibility = View.GONE
         WifiSyncServiceSettings.deviceStorageIndex =
             if (settingsStorageSdCard1!!.isChecked) 2 else 1
-//            if (settingsStorageSdCard1!!.isChecked) 1 else 0
-//            if (settingsStorageSdCard1!!.isChecked) 1 else if (settingsStorageSdCard2!!.isChecked) 2 else 0
         WifiSyncServiceSettings.saveSettings(mainWindow)
         settingsWaitIndicator!!.visibility = View.VISIBLE
         val locateServerThread = Thread(Runnable {

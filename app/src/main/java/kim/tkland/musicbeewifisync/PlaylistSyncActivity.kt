@@ -33,13 +33,13 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
         syncPlaylistsCountMessage = findViewById(R.id.syncPlaylistsCountMessage)
         syncPlaylistsPreviewButton = findViewById(R.id.syncPlaylistsPreviewButton)
         syncPlaylistsStartButton = findViewById(R.id.syncPlaylistsStartButton)
-        syncPlaylistsDeleteFiles?.let{it.setChecked(WifiSyncServiceSettings.syncDeleteUnselectedFiles)}
+        syncPlaylistsDeleteFiles?.setChecked(WifiSyncServiceSettings.syncDeleteUnselectedFiles)
         if (selectedPlaylists == null) {
             loadPlaylists()
         } else {
             showPlaylists()
         }
-        syncPlaylistsDeleteFiles?.let{it.setChecked(WifiSyncServiceSettings.syncDeleteUnselectedFiles)}
+        syncPlaylistsDeleteFiles?.setChecked(WifiSyncServiceSettings.syncDeleteUnselectedFiles)
     }
 
     override fun onDestroy() {
@@ -66,9 +66,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
         try {
             if (setSyncParameters()) {
                 syncPreview = true
-                //if (tryGetStorageAccessGrant()) {
                 WifiSyncService.startSynchronisation(this, 0, true, false)
-                //}
             }
         } finally {
             syncPlaylistsPreviewButton!!.isEnabled = true
@@ -80,9 +78,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
         try {
             if (setSyncParameters()) {
                 syncPreview = false
-                //if (tryGetStorageAccessGrant()) {
                 WifiSyncService.startSynchronisation(this, 0, false, false)
-                //}
             }
         } finally {
             syncPlaylistsStartButton!!.isEnabled = true

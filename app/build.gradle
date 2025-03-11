@@ -9,8 +9,8 @@ android {
     defaultConfig {
         applicationId "kim.tkland.musicbeewifisync"
         minSdk 31
-        versionCode 117
-        versionName '2.7.15'
+        versionCode 118
+        versionName '2.7.16'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         targetSdk 35
@@ -24,8 +24,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility "1.8"
-        targetCompatibility "1.8"
+        sourceCompatibility "17"
+        targetCompatibility "17"
     }
     buildFeatures {
         viewBinding true

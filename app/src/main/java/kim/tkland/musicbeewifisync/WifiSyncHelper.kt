@@ -1,6 +1,5 @@
 package kim.tkland.musicbeewifisync
 
-import android.R
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
@@ -15,7 +14,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.*
-
 
 internal object Dialog {
     @JvmStatic
@@ -64,7 +62,6 @@ internal object ErrorHandler {
     private fun initialise() {
         if (fileHandler == null) {
             try {
-                //folderPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
                 val file = File(folderPath, "MusicBeeWifiSyncErrorLog.txt")
                 try {
                     FileOutputStream(file).channel.truncate(0).close()
@@ -74,7 +71,6 @@ internal object ErrorHandler {
                 fileHandler = FileHandler(file.path)
                 fileHandler!!.formatter = LogFormatter()
                 logger.addHandler(fileHandler as Handler)
-                //logger.info(Build.MODEL + ";  " + Build.VERSION.RELEASE + ";  " + BuildConfig.VERSION_NAME)
             } catch (ex: Exception) {
                 Log.e("WifiSync: ErrorHandler", ex.toString())
             }
@@ -113,12 +109,6 @@ internal object ErrorHandler {
                 logger.info(element.toString())
             }
         }
-        /*else if (BuildConfig.DEBUG) {
-            Log.d("WifiSync: $tag", message)
-            for (element: StackTraceElement in ex.stackTrace) {
-                Log.d("WifiSync", element.toString())
-            }
-        }*/
     }
 
     @JvmStatic

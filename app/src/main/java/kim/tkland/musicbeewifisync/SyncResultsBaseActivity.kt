@@ -97,7 +97,6 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
             }
         }
         val adapter: ArrayAdapter<SyncResultsInfo?> = object : ArrayAdapter<SyncResultsInfo?>(
-        //val adapter: ArrayAdapter<SyncResultsInfo?
             mainWindow?.applicationContext!!,
             R.layout.row_item_sync_results,
             R.id.syncResultsLine1,

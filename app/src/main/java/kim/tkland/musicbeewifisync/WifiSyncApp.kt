@@ -11,7 +11,6 @@ import android.provider.MediaStore
 import java.lang.Thread.sleep
 import java.util.Collections
 
-
 val lockd = Any()
 val locku = Any()
 

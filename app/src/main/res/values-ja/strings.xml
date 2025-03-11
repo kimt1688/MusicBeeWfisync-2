@@ -16,7 +16,7 @@
     <string name="settingsStorageSettingsPrompt">音楽ファイルの保存場所を選択してください：</string>
     <string name="settingsStorageInternal">内蔵ストレージ</string>
     <string name="settingsStorageExternal">SDカード</string>
-    <string name="settingsStorageSdCard1">SD Card (1)</string>
+    <string name="settingsStorageSdCard1">SDカード</string>
     <string name="settingsStorageSdCard2">SD Card (2)</string>
     <string name="settingsSelectSdCard">Select the SD Card root folder</string>
     <string name="settingsGrantAccess">Grant Access</string>
@@ -89,6 +89,8 @@
     <string name="progressDialogTitle">MusicBee Wifi Sync</string>
     <string name="alertDialogMessage">有線Syncでの変更をMediaStoreに登録します</string>
     <string name="progressDialogMessage">有線Syncでの変更をMediaStoreに登録しています…</string>
+    <string name="ok">OK</string>
+    <string name="cancel">キャンセル</string>
 
     <!-- Strings used for fragments for navigation -->
 </resources>
