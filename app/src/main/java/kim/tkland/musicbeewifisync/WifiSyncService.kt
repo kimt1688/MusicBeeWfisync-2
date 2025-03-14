@@ -44,6 +44,7 @@ import com.maxmpz.poweramp.player.TableDefs.*
 import kim.tkland.musicbeewifisync.Dialog.showOkCancel
 import kim.tkland.musicbeewifisync.ErrorHandler.logError
 import kim.tkland.musicbeewifisync.ErrorHandler.logInfo
+import kim.tkland.musicbeewifisync.WifiSyncService.Companion.syncProgressMessage
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -58,6 +59,7 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.InvalidObjectException
 import java.io.OutputStream
+import java.io.UTFDataFormatException
 import java.io.UnsupportedEncodingException
 import java.net.Inet4Address
 import java.net.InetAddress
@@ -177,6 +179,7 @@ class WifiSyncService : Service() {
         return START_REDELIVER_INTENT
     }
 
+    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     private inner class SynchronisationWorker(private val context: Context) :
         Runnable {
         private var clientSocket: Socket? = null
@@ -427,7 +430,9 @@ class WifiSyncService : Service() {
             commandLoop@ while (true) {
                 command = readString()
                 if (WifiSyncServiceSettings.debugMode) {
-                    logInfo("syncDevice", "command=$command, length=${command.length}")
+                    if (syncIsRunning.get()) {
+                        logInfo("syncDevice", "command=$command, length=${command.length}")
+                    }
                 }
                 if (Thread.interrupted()) {
                     if (WifiSyncServiceSettings.debugMode) {
@@ -494,9 +499,9 @@ class WifiSyncService : Service() {
        private fun readString(): String {
            var returnLength = 0
            try {
-               var buffer = ByteArray(Short.MAX_VALUE.toInt())
-               returnLength = socketStreamReader!!.readShort().toInt()
-               if (returnLength <= 0 || returnLength > Short.MAX_VALUE.toInt()) {
+               var buffer = ByteArray(size = 0xFFFF.toInt())
+               returnLength = socketStreamReader!!.readUnsignedShort().toInt()
+               if ((returnLength > 0xFFFF.toInt()) || (returnLength <= 0)) {
                    return ""
                }
                this.socketStreamReader!!.readFully(buffer, 0, returnLength)
@@ -543,6 +548,9 @@ class WifiSyncService : Service() {
                 } else {
                     ary = value.toByteArray(Charsets.UTF_8)
                     length = ary.size
+                }
+                if (length > 0xFFFF.toInt()) {
+                    throw UTFDataFormatException("writeString() value String length too long.")
                 }
                 socketStreamWriter!!.writeShort(length)
                 for (i in 0 until length) {
@@ -883,7 +891,8 @@ class WifiSyncService : Service() {
 
                 try {
                     if (contentUri != null) {
-                        applicationContext.contentResolver.update(contentUri, values, null)
+                        // applicationContext.contentResolver.update(contentUri, values, null)
+                        storage!!.updateFile(application as WifiSyncApp, contentUri)
                         os = contentResolver.openOutputStream(contentUri, "wt")!!
                     } else {
                         contentUri =
@@ -931,12 +940,13 @@ class WifiSyncService : Service() {
                 }
                 writeString(syncStatusOK)
                 flushWriter()
+                /*
                 storage!!.scanFile(
                     filePath,
                     fileLength,
                     fileDateModified,
                     FileStorageAccess.ACTION_ADD
-                )
+                )*/
             } catch (ex: Exception) {
                 try {
                     logError("receiveFile", ex, "file=$filePath")
@@ -1017,8 +1027,8 @@ class WifiSyncService : Service() {
                 }
                 if (cursor != null) {
                     try {
-                        cursor.moveToFirst()
-                        if (cursor.count > 0) {
+                        if (cursor.count == 1) {
+                            cursor.moveToFirst()
                             contentUri =
                                 ContentUris.withAppendedId(playListCollection, cursor.getLong(0))
                             storage!!.updateFile(application as WifiSyncApp, contentUri)
@@ -1045,7 +1055,13 @@ class WifiSyncService : Service() {
                 var os: OutputStream? = null
                 try {
                     if (contentUri != null) {
-                        os = contentResolver.openOutputStream(contentUri, "wt")!!
+                        if(File(this.getPathFromUri(applicationContext, contentUri)).exists()) {
+                            storage!!.updateFile(application as WifiSyncApp, contentUri)
+                            os = contentResolver.openOutputStream(contentUri, "wt")!!
+                        } else {
+                            contentUri = contentResolver.insert(playListCollection, values)
+                            os = contentResolver.openOutputStream(contentUri!!, "wt")!!
+                        }
                     } else {
                         contentUri = contentResolver.insert(playListCollection, values)
                         //storage!!.updateFile(application as WifiSyncApp, contentUri!!)
@@ -1082,6 +1098,10 @@ class WifiSyncService : Service() {
                                 waitWrite.set()
                                 bufferIndex = if ((bufferIndex == 1)) 0 else 1
                             }
+                        } catch (_: InterruptedException) {
+                            Thread.currentThread().interrupt()
+                            writeString(syncStatusCANCEL)
+                            flushWriter()
                         } finally {
                             fs.flush()
                             thread.interrupt()
@@ -1095,12 +1115,13 @@ class WifiSyncService : Service() {
             }
             writeString(syncStatusOK)
             flushWriter()
+            /*
             storage!!.scanFile(
                 filePath,
                 fileLength,
                 fileDateModified,
                 FileStorageAccess.ACTION_ADD
-            )
+            )*/
 
             deleteOriginalPlaylist(filePath)
         }
@@ -1429,11 +1450,12 @@ class WifiSyncService : Service() {
                     deleteUriList.add(filePathToUri(filePath))
                     writeString(status)
                     flushWriter()
-                    //if (deleteUriList.size > 50) {
-                        val app = (application as WifiSyncApp)
-                        storage!!.deleteFile(app, deleteUriList)
-                        deleteUriList = ArrayList()
-                    //}
+
+                    val app = (application as WifiSyncApp)
+                    storage!!.deleteFile(app, deleteUriList)
+                    storage!!.deleteFile(filePath)
+                    deleteUriList = ArrayList()
+
                 } catch (ex: Exception) {
                     logError("deleteFile", ex, "file=$filePath")
                     if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
@@ -1443,20 +1465,6 @@ class WifiSyncService : Service() {
                     flushWriter()
                     failMessage = ex.toString()
                 }
-                    /*
-                if (failMessage != null) {
-                    syncFailedFiles.add(
-                        FileErrorInfo(
-                            FileErrorInfo.ERROR_DELETE,
-                            filePath,
-                            failMessage
-                        )
-                    )
-                }*/
-            }
-            if (deleteUriList.isNotEmpty()) {
-                val app = (application as WifiSyncApp)
-                storage!!.deleteFile(app, deleteUriList)
             }
         }
 
@@ -1480,7 +1488,7 @@ class WifiSyncService : Service() {
                             folderPath
                         )
                     )
-                    if (!storage!!.deleteFolder(folderPath)) {
+                    if (!storage!!.deleteFolder((application as WifiSyncApp), folderPath)) {
                         status = syncStatusFAIL
                     }
                 } catch (ex: Exception) {
@@ -2585,7 +2593,7 @@ internal class FileStorageAccess(
     }
 
     @Throws(Exception::class)
-    fun deleteFolder(folderPath: String): Boolean {
+    fun deleteFolder(app: WifiSyncApp, folderPath: String): Boolean {
         val folderUrl = getFileUrl(folderPath)
         if (isDocumentFileStorage) {
             val folderUri = getDocumentFileUri(folderPath)
@@ -2604,6 +2612,12 @@ internal class FileStorageAccess(
                 return false
             } else if (folder.delete()) {
                 scanFile(folderPath, 0, 0, ACTION_DELETE)
+                syncProgressMessage.set(
+                    String.format(
+                        app.getString(R.string.syncFileActionDelete),
+                        folderPath
+                    )
+                )
                 return true
             } else {
                 return !folder.exists()

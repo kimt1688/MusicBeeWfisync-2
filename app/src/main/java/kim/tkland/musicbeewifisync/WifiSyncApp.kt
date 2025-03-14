@@ -8,11 +8,12 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import android.provider.MediaStore
+import kotlinx.coroutines.runBlocking
 import java.lang.Thread.sleep
 import java.util.Collections
 
-val lockd = Any()
-val locku = Any()
+//val lockd = Any()
+//val locku = Any()
 
 class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
     @JvmField
@@ -49,10 +50,12 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
         // same batch request. The system will automatically delete them
         // using the same prompt dialog, making the experience homogeneous.
 
-        val list: MutableList<Uri?> = ArrayList()
-        Collections.addAll(list, *uriList)
+        //synchronized(this) {
+        runBlocking {
 
-        synchronized(lockd) {
+            val list: MutableList<Uri?> = ArrayList()
+            Collections.addAll(list, *uriList)
+
             val pendingIntent =
                 MediaStore.createDeleteRequest(currentActivity!!.contentResolver, list)
             currentActivity!!.startIntentSenderForResult(
@@ -64,15 +67,15 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
                 0,
                 null
             )
-            sleep(400)
         }
     }
 
     fun update(uriList: Array<Uri>, requestCode: Int) {
-        val list: MutableList<Uri?> = ArrayList()
-        Collections.addAll(list, *uriList)
+        //synchronized(this) {
+        runBlocking {
+            val list: MutableList<Uri?> = ArrayList()
+            Collections.addAll(list, *uriList)
 
-        synchronized(locku) {
             val pendingIntent =
                 MediaStore.createWriteRequest(currentActivity!!.contentResolver, list)
             currentActivity!!.startIntentSenderForResult(
@@ -84,7 +87,6 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
                 0,
                 null
             )
-            sleep(300)
         }
     }
 }

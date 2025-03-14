@@ -89,8 +89,6 @@
     <string name="progressDialogTitle">MusicBee Wifi Sync</string>
     <string name="alertDialogMessage">有線Syncでの変更をMediaStoreに登録します</string>
     <string name="progressDialogMessage">有線Syncでの変更をMediaStoreに登録しています…</string>
-    <string name="ok">OK</string>
-    <string name="cancel">キャンセル</string>
 
     <!-- Strings used for fragments for navigation -->
 </resources>

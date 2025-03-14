@@ -90,7 +90,5 @@
     <string name="progressDialogTitle">MusicBee Wifi Sync</string>
     <string name="alertDialogMessage">Register files modified by Wired Sync in the MediaStore</string>
     <string name="progressDialogMessage">Registering files modified by Wired Sync in the MediaStore…</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
 
 </resources>

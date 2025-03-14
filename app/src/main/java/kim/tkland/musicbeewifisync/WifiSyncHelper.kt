@@ -24,16 +24,16 @@ internal object Dialog {
             val errorDialog = AlertDialog.Builder(parentActivity)
             errorDialog.setMessage(prompt)
             errorDialog.setNegativeButton(
-                R.string.cancel,
+                android.R.string.cancel,
                 DialogInterface.OnClickListener { _, _ ->
-                    result.set(R.string.cancel)
+                    result.set(android.R.string.cancel)
                     synchronized(dialogWait) { dialogWait.notifyAll() }
                 })
             errorDialog.setPositiveButton(
-                R.string.ok,
+                android.R.string.ok,
                 object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface, which: Int) {
-                        result.set(R.string.ok)
+                        result.set(android.R.string.ok)
                         synchronized(dialogWait) { dialogWait.notifyAll() }
                     }
                 })
