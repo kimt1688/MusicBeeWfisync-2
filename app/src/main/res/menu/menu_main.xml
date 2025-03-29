@@ -13,6 +13,11 @@
             android:onClick="onFullScanMenuItemClick"
             android:title="@string/menuFullScanFiles"
             app:showAsAction="never" />
+        <item
+            android:id="@+id/deleteAllPlaylistsMenuItem"
+            android:onClick="onDeleteAllPlaylistsClick"
+            android:title="@string/menuAllPlaylitsDelete"
+            app:showAsAction="never" />
     </group>
     <group android:id="@+id/wifiErrorLogGroup">
         <item android:id="@+id/wifiSyncLogMenuItem" app:showAsAction="never" android:title="@string/menuWifiSyncLog" />

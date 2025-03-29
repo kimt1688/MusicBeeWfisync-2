@@ -89,6 +89,11 @@
     <string name="progressDialogTitle">MusicBee Wifi Sync</string>
     <string name="alertDialogMessage">Register files modified by Wired Sync in the MediaStore</string>
     <string name="progressDialogMessage">Registering files modified by Wired Sync in the MediaStore…</string>
+    <string name="menuAllPlaylitsDelete">Delete All Playlists in Device</string>
+    <string name="menuAllPlaylitsDeleteConfirm">Do you really want to delete all playlists?</string>
+    <string name="playlistDeletingMessage">Deleting playlists...</string>
+
+    playlistDeletingMessage
     <!-- Strings used for fragments for navigation -->
 
 </resources>

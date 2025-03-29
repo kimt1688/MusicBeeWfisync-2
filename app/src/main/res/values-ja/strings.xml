@@ -89,6 +89,9 @@
     <string name="progressDialogTitle">MusicBee Wifi Sync</string>
     <string name="alertDialogMessage">有線Syncでの変更をMediaStoreに登録します</string>
     <string name="progressDialogMessage">有線Syncでの変更をMediaStoreに登録しています…</string>
+    <string name="menuAllPlaylitsDelete">端末内のプレイリストの全削除</string>
+    <string name="menuAllPlaylitsDeleteConfirm">本当にすべてのプレイリストを削除しますか？</string>
+    <string name="playlistDeletingMessage">プレイリストの削除中...</string>
 
     <!-- Strings used for fragments for navigation -->
 </resources>

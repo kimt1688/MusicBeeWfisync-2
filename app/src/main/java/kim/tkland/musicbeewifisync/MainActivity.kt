@@ -1,12 +1,18 @@
 package kim.tkland.musicbeewifisync
 
 import android.app.ActivityManager.TaskDescription
+import android.app.ProgressDialog
+import android.content.ContentUris
+import android.content.DialogInterface
 import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
@@ -17,6 +23,7 @@ import android.widget.RadioGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuCompat
 import androidx.core.net.toUri
+import kim.tkland.musicbeewifisync.Dialog.showOkCancel
 
 class MainActivity : WifiSyncBaseActivity() {
     private var syncPreview = false
@@ -276,5 +283,93 @@ class MainActivity : WifiSyncBaseActivity() {
             serverStatusThread = null
         }
         serverStatusThread!!.start()
+    }
+
+    fun onDeleteAllPlaylistsClick(item: MenuItem) : Boolean{
+        /// 確認ダイアログを出してOKの時に処理
+        var retval = false
+        AlertDialog.Builder(this)
+            .setTitle(R.string.progressDialogTitle)
+            .setMessage(R.string.menuAllPlaylitsDeleteConfirm)
+            .setCancelable(true)
+            .setPositiveButton("OK") { dialog: DialogInterface, _ ->
+                // OKボタン押下時に実行したい処理を記述
+                dialog.dismiss()
+                var thread: Thread? = null
+                progressDialog = ProgressDialog(this)
+                progressDialog!!.setTitle(R.string.progressDialogTitle)
+                progressDialog!!.setMessage(getString(R.string.playlistDeletingMessage))
+                progressDialog!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+                progressDialog!!.setCancelable(false)
+                progressDialog!!.show()
+                progressDialog!!.run {
+                    thread = Thread(
+                        DeleteAllPlaylists()
+                    )
+                    thread.start()
+                }
+            }
+            .setNegativeButton("Cancel") { dialog: DialogInterface, _ ->
+                // クリックしたときの処理
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+        return true
+    }
+
+    protected inner class DeleteAllPlaylists() : Thread() {
+        override fun run() {
+            val playListCollection = MediaStore.Audio.Playlists.getContentUri(
+                MediaStore.getExternalVolumeNames(applicationContext)
+                    .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
+            )
+            var contentUri: Uri? = null
+
+            try {
+                var cursor: Cursor? = null
+                try {
+                    cursor = applicationContext.contentResolver.query(
+                        playListCollection,
+                        arrayOf(
+                            MediaStore.Audio.Playlists._ID,
+                            MediaStore.Audio.Playlists.RELATIVE_PATH,
+                            MediaStore.Audio.Playlists.DISPLAY_NAME
+                        ),
+                        null,
+                        null,
+                        null,
+                        null
+                    )
+                } catch (e: Exception) {
+                    Log.d("SQLite Error", e.stackTraceToString())
+                    progressDialog!!.dismiss()
+                    return
+                }
+                if (cursor != null) {
+                    try {
+                        cursor.moveToFirst()
+                        do {
+                            contentUri =
+                                ContentUris.withAppendedId(playListCollection, cursor.getLong(0))
+                            (application as WifiSyncApp).delete(contentUri)
+                        } while (cursor.moveToNext())
+                    } catch (e: Exception) {
+                        Log.d("onDeleteAllPlaylistsClick", e.message!!)
+                        Log.d("onDeleteAllPlaylistsClick", e.stackTraceToString())
+                        progressDialog!!.dismiss()
+                        return
+                    }
+                    cursor.close()
+                }
+            } catch (ex: Exception) {
+                Log.d("onDeleteAllPlaylistsClick", ex.message!!)
+                Log.d("onDeleteAllPlaylistsClick", ex.stackTraceToString())
+                progressDialog!!.dismiss()
+                return
+            }
+            progressDialog!!.dismiss()
+            return
+        }
     }
 }

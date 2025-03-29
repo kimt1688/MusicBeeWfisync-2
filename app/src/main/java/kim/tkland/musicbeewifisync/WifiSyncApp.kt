@@ -8,12 +8,8 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import android.provider.MediaStore
-import kotlinx.coroutines.runBlocking
-import java.lang.Thread.sleep
-import java.util.Collections
-
-//val lockd = Any()
-//val locku = Any()
+import android.util.Log
+import java.util.concurrent.atomic.AtomicReference
 
 class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
     @JvmField
@@ -38,7 +34,7 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
     override fun onActivityPaused(activity: Activity) {}
     override fun onActivityResumed(activity: Activity) {}
 
-    fun delete(uriList: Array<Uri>, requestCode: Int) {
+    fun delete(uri: Uri) {
         // WARNING: if the URI isn't a MediaStore Uri and specifically
         // only for media files (images, videos, audio) then the request
         // will throw an IllegalArgumentException, with the message:
@@ -50,43 +46,42 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
         // same batch request. The system will automatically delete them
         // using the same prompt dialog, making the experience homogeneous.
 
-        //synchronized(this) {
-        runBlocking {
+        val activity : AtomicReference<Activity> = AtomicReference(this.currentActivity)
+        Log.d("WifiSyncApp", "delete(uri):${uri}")
+        val list: MutableList<Uri> = ArrayList()
+        list.add(uri)
 
-            val list: MutableList<Uri?> = ArrayList()
-            Collections.addAll(list, *uriList)
-
-            val pendingIntent =
-                MediaStore.createDeleteRequest(currentActivity!!.contentResolver, list)
-            currentActivity!!.startIntentSenderForResult(
-                pendingIntent.intentSender,
-                requestCode,
-                null,
-                0,
-                0,
-                0,
-                null
-            )
-        }
+        val pendingIntent =
+            MediaStore.createDeleteRequest(activity.get().contentResolver, list)
+        activity.get().startIntentSenderForResult(
+            pendingIntent.intentSender,
+            777,
+            null,
+            0,
+            0,
+            0,
+            null
+        )
+        Thread.sleep(300)
     }
 
-    fun update(uriList: Array<Uri>, requestCode: Int) {
-        //synchronized(this) {
-        runBlocking {
-            val list: MutableList<Uri?> = ArrayList()
-            Collections.addAll(list, *uriList)
+    fun update(uri: Uri) {
+        val activity : AtomicReference<Activity> = AtomicReference(this.currentActivity)
+        Log.d("WifiSyncApp", "delete(uri):${uri}")
+        val list: MutableList<Uri?> = ArrayList()
+        list.add(uri)
 
-            val pendingIntent =
-                MediaStore.createWriteRequest(currentActivity!!.contentResolver, list)
-            currentActivity!!.startIntentSenderForResult(
-                pendingIntent.intentSender,
-                requestCode,
-                null,
-                0,
-                0,
-                0,
-                null
-            )
-        }
+        val pendingIntent =
+            MediaStore.createWriteRequest(activity.get().contentResolver, list)
+        activity.get().startIntentSenderForResult(
+            pendingIntent.intentSender,
+            999,
+            null,
+            0,
+            0,
+            0,
+            null
+        )
+        Thread.sleep(300)
     }
 }

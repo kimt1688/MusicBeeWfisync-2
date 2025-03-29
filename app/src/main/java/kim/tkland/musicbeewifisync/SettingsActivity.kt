@@ -5,9 +5,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.DocumentsContract
+import android.provider.Settings.ACTION_REQUEST_MANAGE_MEDIA
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -29,6 +31,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuCompat
 import java.io.File
 import androidx.core.content.edit
+import androidx.core.net.toUri
 
 class SettingsActivity : WifiSyncBaseActivity() {
     private var initialSetup = false
@@ -98,6 +101,10 @@ class SettingsActivity : WifiSyncBaseActivity() {
                     requestPermissionForReadWrite()
                 }
             }
+            val intent = Intent(ACTION_REQUEST_MANAGE_MEDIA)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .setData("package:kim.tkland.musicbeewifisync".toUri())
+            startActivity(intent)
             val sharedPref =
                 getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
             val uriStr = sharedPref.getString("accesseduri", "")
@@ -192,6 +199,8 @@ class SettingsActivity : WifiSyncBaseActivity() {
                 this,
                 arrayOf(
                     Manifest.permission.READ_MEDIA_AUDIO,
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
                     Manifest.permission.MANAGE_MEDIA,
                     Manifest.permission.ACCESS_MEDIA_LOCATION
                 ), PERMISSION_READ_EXTERNAL_STORAGE

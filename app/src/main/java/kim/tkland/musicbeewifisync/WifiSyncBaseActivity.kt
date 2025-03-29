@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Bundle
 import android.os.storage.StorageManager
 import android.view.MenuItem
@@ -90,7 +91,7 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
     // 有線 Syncのファイルを見つけて登録する
     protected fun listNewFiles() {
         var thread: Thread? = null
-        progressDialog = ProgressDialog((application as WifiSyncApp).currentActivity)
+        progressDialog = ProgressDialog((application as WifiSyncApp).currentActivity!!)
         progressDialog!!.setTitle(R.string.progressDialogTitle)
         progressDialog!!.setMessage(resources.getString(R.string.progressDialogMessage))
         progressDialog!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
@@ -107,14 +108,12 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
 
     protected inner class GetMusicFiles() : Thread() {
         override fun run() {
-            runBlocking() {
-                val sm = applicationContext.getSystemService(StorageManager::class.java)
-                val svl = sm.storageVolumes
-                for (sv in svl) {
-                    if (sv.directory != null) {
-                        val path = "${sv.directory!!.absolutePath}/Music/"
-                        searchFilesInDirectory(File(path))
-                    }
+            val sm = applicationContext.getSystemService(StorageManager::class.java)
+            val svl = sm.storageVolumes
+            for (sv in svl) {
+                if (sv.directory != null) {
+                    val path = "${sv.directory!!.absolutePath}/Music/"
+                    searchFilesInDirectory(File(path))
                 }
             }
 
@@ -123,18 +122,40 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
 
         private fun searchFilesInDirectory(dir: File) {
             val files: Array<File>? = dir.listFiles()
-            if (!files.isNullOrEmpty()) {
+            if (files!!.isNotEmpty()) {
                 //ファイルが存在していた時のみ処理を行う
                 for (f in files) {
                     if (f.isDirectory()) {
                         //ディレクトリの場合再帰的に検索する
                         searchFilesInDirectory(f)
                     } else {
-                        MediaScannerConnection.scanFile(applicationContext, arrayOf(f.path), null, null)
-                        return
+                        runBlocking {
+                            /*
+                            val mediaScannerConnection = MediaScannerConnection(applicationContext, MediaScannerClient())
+                            mediaScannerConnection.connect()
+                            mediaScannerConnection.scanFile(f.path, "")
+                            */
+                            MediaScannerConnection.scanFile(
+                                applicationContext,
+                                arrayOf(f.path),
+                                null,
+                                null
+                            )
+                        }
                     }
                 }
             }
         }
     }
+
+    private inner class MediaScannerClient() : MediaScannerConnection.MediaScannerConnectionClient {
+        override fun onMediaScannerConnected() : Unit {
+
+        }
+
+        override fun onScanCompleted(path: String, uri: Uri): Unit {
+
+        }
+    }
+
 }
