@@ -15,7 +15,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.*
 
-internal object Dialog {
+object Dialog {
     @JvmStatic
     fun showOkCancel(parentActivity: Activity, prompt: String?): Int {
         val dialogWait = Object()

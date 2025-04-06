@@ -2757,10 +2757,17 @@ internal class FileStorageAccess(
                 fileScanCount.getAndDecrement()
                 synchronized(fileScanWait) {
                     // 削除ファイルの表示を行う、filePathでよいか？
+                    // フルパスのことがあるので、先頭削除を行う
+                    var path = ""
+                    if (filePath.startsWith(storageRootPath, true)) {
+                        path = filePath.substring(storageRootPath.length + 1)
+                    } else {
+                        path = filePath
+                    }
                     syncProgressMessage.set(
                         String.format(
                             context.getString(R.string.syncFileActionDelete),
-                            filePath
+                            path
                         )
                     )
                     fileScanWait.notifyAll()

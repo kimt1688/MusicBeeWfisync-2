@@ -1,7 +1,6 @@
 package kim.tkland.musicbeewifisync
 
 import android.app.ActivityManager.TaskDescription
-import android.app.ProgressDialog
 import android.content.ContentUris
 import android.content.DialogInterface
 import android.content.Intent
@@ -23,7 +22,6 @@ import android.widget.RadioGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuCompat
 import androidx.core.net.toUri
-import kim.tkland.musicbeewifisync.Dialog.showOkCancel
 
 class MainActivity : WifiSyncBaseActivity() {
     private var syncPreview = false
@@ -285,9 +283,8 @@ class MainActivity : WifiSyncBaseActivity() {
         serverStatusThread!!.start()
     }
 
-    fun onDeleteAllPlaylistsClick(item: MenuItem) : Boolean{
+    fun onDeleteAllPlaylistsClick(item: MenuItem) {
         /// 確認ダイアログを出してOKの時に処理
-        var retval = false
         AlertDialog.Builder(this)
             .setTitle(R.string.progressDialogTitle)
             .setMessage(R.string.menuAllPlaylitsDeleteConfirm)
@@ -295,27 +292,14 @@ class MainActivity : WifiSyncBaseActivity() {
             .setPositiveButton("OK") { dialog: DialogInterface, _ ->
                 // OKボタン押下時に実行したい処理を記述
                 dialog.dismiss()
-                var thread: Thread? = null
-                progressDialog = ProgressDialog(this)
-                progressDialog!!.setTitle(R.string.progressDialogTitle)
-                progressDialog!!.setMessage(getString(R.string.playlistDeletingMessage))
-                progressDialog!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-                progressDialog!!.setCancelable(false)
-                progressDialog!!.show()
-                progressDialog!!.run {
-                    thread = Thread(
-                        DeleteAllPlaylists()
-                    )
-                    thread.start()
-                }
+                var thread = Thread(DeleteAllPlaylists())
+                showWifiSyncAlertDialog(getString(R.string.playlistDeletingMessage), thread, null)
             }
             .setNegativeButton("Cancel") { dialog: DialogInterface, _ ->
                 // クリックしたときの処理
                 dialog.dismiss()
             }
-            .create()
             .show()
-        return true
     }
 
     protected inner class DeleteAllPlaylists() : Thread() {
@@ -344,6 +328,7 @@ class MainActivity : WifiSyncBaseActivity() {
                 } catch (e: Exception) {
                     Log.d("SQLite Error", e.stackTraceToString())
                     progressDialog!!.dismiss()
+                    interrupt()
                     return
                 }
                 if (cursor != null) {
@@ -354,22 +339,25 @@ class MainActivity : WifiSyncBaseActivity() {
                                 ContentUris.withAppendedId(playListCollection, cursor.getLong(0))
                             (application as WifiSyncApp).delete(contentUri)
                         } while (cursor.moveToNext())
-                    } catch (e: Exception) {
-                        Log.d("onDeleteAllPlaylistsClick", e.message!!)
+                        cursor.close()
+                        progressDialog!!.dismiss()
+                        interrupt()
+                        return
+                    } catch (e: InterruptedException) {
+                        Log.d("onDeleteAllPlaylistsClick", e.toString())
                         Log.d("onDeleteAllPlaylistsClick", e.stackTraceToString())
                         progressDialog!!.dismiss()
+                        interrupt()
                         return
                     }
-                    cursor.close()
                 }
             } catch (ex: Exception) {
-                Log.d("onDeleteAllPlaylistsClick", ex.message!!)
+                Log.d("onDeleteAllPlaylistsClick", ex.toString())
                 Log.d("onDeleteAllPlaylistsClick", ex.stackTraceToString())
                 progressDialog!!.dismiss()
+                interrupt()
                 return
             }
-            progressDialog!!.dismiss()
-            return
         }
     }
 }
