@@ -127,6 +127,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             }
         }
         waitResultsThread!!.start()
+        setSupportActionBar(findViewById(R.id.my_toolbar))
     }
 
     override fun onDestroy() {

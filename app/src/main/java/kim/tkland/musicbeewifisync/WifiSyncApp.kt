@@ -62,12 +62,12 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
             0,
             null
         )
-        Thread.sleep(300)
+        Thread.sleep(500)
     }
 
     fun update(uri: Uri) {
         val activity : AtomicReference<Activity> = AtomicReference(this.currentActivity)
-        Log.d("WifiSyncApp", "delete(uri):${uri}")
+        Log.d("WifiSyncApp", "update(uri):${uri}")
         val list: MutableList<Uri?> = ArrayList()
         list.add(uri)
 

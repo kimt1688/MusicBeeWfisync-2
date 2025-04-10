@@ -2,36 +2,51 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/settingScreenStyle"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
     android:verticalScrollbarPosition="right"
-    tools:context="kim.tkland.musicbeewifisync.SettingsActivity">
+    tools:context="kim.tkland.musicbeewifisync.SettingsActivity" >
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorButtonNormal"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <TextView
         android:id="@+id/settingsInfo0"
-        android:layout_width="wrap_content"
+        android:layout_width="355dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="15dp"
         android:text="@string/settingsLocateServerInfo0"
         android:textColor="@color/colorError"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
 
     <TextView
         android:id="@+id/settingsInfo1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="15dp"
         android:text="@string/settingsLocateServerInfo1"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingsInfo0" />
+        app:layout_constraintTop_toBottomOf="@id/settingsInfo0" />
 
     <TextView
         android:id="@+id/settingsInfo2"
@@ -74,6 +89,7 @@
             android:layout_height="69dp"
             android:layout_marginTop="6dp"
             android:text="@string/settingsStorageInternal"
+            android:theme="@style/AppTheme"
             android:textSize="20sp" />
 
         <RadioButton
@@ -84,6 +100,7 @@
             android:paddingVertical="15sp"
             android:text="@string/settingsStorageExternal"
             android:textSize="20sp"
+            android:theme="@style/AppTheme"
             app:layout_constraintTop_toBottomOf="parent" />
 
     </RadioGroup>
@@ -92,8 +109,10 @@
         android:id="@+id/settingsGrantAccessButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="0dp"
         android:text="@string/settingsGrantAccess"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintLeft_toLeftOf="@+id/settingsStorageOptions"
         app:layout_constraintTop_toBottomOf="@+id/settingsStorageOptions" />
 
@@ -101,11 +120,12 @@
         android:id="@+id/settingsDebugMode"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
         android:text="@string/settingsDebugMode"
         android:textSize="16sp"
         android:visibility="invisible"
+        android:theme="@style/AppTheme"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settingsGrantAccessButton" />
 
@@ -119,7 +139,7 @@
         android:text="@string/errorLocateServerNoConfig"
         android:textColor="@color/colorError"
         android:textSize="16sp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/settingsDeviceNamePrompt"
         app:layout_constraintStart_toStartOf="@+id/settingsDeviceNamePrompt"
         app:layout_constraintTop_toBottomOf="@+id/settingsDebugMode" />
@@ -134,7 +154,7 @@
         android:singleLine="true"
         android:text="@string/settingsDeviceNamePrompt"
         android:textSize="16sp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settingsLocateServerNoConfig" />
 
@@ -143,6 +163,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:autofillHints=""
         android:inputType="text"
         android:textSize="16sp"
         android:visibility="invisible"
@@ -159,25 +180,24 @@
         android:minWidth="60dp"
         android:minHeight="60dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/locateServerButton"
+        android:theme="@style/AppTheme"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingsDebugMode"
+        app:layout_constraintTop_toBottomOf="@+id/settingsDeviceName"
         app:layout_constraintVertical_bias="0.391" />
 
     <Button
         android:id="@+id/locateServerButton"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="58dp"
+        android:layout_marginBottom="4dp"
         android:background="@color/colorButtonBackground"
         android:onClick="onLocateServerButton_Click"
         android:text="@string/settingsLocate"
+        android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="@color/colorButtonTextEnabled"
         android:textSize="17sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

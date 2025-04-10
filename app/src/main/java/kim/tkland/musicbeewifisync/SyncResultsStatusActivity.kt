@@ -52,6 +52,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         }
         timerHandler.postDelayed(timerRunnable!!, 300)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        setSupportActionBar(findViewById(R.id.my_toolbar))
     }
 
     override fun onDestroy() {

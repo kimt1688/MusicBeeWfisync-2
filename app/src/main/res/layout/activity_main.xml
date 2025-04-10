@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    tools:context="kim.tkland.musicbeewifisync.MainActivity">
+    tools:context="kim.tkland.musicbeewifisync.MainActivity" >
 
     <ScrollView
         android:layout_width="match_parent"
@@ -20,7 +20,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/my_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorButtonNormal"
+                android:elevation="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
             <LinearLayout
                 android:id="@+id/syncFrom"
                 android:layout_width="match_parent"
@@ -58,6 +67,7 @@
                 android:singleLine="true"
                 android:text="@string/syncFromDefault"
                 android:textSize="16sp"
+                android:theme="@style/AppTheme"
                 app:layout_constraintTop_toBottomOf="@+id/syncFrom" />
 
             <LinearLayout
@@ -96,6 +106,7 @@
                 android:layout_marginEnd="15dp"
                 android:text="@string/syncToPlaycounts"
                 android:textSize="16sp"
+                android:theme="@style/AppTheme"
                 app:layout_constraintTop_toBottomOf="@+id/syncTo" />
 
             <CheckBox
@@ -107,6 +118,7 @@
                 android:layout_marginEnd="15dp"
                 android:text="@string/syncToRatings"
                 android:textSize="16sp"
+                android:theme="@style/AppTheme"
                 app:layout_constraintTop_toBottomOf="@+id/syncToPlayCounts" />
 
             <CheckBox
@@ -119,6 +131,7 @@
                 android:labelFor="@+id/syncToPlaylistPath"
                 android:text="@string/syncToPlaylists"
                 android:textSize="16sp"
+                android:theme="@style/AppTheme"
                 app:layout_constraintTop_toBottomOf="@+id/syncToRatings" />
 
             <EditText
@@ -157,30 +170,33 @@
                     android:id="@+id/reverceFromPoweramp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="43dp"
+                    android:layout_marginStart="43dp"
                     android:layout_marginTop="5dp"
                     android:onClick="onPowerampCheckClick"
                     android:text="Poweramp"
+                    android:theme="@style/AppTheme"
                     android:textSize="20sp" />
 
                 <RadioButton
                     android:id="@+id/reverceFromGoneMAD"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="43dp"
+                    android:layout_marginStart="43dp"
                     android:layout_marginTop="5dp"
                     android:onClick="onGoneMADCheckClick"
                     android:text="GoneMAD"
+                    android:theme="@style/AppTheme"
                     android:textSize="20sp" />
 
                 <RadioButton
                     android:id="@+id/reverceFromNone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="43dp"
+                    android:layout_marginStart="43dp"
                     android:layout_marginTop="5dp"
                     android:onClick="onNoneCheckClick"
                     android:text="None"
+                    android:theme="@style/AppTheme"
                     android:textSize="20sp" />
             </RadioGroup>
         </LinearLayout>
@@ -256,12 +272,4 @@
             android:textSize="17sp" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="2dp"
-        android:layout_height="60dp"
-        android:background="#FFFFFF"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"></LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

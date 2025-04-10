@@ -859,7 +859,7 @@ class WifiSyncService : Service() {
                 val ext = File(filePath).extension
                 var isplaylist = false
                 if (ext.isNotEmpty())
-                    isplaylist = ext.equals("m3u", ignoreCase = true) || ext.equals("m3u8", ignoreCase = true) || ext.equals("wpl", ignoreCase = true)
+                    isplaylist = ext.equals("m3u", ignoreCase = true) || ext.equals("m3u8", ignoreCase = true) || ext.equals("wpl", ignoreCase = true) || ext.equals("pla", ignoreCase = true)
                 val mimetype: String?
                 if (isplaylist) {
                     receivePlaylist(filePath, fileLength, fileDateModified)
@@ -1104,6 +1104,11 @@ class WifiSyncService : Service() {
                         MediaStore.Audio.Playlists.MIME_TYPE,
                         "application/vnd.ms-wpl"
                     )
+                /*} else if (mymetypebase.equals("pla", ignoreCase = true)) {
+                    values.put(
+                        MediaStore.Audio.Playlists.MIME_TYPE,
+                        "audio/x-mpegurl"
+                    )*/
                 }
 
                 var os: OutputStream? = null
@@ -2684,7 +2689,7 @@ internal class FileStorageAccess(
         val charIndex = filePath.lastIndexOf('.')
         if (charIndex != -1) {
             val ext = filePath.substring(charIndex)
-            return (ext.equals(".m3u", ignoreCase = true) || ext.equals(".m3u8", ignoreCase = true) || ext.equals(".wpl", ignoreCase = true))
+            return (ext.equals(".m3u", ignoreCase = true) || ext.equals(".m3u8", ignoreCase = true) || ext.equals(".wpl", ignoreCase = true) || ext.equals(".pla", ignoreCase = true))
         }
         return false
     }

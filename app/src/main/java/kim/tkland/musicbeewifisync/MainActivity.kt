@@ -38,6 +38,7 @@ class MainActivity : WifiSyncBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_settings)
         ErrorHandler.initialise(this)
         // needed so android "Recent Views" actually shows the icon - only seems to be an issue with P
         @Suppress("DEPRECATION") setTaskDescription(
@@ -134,6 +135,7 @@ class MainActivity : WifiSyncBaseActivity() {
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         }
+        setSupportActionBar(findViewById(R.id.my_toolbar))
     }
 
     private fun setPlaylistsEnabled(enabled: Boolean) {
@@ -281,83 +283,5 @@ class MainActivity : WifiSyncBaseActivity() {
             serverStatusThread = null
         }
         serverStatusThread!!.start()
-    }
-
-    fun onDeleteAllPlaylistsClick(item: MenuItem) {
-        /// 確認ダイアログを出してOKの時に処理
-        AlertDialog.Builder(this)
-            .setTitle(R.string.progressDialogTitle)
-            .setMessage(R.string.menuAllPlaylitsDeleteConfirm)
-            .setCancelable(true)
-            .setPositiveButton("OK") { dialog: DialogInterface, _ ->
-                // OKボタン押下時に実行したい処理を記述
-                dialog.dismiss()
-                var thread = Thread(DeleteAllPlaylists())
-                showWifiSyncAlertDialog(getString(R.string.playlistDeletingMessage), thread, null)
-            }
-            .setNegativeButton("Cancel") { dialog: DialogInterface, _ ->
-                // クリックしたときの処理
-                dialog.dismiss()
-            }
-            .show()
-    }
-
-    protected inner class DeleteAllPlaylists() : Thread() {
-        override fun run() {
-            val playListCollection = MediaStore.Audio.Playlists.getContentUri(
-                MediaStore.getExternalVolumeNames(applicationContext)
-                    .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
-            )
-            var contentUri: Uri? = null
-
-            try {
-                var cursor: Cursor? = null
-                try {
-                    cursor = applicationContext.contentResolver.query(
-                        playListCollection,
-                        arrayOf(
-                            MediaStore.Audio.Playlists._ID,
-                            MediaStore.Audio.Playlists.RELATIVE_PATH,
-                            MediaStore.Audio.Playlists.DISPLAY_NAME
-                        ),
-                        null,
-                        null,
-                        null,
-                        null
-                    )
-                } catch (e: Exception) {
-                    Log.d("SQLite Error", e.stackTraceToString())
-                    progressDialog!!.dismiss()
-                    interrupt()
-                    return
-                }
-                if (cursor != null) {
-                    try {
-                        cursor.moveToFirst()
-                        do {
-                            contentUri =
-                                ContentUris.withAppendedId(playListCollection, cursor.getLong(0))
-                            (application as WifiSyncApp).delete(contentUri)
-                        } while (cursor.moveToNext())
-                        cursor.close()
-                        progressDialog!!.dismiss()
-                        interrupt()
-                        return
-                    } catch (e: InterruptedException) {
-                        Log.d("onDeleteAllPlaylistsClick", e.toString())
-                        Log.d("onDeleteAllPlaylistsClick", e.stackTraceToString())
-                        progressDialog!!.dismiss()
-                        interrupt()
-                        return
-                    }
-                }
-            } catch (ex: Exception) {
-                Log.d("onDeleteAllPlaylistsClick", ex.toString())
-                Log.d("onDeleteAllPlaylistsClick", ex.stackTraceToString())
-                progressDialog!!.dismiss()
-                interrupt()
-                return
-            }
-        }
     }
 }

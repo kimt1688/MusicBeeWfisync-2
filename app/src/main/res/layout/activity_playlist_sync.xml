@@ -5,7 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="kim.tkland.musicbeewifisync.PlaylistSyncActivity">
-
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorButtonNormal"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
     <TextView
         android:id="@+id/syncPlaylistsPrompt"
         android:layout_width="match_parent"
@@ -15,7 +26,7 @@
         android:layout_marginEnd="15dp"
         android:textSize="15sp"
         android:text="@string/syncPlaylistsPrompt"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
         />
 
     <CheckBox
@@ -28,6 +39,7 @@
         android:text="@string/syncPlaylistsDeleteUnselected"
         android:textSize="15sp"
         android:singleLine="true"
+        android:theme="@style/AppTheme"
         app:layout_constraintTop_toBottomOf="@+id/syncPlaylistsPrompt"
         app:layout_constraintLeft_toLeftOf="parent"
         />

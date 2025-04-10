@@ -148,6 +148,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         }
         setActivityRoot(this)
+        setSupportActionBar(findViewById(R.id.my_toolbar))
     }
 
     // アクティビティの結果に対するコールバックの登録

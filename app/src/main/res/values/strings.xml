@@ -92,9 +92,7 @@
     <string name="menuAllPlaylitsDelete">Delete All Playlists in Device</string>
     <string name="menuAllPlaylitsDeleteConfirm">Do you really want to delete all playlists?</string>
     <string name="playlistDeletingMessage">Deleting playlists…</string>
-    <string name="textview">TextView</string>
 
-    playlistDeletingMessage
     <!-- Strings used for fragments for navigation -->
 
 </resources>

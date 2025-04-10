@@ -5,7 +5,6 @@
     android:orientation="horizontal"
     android:paddingStart="15dp"
     android:paddingEnd="15dp">
-
     <CheckBox
         android:id="@+id/syncFileSelectorName"
         android:layout_width="match_parent"
@@ -14,5 +13,6 @@
         android:textSize="15sp"
         android:gravity="center_vertical"
         android:singleLine="true"
+        android:theme="@style/AppTheme"
     />
 </LinearLayout>

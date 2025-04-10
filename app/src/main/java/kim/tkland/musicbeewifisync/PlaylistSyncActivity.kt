@@ -40,6 +40,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
             showPlaylists()
         }
         syncPlaylistsDeleteFiles?.setChecked(WifiSyncServiceSettings.syncDeleteUnselectedFiles)
+        setSupportActionBar(findViewById(R.id.my_toolbar))
     }
 
     override fun onDestroy() {
