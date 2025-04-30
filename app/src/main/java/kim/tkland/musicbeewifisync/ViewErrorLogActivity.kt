@@ -21,7 +21,7 @@ import androidx.core.view.updatePadding
 class ViewErrorLogActivity : AppCompatActivity() {
     private var errorText: TextView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        this.enableEdgeToEdge()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_error_log)
         val windowInsetsController =
@@ -58,6 +58,8 @@ class ViewErrorLogActivity : AppCompatActivity() {
             // down to descendant views.
             WindowInsetsCompat.CONSUMED
         }
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightStatusBars = true
         setSupportActionBar(findViewById(R.id.my_toolbar))
         errorText = findViewById(R.id.errorText)
         errorText?.let{ it.movementMethod = ScrollingMovementMethod() }

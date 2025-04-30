@@ -4,6 +4,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 // Existing plugins
 //    id("com.android.application") version "8.9.1" apply false
 //}
+plugins {
+    // Existing plugins
+    alias(libs.plugins.compose.compiler) apply false
+}
 
 buildscript {
     //ext {
@@ -12,7 +16,7 @@ buildscript {
     //ext.agp_version = '8.9,1'
     //ext.kotlin_version = '2.1.10'
     extra.apply {
-        set("agpversion", "8.9.1")
+        set("agpversion", "8.9.2")
         set("kotlinversion", "2.1.10")
     }
     repositories {
@@ -30,6 +34,8 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
+val debugDebuggable by extra(true)
+
 
 allprojects {
     repositories {

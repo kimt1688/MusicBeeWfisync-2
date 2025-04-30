@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuCompat
 
@@ -16,6 +17,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     private var proceedSyncButtonText: TextView? = null
     private var waitResultsThread: Thread? = null
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sync_preview)
         val actionBar = supportActionBar
@@ -70,7 +72,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             }
                         }
                         builder.show()
-                    } else if (previewToData.size == 0 && previewFromData.size == 0) {
+                    } else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
                         disableProceedSyncButton()
                         previewStatusMessage.setText(R.string.syncPreviewNoResults)
                         previewStatusMessage.visibility = View.VISIBLE
@@ -120,7 +122,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         showResults(previewListView, previewToData, previewFromData)
                     }
                 }
-            } catch (ex: InterruptedException) {
+            } catch (_: InterruptedException) {
                 // ignore
             } catch (ex: Exception) {
                 ErrorHandler.logError("preview", ex)

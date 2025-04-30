@@ -11,6 +11,7 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.core.view.MenuCompat
 import java.net.SocketTimeoutException
 
@@ -25,6 +26,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
     private var syncPlaylistsPreviewButton: Button? = null
     private var syncPlaylistsStartButton: LinearLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playlist_sync)
         syncPlaylistsDeleteFiles = findViewById(R.id.syncPlaylistsDeleteFiles)

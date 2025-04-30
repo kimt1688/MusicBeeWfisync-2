@@ -11,9 +11,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.setMargins
+import androidx.core.view.updatePadding
 import com.google.android.material.snackbar.Snackbar
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
@@ -26,6 +32,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     private val timerHandler: Handler = Handler(Looper.getMainLooper())
     private var timerRunnable: Runnable? = null
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sync_status)
         WifiSyncService.resultsActivityReady.set()
@@ -128,13 +135,17 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             syncCompletionStatusMessage!!.setText(messageId)
             syncCompletionStatusMessage!!.visibility = View.VISIBLE
             if (errorMessageId == R.string.syncCompletedFail) {
-                if ((WifiSyncService.syncToResults == null || WifiSyncService.syncToResults!!.size == 0) && WifiSyncService.syncFailedFiles.size == 0) {
+                if ((WifiSyncService.syncToResults == null || WifiSyncService.syncToResults!!.isEmpty()) && WifiSyncService.syncFailedFiles.isEmpty()) {
                     syncCompletionStatusMessage!!.setText(R.string.syncCompletedFailErrorLog)
                     syncFailedResults!!.visibility = View.VISIBLE
                 } else {
                     val params =
                         syncCompletionStatusMessage!!.layoutParams as ConstraintLayout.LayoutParams
+                    params.topToTop = findViewById<Toolbar>(R.id.my_toolbar).top
+                    params.setMargins(0, findViewById<Toolbar>(R.id.my_toolbar).height, 0, 0)
+                    params.bottomToTop = findViewById<Button>(R.id.stopSyncButton).top
                     params.verticalBias = 0.0f
+
                     syncCompletionStatusMessage!!.layoutParams = params
                     syncCompletionStatusMessage!!.setText(R.string.syncCompletedFailMessage)
                     syncFailedResults!!.visibility = View.VISIBLE

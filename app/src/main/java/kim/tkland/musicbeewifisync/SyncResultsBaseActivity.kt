@@ -27,7 +27,7 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
     @JvmField
     protected var warningColor = 0
     override fun onCreate(savedInstanceState: Bundle?) {
-        this.enableEdgeToEdge()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         infoColor = ContextCompat.getColor(this, R.color.colorButtonTextDisabled)
@@ -49,6 +49,7 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
                 v.left = (insets.left).toInt()
                 v.bottom = (insets.bottom).toInt()
                 v.right = (insets.right).toInt()
+                v.bottom = (insets.bottom).toInt()
             }
             v.updatePadding(
                 left = bars.left,
@@ -66,6 +67,9 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
             // down to descendant views.
             WindowInsetsCompat.CONSUMED
         }
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightStatusBars = true
+
     }
 
     override fun onDestroy() {

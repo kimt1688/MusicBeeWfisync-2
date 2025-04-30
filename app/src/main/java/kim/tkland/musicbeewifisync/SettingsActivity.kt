@@ -24,6 +24,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -45,18 +46,19 @@ class SettingsActivity : WifiSyncBaseActivity() {
     private var settingsDeviceName: EditText? = null
     private val PERMISSION_READ_EXTERNAL_STORAGE = 1000
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         initialSetup = WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()
         locateServerButton = findViewById(R.id.locateServerButton)
-        settingsWaitIndicator = findViewById(R.id.settingsWaitIndicator)
+        // settingsWaitIndicator = findViewById(R.id.settingsWaitIndicator)
         settingsLocateServerNoConfig = findViewById(R.id.settingsLocateServerNoConfig)
         val settingsStoragePrompt = findViewById<TextView>(R.id.settingsStoragePrompt)
         settingsStorageOptions = findViewById(R.id.settingsStorageOptions)
         settingsStorageOptions?.let { it.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { _, _ -> showGrantAccessButton() }) }
         val settingsStorageInternal = findViewById<RadioButton>(R.id.settingsStorageInternal)
         settingsStorageSdCard1 = findViewById(R.id.settingsStorageSdCard1)
-        settingsGrantAccessButton = findViewById(R.id.settingsGrantAccessButton)
+        // settingsGrantAccessButton = findViewById(R.id.settingsGrantAccessButton)
         settingsDebugMode = findViewById(R.id.settingsDebugMode)
         settingsDebugMode?.setChecked(WifiSyncServiceSettings.debugMode)
         settingsDebugMode?.let {
@@ -258,12 +260,12 @@ class SettingsActivity : WifiSyncBaseActivity() {
         WifiSyncServiceSettings.deviceStorageIndex =
             if (settingsStorageSdCard1!!.isChecked) 2 else 1
         WifiSyncServiceSettings.saveSettings(mainWindow)
-        settingsWaitIndicator!!.visibility = View.VISIBLE
+        // settingsWaitIndicator!!.visibility = View.VISIBLE
         val locateServerThread = Thread(Runnable {
             val serverIPAddress = WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
             runOnUiThread {
                 if (mainWindow != null) {
-                    settingsWaitIndicator!!.visibility = View.INVISIBLE
+                    // settingsWaitIndicator!!.visibility = View.INVISIBLE
                     locateServerButton!!.isEnabled = true
                     locateServerButton!!.setTextColor(buttonTextEnabledColor)
                     if (serverIPAddress == null) {

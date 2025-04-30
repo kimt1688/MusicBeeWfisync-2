@@ -14,8 +14,10 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
 import android.view.ViewGroup.MarginLayoutParams
+import android.view.WindowInsets
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColor
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -31,7 +33,7 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
     protected var progressDialog: WifiSyncAlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        this.enableEdgeToEdge()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         val resources = resources
         @Suppress("DEPRECATION")
@@ -72,6 +74,8 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
             // down to descendant views.
             WindowInsetsCompat.CONSUMED
         }
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightStatusBars = true
     }
 
     override fun onDestroy() {

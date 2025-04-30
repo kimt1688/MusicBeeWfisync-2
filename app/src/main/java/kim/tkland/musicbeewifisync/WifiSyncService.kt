@@ -868,6 +868,8 @@ class WifiSyncService : Service() {
                     mimetype = MimeTypeMap.getSingleton()
                         .getMimeTypeFromExtension(ext.lowercase(Locale.getDefault()))
                     if (!mimetype!!.startsWith("audio", true)) {
+                        writeString(syncStatusCANCEL)
+                        flushWriter()
                         // エラーダイアログ表示、スキップ
                         val msg: String = resources.getString(R.string.mimeTypeErrorMessage)
                         GlobalScope.launch(Dispatchers.Main) {
@@ -879,9 +881,7 @@ class WifiSyncService : Service() {
                                 .create()
                                 .show()
                         }
-                        writeString(resources.getString(R.string.mimeTypeError))
-                        flushWriter()
-
+                        // writeString(resources.getString(R.string.mimeTypeError))
                         return
                     }
                 }
@@ -1696,11 +1696,11 @@ class WifiSyncService : Service() {
             val results = ArrayList<FileStatsInfo>()
             val contentResolver = contentResolver
             val projection = arrayOf(
-                com.maxmpz.poweramp.player.TableDefs.Folders.PATH,
-                com.maxmpz.poweramp.player.TableDefs.Files.NAME,
-                com.maxmpz.poweramp.player.TableDefs.Files.RATING,
-                com.maxmpz.poweramp.player.TableDefs.Files.PLAYED_TIMES,
-                com.maxmpz.poweramp.player.TableDefs.Files.PLAYED_AT
+                TableDefs.Folders.PATH,
+                TableDefs.Files.NAME,
+                TableDefs.Files.RATING,
+                TableDefs.Files.PLAYED_TIMES,
+                TableDefs.Files.PLAYED_AT
             )
             contentResolver.query(
                 //Uri.parse("content://com.maxmpz.audioplayer.data/files"),
