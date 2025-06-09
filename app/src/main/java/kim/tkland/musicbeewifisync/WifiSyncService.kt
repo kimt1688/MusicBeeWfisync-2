@@ -860,13 +860,12 @@ class WifiSyncService : Service() {
                 var isplaylist = false
                 if (ext.isNotEmpty())
                     isplaylist = ext.equals("m3u", ignoreCase = true) || ext.equals("m3u8", ignoreCase = true) || ext.equals("wpl", ignoreCase = true) || ext.equals("pla", ignoreCase = true)
-                val mimetype: String?
+                val mimetype = MimeTypeMap.getSingleton()
+                    .getMimeTypeFromExtension(ext.lowercase(Locale.getDefault()))
                 if (isplaylist) {
                     receivePlaylist(filePath, fileLength, fileDateModified)
                     return
                 } else {
-                    mimetype = MimeTypeMap.getSingleton()
-                        .getMimeTypeFromExtension(ext.lowercase(Locale.getDefault()))
                     if (!mimetype!!.startsWith("audio", true)) {
                         writeString(syncStatusCANCEL)
                         flushWriter()

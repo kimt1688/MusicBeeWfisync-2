@@ -1,11 +1,13 @@
-import com.android.sdklib.AndroidVersion.VersionCodes.*
-
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    // Existing plugins
-   id("com.android.application")
-   id("kotlin-android")
-   alias(libs.plugins.compose.compiler)
+    id("org.gradle.kotlin.kotlin-dsl") version "6.1.2"
 }
+//plugins {
+    // Existing plugins
+//    alias(libs.plugins.android.application)
+//    alias(libs.plugins.kotlin.android)
+//    alias(libs.plugins.compose.compiler)
+//}
 
 android {
     compileSdk = 35
@@ -15,11 +17,11 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 123
-        versionName = "2.8.1"
+        versionCode = 124
+        versionName = "2.8.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        targetSdk = VANILLA_ICE_CREAM
+        targetSdk = 35
     }
 
     buildTypes {
@@ -77,7 +79,6 @@ dependencies {
     implementation (libs.material)
     implementation (libs.androidx.navigation.fragment.ktx)
     implementation (libs.androidx.navigation.ui.ktx)
-    implementation (libs.cronet.embedded)
     implementation (libs.androidx.ui.tooling)
     implementation (libs.androidx.ui.tooling.preview)
     implementation (libs.androidx.ui)
@@ -85,7 +86,6 @@ dependencies {
     implementation (libs.kotlin.reflect)
     implementation (libs.androidx.leanback)
     testImplementation (libs.junit)
-    androidTestImplementation (libs.androidx.junit)
     testImplementation (libs.androidx.espresso.core)
     implementation (libs.kotlin.stdlib.jdk7)
     implementation (libs.androidx.lifecycle.livedata.ktx)
@@ -101,8 +101,14 @@ dependencies {
     implementation (libs.androidx.documentfile)
     implementation (libs.kotlinx.coroutines.android)
     implementation (platform(libs.compose.bom))
-    androidTestImplementation (platform(libs.compose.bom))
 }
 repositories {
-    mavenCentral()
+//    mavenCentral()
+    google()
+    mavenCentral {
+        metadataSources {
+            mavenPom()
+            gradleMetadata()
+        }
+    }
 }
