@@ -794,47 +794,6 @@ class WifiSyncService : Service() {
             }
         }
 
-        /*
-        fun delete(uri: Uri) {
-            val activity : AtomicReference<Activity> = AtomicReference((application as WifiSyncApp).currentActivity)
-            Log.d("WifiSyncApp", "delete(uri):${uri}")
-            val list: MutableList<Uri> = ArrayList()
-            list.add(uri)
-
-            val pendingIntent =
-                MediaStore.createDeleteRequest(application.contentResolver, list)
-            activity.get().startIntentSenderForResult(
-                pendingIntent.intentSender,
-                777,
-                null,
-                0,
-                0,
-                0,
-                null
-            )
-            Thread.sleep(300)
-        }
-         */
-/*
-        fun update(uri: Uri) {
-            var activity : AtomicReference<Activity> = AtomicReference((application as WifiSyncApp).currentActivity)
-            val list: MutableList<Uri?> = ArrayList()
-            list.add(uri)
-
-            val pendingIntent =
-                MediaStore.createWriteRequest(applicationContext.contentResolver, list)
-            activity.get().startIntentSenderForResult(
-                pendingIntent.intentSender,
-                999,
-                null,
-                0,
-                0,
-                0,
-                null
-            )
-        }
- */
-
         @OptIn(DelicateCoroutinesApi::class)
         @Throws(Exception::class)
         private fun receiveFile() {
@@ -864,9 +823,10 @@ class WifiSyncService : Service() {
                 if (isplaylist) {
                     receivePlaylist(filePath, fileLength, fileDateModified)
                     return
-                } else {
+                } /*else {*/
                     mimetype = MimeTypeMap.getSingleton()
                         .getMimeTypeFromExtension(ext.lowercase(Locale.getDefault()))
+                /*
                     if (!mimetype!!.startsWith("audio", true)) {
                         writeString(syncStatusCANCEL)
                         flushWriter()
@@ -884,7 +844,7 @@ class WifiSyncService : Service() {
                         // writeString(resources.getString(R.string.mimeTypeError))
                         return
                     }
-                }
+                }*/
                 val separatorIndex = filePath.lastIndexOf('/') + 1
                 val path = filePath.substring(0, separatorIndex)
                 val name = filePath.substring(separatorIndex)
@@ -953,10 +913,13 @@ class WifiSyncService : Service() {
                                 buffer,
                                 readCount,
                                 waitRead,
-                                waitWrite
+                                waitWrite,
+                                socketReadBufferLength
                             )
                         )
                         thread.start()
+                        writeReceiveFile(fs!!, buffer, waitRead, waitWrite, readCount, thread)
+                        /*
                         try {
                             var bytesRead: Int
                             var bufferIndex = 0
@@ -979,19 +942,13 @@ class WifiSyncService : Service() {
                         } finally {
                             thread.interrupt()
                         }
+                        */
                     }
                 }finally {
                     os?.close()
                 }
                 writeString(syncStatusOK)
                 flushWriter()
-                /*
-                storage!!.scanFile(
-                    filePath,
-                    fileLength,
-                    fileDateModified,
-                    FileStorageAccess.ACTION_ADD
-                )*/
             } catch (ex: Exception) {
                 try {
                     logError("receiveFile", ex, "file=$filePath")
@@ -1130,15 +1087,18 @@ class WifiSyncService : Service() {
                         writeString(syncStatusOK)
                         flushWriter()
                         val thread = Thread(
-                            ReceiveTextFileReceiveLoop(
+                            ReceiveFileReceiveLoop(
                                 fileLength,
                                 buffer,
                                 readCount,
                                 waitRead,
-                                waitWrite
+                                waitWrite,
+                                socketTextReadBufferLength
                             )
                         )
                         thread.start()
+                        writeReceiveFile(fs, buffer, waitRead, waitWrite, readCount, thread)
+                        /*
                         try {
                             var bytesRead = 0
                             var bufferIndex = 0
@@ -1164,6 +1124,7 @@ class WifiSyncService : Service() {
                             fs.flush()
                             thread.interrupt()
                         }
+                         */
                     }
                 }finally {
                     os?.close()
@@ -1175,15 +1136,50 @@ class WifiSyncService : Service() {
             flushWriter()
         }
 
+        private fun writeReceiveFile(
+                fs: OutputStream,
+                buffer: Array<ByteArray>,
+                waitRead: AutoResetEvent,
+                waitWrite: AutoResetEvent,
+                readCount: IntArray,
+                thread: Thread
+            )
+        {
+            try {
+                var bytesRead = 0
+                var bufferIndex = 0
+                while (true) {
+                    waitRead.waitOne()
+                    bytesRead = readCount[bufferIndex]
+                    if (bytesRead < 0) {
+                        throw SocketException("Error reading file")
+                    } else if (bytesRead == 0) {
+                        break
+                    }
+                    fs.write(buffer[bufferIndex], 0, bytesRead)
+                    waitWrite.set()
+                    bufferIndex = if ((bufferIndex == 1)) 0 else 1
+                }
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+                writeString(syncStatusCANCEL)
+                flushWriter()
+            } finally {
+                fs.flush()
+                thread.interrupt()
+            }
+        }
+
         private inner class ReceiveFileReceiveLoop(
             private val fileLength: Long,
             private val buffer: Array<ByteArray>,
             private val readCount: IntArray,
             private val waitRead: AutoResetEvent,
-            private val waitWrite: AutoResetEvent
+            private val waitWrite: AutoResetEvent,
+            private val initReadLength: Int
         ) : Runnable {
             override fun run() {
-                var readLength = socketReadBufferLength
+                var readLength = initReadLength
                 var bytesRead: Int
                 var remainingBytes = fileLength
                 var bufferIndex = 0
@@ -1192,7 +1188,7 @@ class WifiSyncService : Service() {
                         if (remainingBytes <= 0) {
                             bytesRead = 0
                         } else {
-                            if (remainingBytes < socketReadBufferLength) {
+                            if (remainingBytes < initReadLength) {
                                 readLength = remainingBytes.toInt()
                             }
                             bytesRead = readArray(buffer[bufferIndex], readLength)
@@ -1216,7 +1212,7 @@ class WifiSyncService : Service() {
                 }
             }
         }
-
+/*
         private inner class ReceiveTextFileReceiveLoop(
             private val fileLength: Long,
             private val buffer: Array<ByteArray>,
@@ -1257,7 +1253,7 @@ class WifiSyncService : Service() {
                 }
             }
         }
-
+*/
         @Throws(Exception::class)
         private fun sendFile() {
             val filePath = readString()
@@ -1383,6 +1379,7 @@ class WifiSyncService : Service() {
             flushWriter()
         }
 
+        /*
         private fun filePathToPlaylistUri(filePath: String): Uri {
             var id: Long = 0
             val cr = context.contentResolver
@@ -1416,6 +1413,7 @@ class WifiSyncService : Service() {
             )
             return return_uri
         }
+        */
 
         @Throws(Exception::class)
         private fun deleteFiles() {
@@ -2593,49 +2591,6 @@ internal class FileStorageAccess(
         )
         return return_uri
     }
-/*
-    fun dirPathToUri(filePath: String): Uri {
-        var id: Long = 0
-        val cr = context.applicationContext.contentResolver
-
-        val uri = MediaStore.Audio.Media.getContentUri(
-            MediaStore.getExternalVolumeNames(context.applicationContext)
-                .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
-        )
-        val projection =
-            arrayOf(MediaStore.Files.FileColumns._ID, MediaStore.Files.FileColumns.DISPLAY_NAME, MediaStore.Files.FileColumns.RELATIVE_PATH)
-        //val selection = MediaStore.Files.FileColumns.DISPLAY_NAME
-        val selectionArgs = arrayOf(
-            "",
-            filePath,
-        )
-
-        val cursor = cr.query(
-            uri, projection,
-            "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ? and ${MediaStore.Files.FileColumns.RELATIVE_PATH} = ?", selectionArgs, null
-        )
-
-        if (cursor != null) {
-            if (cursor.count > 0) {
-                cursor.moveToFirst()
-                do {
-                    val idIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
-                    id = cursor.getString(idIndex).toLong()
-                } while (cursor.moveToNext())
-            }
-            cursor.close()
-        }
-        val return_uri = ContentUris.withAppendedId(
-            MediaStore.Audio.Media.getContentUri(
-                MediaStore.getExternalVolumeNames(context.applicationContext)
-                    .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
-            ),
-            id
-        )
-        return return_uri
-    }
-
- */
 
     @Throws(Exception::class)
     fun deleteFolder(folderPath: String): Boolean {
@@ -2657,14 +2612,6 @@ internal class FileStorageAccess(
                 return false
             } else if (folder.delete()) {
                 scanFile(folderPath, 0, 0, ACTION_DELETE)
-                /*
-                syncProgressMessage.set(
-                    String.format(
-                        app.getString(R.string.syncFileActionDelete),
-                        folderPath
-                    )
-                )
-                 */
                 return true
             } else {
                 return !folder.exists()
