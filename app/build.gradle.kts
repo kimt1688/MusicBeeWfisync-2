@@ -15,11 +15,11 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 123
-        versionName = "2.8.1"
+        versionCode = 125
+        versionName = "2.8.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        targetSdk = VANILLA_ICE_CREAM
+        targetSdk = 35
     }
 
     buildTypes {
@@ -28,6 +28,7 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             isJniDebuggable = false
+            signingConfig = signingConfigs.getByName("debug")
             ndk {
                 debugSymbolLevel = "FULL"
             }
@@ -70,20 +71,19 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-	implementation (libs.androidx.constraintlayout)
+    implementation (libs.androidx.constraintlayout)
     implementation (libs.androidx.appcompat.resources)
     implementation (libs.material)
     implementation (libs.androidx.navigation.fragment.ktx)
     implementation (libs.androidx.navigation.ui.ktx)
-    implementation (libs.cronet.embedded)
     implementation (libs.androidx.ui.tooling)
     implementation (libs.androidx.ui.tooling.preview)
     implementation (libs.androidx.ui)
     implementation (libs.kotlin.stdlib)
     implementation (libs.kotlin.reflect)
     implementation (libs.androidx.leanback)
+    implementation(project(":app:poweramp_api_lib"))
     testImplementation (libs.junit)
     androidTestImplementation (libs.androidx.junit)
     testImplementation (libs.androidx.espresso.core)

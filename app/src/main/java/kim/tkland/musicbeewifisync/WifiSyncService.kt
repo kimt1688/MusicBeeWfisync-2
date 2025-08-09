@@ -1698,7 +1698,7 @@ class WifiSyncService : Service() {
                 TableDefs.Files.NAME,
                 TableDefs.Files.RATING,
                 TableDefs.Files.PLAYED_TIMES,
-                TableDefs.Files.PLAYED_AT
+                TableDefs.Files.PLAYED_FULLY_AT
             )
             contentResolver.query(
                 //Uri.parse("content://com.maxmpz.audioplayer.data/files"),
