@@ -1,8 +1,18 @@
 package kim.tkland.musicbeewifisync
 
+import android.Manifest
 import android.content.Context
+import android.content.Context.CONNECTIVITY_SERVICE
+import android.net.ConnectivityManager
+import android.net.LinkAddress
+import android.net.LinkProperties
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
+import androidx.annotation.RequiresPermission
 import java.math.BigInteger
+import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.nio.ByteOrder
@@ -38,19 +48,20 @@ class IpAddressProviderImpl(context: Context, overrideSearchIP: InetAddress?) : 
     }
 
     private fun detectDeviceIP(context: Context): InetAddress? {
-        val wifiManager =
-            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        @Suppress("DEPRECATION") val connectionInfo = wifiManager.connectionInfo ?: return null
-        @Suppress("DEPRECATION") var ipAddress = connectionInfo.ipAddress
-        if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-            ipAddress = Integer.reverseBytes(ipAddress)
+        //val wifiManager =
+        //    context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        //@Suppress("DEPRECATION") val connectionInfo = wifiManager.connectionInfo ?: return null
+        //@Suppress("DEPRECATION") var ipAddress = connectionInfo.ipAddress
+        var ipAddress: InetAddress? = null
+        val manager: ConnectivityManager = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val linkProperties = manager.getLinkProperties(manager.activeNetwork)
+        for(i in 0 until (linkProperties?.linkAddresses?.size ?:0)) {
+            if (linkProperties?.linkAddresses[i]?.address is Inet4Address) {
+                ipAddress = linkProperties.linkAddresses[i].address
+                break
+            }
         }
-        val ipByteArray = BigInteger.valueOf(ipAddress.toLong()).toByteArray()
-        return try {
-            InetAddress.getByAddress(ipByteArray)
-        } catch (e: UnknownHostException) {
-            null
-        }
+        return ipAddress
     }
 
     override fun iterator(): Iterator<InetAddress?> {

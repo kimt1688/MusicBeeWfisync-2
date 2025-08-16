@@ -52,7 +52,7 @@ class ViewErrorLogActivity : AppCompatActivity() {
             // Apply the insets as padding to the view. Here, set all the dimensions
             // as appropriate to your layout. You can also update the view's margin if
             // more appropriate.
-            v.updatePadding(insets.left, insets.top, insets.right, insets.bottom)
+            //v.updatePadding(insets.left, insets.top, insets.right, insets.bottom)
 
             // Return CONSUMED if you don't want the window insets to keep passing
             // down to descendant views.
@@ -60,6 +60,8 @@ class ViewErrorLogActivity : AppCompatActivity() {
         }
         WindowCompat.getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars = true
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightNavigationBars = true
         setSupportActionBar(findViewById(R.id.my_toolbar))
         errorText = findViewById(R.id.errorText)
         errorText?.let{ it.movementMethod = ScrollingMovementMethod() }

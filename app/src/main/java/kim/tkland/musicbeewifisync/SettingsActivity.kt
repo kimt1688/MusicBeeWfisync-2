@@ -46,7 +46,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
     private var settingsDeviceName: EditText? = null
     private val PERMISSION_READ_EXTERNAL_STORAGE = 1000
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         initialSetup = WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()

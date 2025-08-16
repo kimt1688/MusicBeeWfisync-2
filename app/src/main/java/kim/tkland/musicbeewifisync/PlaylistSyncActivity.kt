@@ -26,7 +26,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
     private var syncPlaylistsPreviewButton: Button? = null
     private var syncPlaylistsStartButton: LinearLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playlist_sync)
         syncPlaylistsDeleteFiles = findViewById(R.id.syncPlaylistsDeleteFiles)

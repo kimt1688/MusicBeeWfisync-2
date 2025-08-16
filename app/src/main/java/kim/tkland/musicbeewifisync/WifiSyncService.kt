@@ -58,6 +58,7 @@ import java.io.InvalidObjectException
 import java.io.OutputStream
 import java.io.UTFDataFormatException
 import java.io.UnsupportedEncodingException
+import java.lang.Float
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.InetSocketAddress
@@ -500,7 +501,7 @@ class WifiSyncService : Service() {
        private fun readString(): String {
            var returnLength = 0
            try {
-               var buffer = ByteArray(size = 0xFFFF.toInt())
+               val buffer = ByteArray(size = 0xFFFF.toInt())
                while (socketStreamReader!!.available() == 0) {}
                returnLength = socketStreamReader!!.readUnsignedShort().toInt()
                if ((returnLength > 0xFFFF.toInt()) || (returnLength <= 0)) {
@@ -819,12 +820,12 @@ class WifiSyncService : Service() {
                 var isplaylist = false
                 if (ext.isNotEmpty())
                     isplaylist = ext.equals("m3u", ignoreCase = true) || ext.equals("m3u8", ignoreCase = true) || ext.equals("wpl", ignoreCase = true) || ext.equals("pla", ignoreCase = true)
-                val mimetype: String?
+                // val mimetype: String?
                 if (isplaylist) {
                     receivePlaylist(filePath, fileLength, fileDateModified)
                     return
                 } /*else {*/
-                    mimetype = MimeTypeMap.getSingleton()
+                val mimetype = MimeTypeMap.getSingleton()
                         .getMimeTypeFromExtension(ext.lowercase(Locale.getDefault()))
                 /*
                     if (!mimetype!!.startsWith("audio", true)) {
@@ -919,30 +920,6 @@ class WifiSyncService : Service() {
                         )
                         thread.start()
                         writeReceiveFile(fs!!, buffer, waitRead, waitWrite, readCount, thread)
-                        /*
-                        try {
-                            var bytesRead: Int
-                            var bufferIndex = 0
-                            while (true) {
-                                waitRead.waitOne()
-                                bytesRead = readCount[bufferIndex]
-                                if (bytesRead < 0) {
-                                    throw SocketException("Error reading file")
-                                } else if (bytesRead == 0) {
-                                    break
-                                }
-                                fs?.write(buffer[bufferIndex], 0, bytesRead)
-                                waitWrite.set()
-                                bufferIndex = if ((bufferIndex == 1)) 0 else 1
-                            }
-                        } catch (_: InterruptedException) {
-                            Thread.currentThread().interrupt()
-                            writeString(syncStatusCANCEL)
-                            flushWriter()
-                        } finally {
-                            thread.interrupt()
-                        }
-                        */
                     }
                 }finally {
                     os?.close()
@@ -1098,33 +1075,6 @@ class WifiSyncService : Service() {
                         )
                         thread.start()
                         writeReceiveFile(fs, buffer, waitRead, waitWrite, readCount, thread)
-                        /*
-                        try {
-                            var bytesRead = 0
-                            var bufferIndex = 0
-                            var logIndex = 0
-                            while (true) {
-                                waitRead.waitOne()
-                                logIndex = bufferIndex
-                                bytesRead = readCount[bufferIndex]
-                                if (bytesRead < 0) {
-                                    throw SocketException("Error reading file")
-                                } else if (bytesRead == 0) {
-                                    break
-                                }
-                                fs.write(buffer[bufferIndex], 0, bytesRead)
-                                waitWrite.set()
-                                bufferIndex = if ((bufferIndex == 1)) 0 else 1
-                            }
-                        } catch (_: InterruptedException) {
-                            Thread.currentThread().interrupt()
-                            writeString(syncStatusCANCEL)
-                            flushWriter()
-                        } finally {
-                            fs.flush()
-                            thread.interrupt()
-                        }
-                         */
                     }
                 }finally {
                     os?.close()
@@ -1212,48 +1162,7 @@ class WifiSyncService : Service() {
                 }
             }
         }
-/*
-        private inner class ReceiveTextFileReceiveLoop(
-            private val fileLength: Long,
-            private val buffer: Array<ByteArray>,
-            private val readCount: IntArray,
-            private val waitRead: AutoResetEvent,
-            private val waitWrite: AutoResetEvent
-        ) : Runnable {
-            override fun run() {
-                var readLength = socketTextReadBufferLength
-                var bytesRead = 0
-                var remainingBytes = fileLength
-                var bufferIndex = 0
 
-                while (true) {
-                    try {
-                        if (remainingBytes <= 0) {
-                            bytesRead = 0
-                            // break
-                        } else {
-                            bytesRead = readArray(buffer[bufferIndex], readLength)
-                        }
-                    } catch (ex: Exception) {
-                        bytesRead = -1
-                        logError("receiveTextFileLoop", ex)
-                    }
-                    try {
-                        waitWrite.waitOne()
-                    } catch (_: InterruptedException) {
-                        bytesRead = -1
-                    }
-                    readCount[bufferIndex] = bytesRead.toInt()
-                    waitRead.set()
-                    if (bytesRead <= 0) {
-                        break
-                    }
-                    remainingBytes -= bytesRead
-                    bufferIndex = if ((bufferIndex == 1)) 0 else 1
-                }
-            }
-        }
-*/
         @Throws(Exception::class)
         private fun sendFile() {
             val filePath = readString()
@@ -1378,42 +1287,6 @@ class WifiSyncService : Service() {
             }
             flushWriter()
         }
-
-        /*
-        private fun filePathToPlaylistUri(filePath: String): Uri {
-            var id: Long = 0
-            val cr = context.contentResolver
-
-            val uri = MediaStore.Audio.Playlists.getContentUri("external")
-            val projection =
-                arrayOf(MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.DISPLAY_NAME, MediaStore.Audio.Playlists.RELATIVE_PATH)
-            val selectionArgs = arrayOf(
-                filePath.substring(filePath.lastIndexOf('/') + 1),
-                filePath.substring(0, filePath.lastIndexOf('/') + 1),
-            )
-
-            val cursor = cr.query(
-                uri, projection,
-                "${MediaStore.Audio.Playlists.DISPLAY_NAME} = ? and ${MediaStore.Audio.Playlists.RELATIVE_PATH} = ?", selectionArgs, null
-            )
-
-            if (cursor != null) {
-                if (cursor.count > 0) {
-                    cursor.moveToFirst()
-                    do {
-                        val idIndex = cursor.getColumnIndex(MediaStore.Audio.Playlists._ID)
-                        id = cursor.getString(idIndex).toLong()
-                    } while (cursor.moveToNext())
-                }
-                cursor.close()
-            }
-            val return_uri = ContentUris.withAppendedId(
-                MediaStore.Audio.Playlists.getContentUri("external"),
-                id
-            )
-            return return_uri
-        }
-        */
 
         @Throws(Exception::class)
         private fun deleteFiles() {
@@ -1888,7 +1761,7 @@ class WifiSyncService : Service() {
                 if (lastName.equals("Uri", ignoreCase = true)) {
                     lastFileUrl += String(ch, start, length)
                 } else if (lastName.equals("Rating", ignoreCase = true)) {
-                    lastRating = (java.lang.Float.valueOf(String(ch, start, length)) * 20).toInt().toByte()
+                    lastRating = (Float.valueOf(String(ch, start, length)) * 20).toInt().toByte()
                 } else if (lastName.equals("LastPlayed", ignoreCase = true)) {
                     lastPlayedDate = (java.lang.Long.valueOf(String(ch, start, length)))
                 } else if (lastName.equals("Playcount", ignoreCase = true)) {
@@ -2267,7 +2140,7 @@ class WifiSyncService : Service() {
         fun getMusicBeeServerAddress(context: Context?, serverIP: InetAddress?): String? {
             val ipProvider: IpAddressProvider = IpAddressProviderImpl((context)!!, serverIP)
             val candidateAddresses = findCandidateIpAddresses(ipProvider)
-            if (candidateAddresses.isEmpty) {
+            if (candidateAddresses.isEmpty()) {
                 return null
             } else {
                 val candidate = candidateAddresses[0]

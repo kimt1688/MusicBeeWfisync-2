@@ -46,10 +46,10 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
             // if that's more appropriate.
 
             v.updateLayoutParams() {
-                v.left = (insets.left).toInt()
-                v.bottom = (insets.bottom).toInt()
-                v.right = (insets.right).toInt()
-                v.bottom = (insets.bottom).toInt()
+                v.left = insets.left
+                v.right = insets.right
+                //v.top = insets.top
+                v.bottom = insets.bottom
             }
             v.updatePadding(
                 left = bars.left,
@@ -61,7 +61,7 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
             // Apply the insets as padding to the view. Here, set all the dimensions
             // as appropriate to your layout. You can also update the view's margin if
             // more appropriate.
-            v.updatePadding(insets.left, insets.top, insets.right, insets.bottom)
+            //v.updatePadding(insets.left, insets.top, insets.right, insets.bottom)
 
             // Return CONSUMED if you don't want the window insets to keep passing
             // down to descendant views.
@@ -69,7 +69,8 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
         }
         WindowCompat.getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars = true
-
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightNavigationBars = true
     }
 
     override fun onDestroy() {

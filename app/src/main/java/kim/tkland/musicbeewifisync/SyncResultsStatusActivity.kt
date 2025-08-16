@@ -32,7 +32,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     private val timerHandler: Handler = Handler(Looper.getMainLooper())
     private var timerRunnable: Runnable? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sync_status)
         WifiSyncService.resultsActivityReady.set()

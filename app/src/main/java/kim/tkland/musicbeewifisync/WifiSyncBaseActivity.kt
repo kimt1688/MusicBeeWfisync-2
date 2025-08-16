@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColor
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowCompat.*
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updateLayoutParams
@@ -36,13 +37,13 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         val resources = resources
-        @Suppress("DEPRECATION")
-        buttonTextEnabledColor = resources.getColor(R.color.colorButtonTextEnabled)
-        @Suppress("DEPRECATION")
-        buttonTextDisabledColor = resources.getColor(R.color.colorButtonTextDisabled)
+        //@Suppress("DEPRECATION")
+        buttonTextEnabledColor = resources.getColor(R.color.colorButtonTextEnabled, null)
+        //@Suppress("DEPRECATION")
+        buttonTextDisabledColor = resources.getColor(R.color.colorButtonTextDisabled, null)
 
         val windowInsetsController =
-            WindowCompat.getInsetsController(window, window.decorView)
+            getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, windowInsets ->
@@ -54,9 +55,10 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
             // if that's more appropriate.
 
             v.updateLayoutParams() {
-                v.left = (insets.left).toInt()
-                v.bottom = (insets.bottom).toInt()
-                v.right = (insets.right).toInt()
+                //v.top = insets.top
+                v.bottom = insets.bottom
+                v.left = insets.left
+                v.right = insets.right
             }
             v.updatePadding(
                 left = bars.left,
@@ -68,13 +70,13 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
             // Apply the insets as padding to the view. Here, set all the dimensions
             // as appropriate to your layout. You can also update the view's margin if
             // more appropriate.
-            v.updatePadding(insets.left, insets.top, insets.right, insets.bottom)
+            //v.updatePadding(bars.left, bars.top, bars.right, bars.bottom)
 
             // Return CONSUMED if you don't want the window insets to keep passing
             // down to descendant views.
             WindowInsetsCompat.CONSUMED
         }
-        WindowCompat.getInsetsController(window, window.decorView)
+        getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars = true
     }
 
