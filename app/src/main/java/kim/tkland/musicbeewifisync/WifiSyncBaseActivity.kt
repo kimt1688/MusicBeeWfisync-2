@@ -1,10 +1,13 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.color.transparent
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -13,11 +16,9 @@ import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
-import android.view.ViewGroup.MarginLayoutParams
-import android.view.WindowInsets
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.toColor
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowCompat.*
@@ -35,49 +36,45 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
-        super.onCreate(savedInstanceState)
-        val resources = resources
-        //@Suppress("DEPRECATION")
-        buttonTextEnabledColor = resources.getColor(R.color.colorButtonTextEnabled, null)
-        //@Suppress("DEPRECATION")
-        buttonTextDisabledColor = resources.getColor(R.color.colorButtonTextDisabled, null)
+        //WindowCompat.setDecorFitsSystemWindows(window, true)
+        //val resources = resources
+        //val transparent = ResourcesCompat.getColor(resources, android.R.color.transparent, theme)
+        //val isDarkMode = isDarkMode(resources)
+        //window.statusBarColor = transparent
+        //window.navigationBarColor = transparent
+        //val controller = WindowInsetsControllerCompat(window, window.decorView)
+        //controller.isAppearanceLightStatusBars = !isDarkMode
+        //controller.isAppearanceLightNavigationBars = !isDarkMode
 
+        super.onCreate(savedInstanceState)
+        buttonTextEnabledColor = resources.getColor(R.color.colorButtonTextEnabled, null)
+        buttonTextDisabledColor = resources.getColor(R.color.colorButtonTextDisabled, null)
         val windowInsetsController =
-            getInsetsController(window, window.decorView)
+            WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-            // Apply the insets as a margin to the view. This solution sets
-            // only the bottom, left, and right dimensions, but you can apply whichever
-            // insets are appropriate to your layout. You can also update the view padding
-            // if that's more appropriate.
+            val bars =
+                windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
 
-            v.updateLayoutParams() {
-                //v.top = insets.top
-                v.bottom = insets.bottom
-                v.left = insets.left
-                v.right = insets.right
-            }
+            //v.updateLayoutParams() {
+                //v.top = (insets.top).toInt()
+                //v.left = (insets.left).toInt()
+                //v.bottom = (insets.bottom).toInt()
+                //v.right = (insets.right).toInt()
+            //}
+
             v.updatePadding(
-                left = bars.left,
+            //    left = bars.left,
                 top = bars.top,
-                right = bars.right,
+            //    right = bars.right,
                 bottom = bars.bottom,
             )
-
-            // Apply the insets as padding to the view. Here, set all the dimensions
-            // as appropriate to your layout. You can also update the view's margin if
-            // more appropriate.
-            //v.updatePadding(bars.left, bars.top, bars.right, bars.bottom)
-
-            // Return CONSUMED if you don't want the window insets to keep passing
-            // down to descendant views.
             WindowInsetsCompat.CONSUMED
         }
-        getInsetsController(window, window.decorView)
-            .isAppearanceLightStatusBars = true
+        //getInsetsController(window, window.decorView)
+        //    .isAppearanceLightStatusBars = true
     }
 
     override fun onDestroy() {

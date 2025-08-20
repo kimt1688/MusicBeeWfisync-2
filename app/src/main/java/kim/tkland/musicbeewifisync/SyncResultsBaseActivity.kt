@@ -1,5 +1,8 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.color.transparent
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +13,7 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -33,6 +37,7 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
         infoColor = ContextCompat.getColor(this, R.color.colorButtonTextDisabled)
         errorColor = ContextCompat.getColor(this, R.color.colorWarning)
         warningColor = ContextCompat.getColor(this, R.color.colorWarning)
+
         val windowInsetsController =
             WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior =
@@ -40,37 +45,23 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-            // Apply the insets as a margin to the view. This solution sets
-            // only the bottom, left, and right dimensions, but you can apply whichever
-            // insets are appropriate to your layout. You can also update the view padding
-            // if that's more appropriate.
 
-            v.updateLayoutParams() {
-                v.left = insets.left
-                v.right = insets.right
+            //v.updateLayoutParams() {
+                //v.left = insets.left
+                //v.right = insets.right
                 //v.top = insets.top
-                v.bottom = insets.bottom
-            }
+                //v.bottom = insets.bottom
+            //}
             v.updatePadding(
-                left = bars.left,
+            //    left = bars.left,
                 top = bars.top,
-                right = bars.right,
+            //    right = bars.right,
                 bottom = bars.bottom,
             )
-
-            // Apply the insets as padding to the view. Here, set all the dimensions
-            // as appropriate to your layout. You can also update the view's margin if
-            // more appropriate.
-            //v.updatePadding(insets.left, insets.top, insets.right, insets.bottom)
-
-            // Return CONSUMED if you don't want the window insets to keep passing
-            // down to descendant views.
             WindowInsetsCompat.CONSUMED
         }
-        WindowCompat.getInsetsController(window, window.decorView)
-            .isAppearanceLightStatusBars = true
-        WindowCompat.getInsetsController(window, window.decorView)
-            .isAppearanceLightNavigationBars = true
+        //WindowCompat.getInsetsController(window, window.decorView)
+        //    .isAppearanceLightStatusBars = true
     }
 
     override fun onDestroy() {

@@ -433,7 +433,7 @@ class WifiSyncService : Service() {
                 command = readString()
                 if (WifiSyncServiceSettings.debugMode) {
                     if (syncIsRunning.get()) {
-                        logInfo("syncDevice", "command=$command, length=${command.length}")
+                        logInfo("syncDevice", "command=$command")
                     }
                 }
                 if (Thread.interrupted()) {
