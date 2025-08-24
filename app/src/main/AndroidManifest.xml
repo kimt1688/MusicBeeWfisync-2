@@ -3,35 +3,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="kim.tkland.musicbeewifisync"
     tools:ignore="ImpliedTouchscreenHardware,MissingLeanbackLauncher,MissingLeanbackSupport,SelectedPhotoAccess">
+
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" android:minSdkVersion="33" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.MANAGE_MEDIA"
-        tools:ignore="ProtectedPermissions" android:minSdkVersion="33" />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_AUDIO"
+        android:minSdkVersion="33" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.MANAGE_MEDIA"
+        android:minSdkVersion="33"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" android:minSdkVersion="34" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+        android:minSdkVersion="34" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <queries>
         <package android:name="com.maxmpz.audioplayer" />
     </queries>
 
     <application
-        android:name="kim.tkland.musicbeewifisync.WifiSyncApp"
+        android:name=".WifiSyncApp"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
-
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <service
-            android:name="kim.tkland.musicbeewifisync.WifiSyncService"
-            android:foregroundServiceType="dataSync"
-            android:exported="false" />
+            android:name=".WifiSyncService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <activity
-            android:name="kim.tkland.musicbeewifisync.MainActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,19 +50,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="kim.tkland.musicbeewifisync.SettingsActivity"
+            android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name="kim.tkland.musicbeewifisync.SyncResultsStatusActivity"
+            android:name=".SyncResultsStatusActivity"
             android:label="@string/title_activity_sync_status" />
         <activity
-            android:name="kim.tkland.musicbeewifisync.SyncResultsPreviewActivity"
+            android:name=".SyncResultsPreviewActivity"
             android:label="@string/title_activity_sync_preview" />
         <activity
-            android:name="kim.tkland.musicbeewifisync.PlaylistSyncActivity"
+            android:name=".PlaylistSyncActivity"
             android:label="@string/title_activity_sync_playlists" />
         <activity
-            android:name="kim.tkland.musicbeewifisync.ViewErrorLogActivity"
+            android:name=".ViewErrorLogActivity"
             android:label="@string/title_activity_view_error_log" />
     </application>
 

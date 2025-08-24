@@ -8,4 +8,6 @@
     <color name="colorButtonTextDisabled">#9A9A9A</color>
     <color name="colorError">#FF0000</color>
     <color name="colorWarning">#E5620B</color>
+    <color name="colorSuccess">#4CAF50</color>
+    <color name="colorInfo">#2196F3</color>
 </resources>

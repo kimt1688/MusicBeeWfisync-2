@@ -27,6 +27,7 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuCompat
 import java.io.File
@@ -134,11 +135,11 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
 
         } else {
-            val actionBar = supportActionBar
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true)
-                actionBar.setTitle(R.string.title_activity_settings2)
-            }
+            //val actionBar = supportActionBar
+            //if (actionBar != null) {
+            //    actionBar.setDisplayHomeAsUpEnabled(true)
+            //    actionBar.setTitle(R.string.title_activity_settings2)
+            //}
             findViewById<View>(R.id.settingsInfo0).visibility = View.GONE
             findViewById<View>(R.id.settingsInfo1).visibility = View.GONE
             findViewById<View>(R.id.settingsInfo2).visibility = View.GONE
@@ -150,7 +151,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         }
         setActivityRoot(this)
-        setSupportActionBar(findViewById(R.id.my_toolbar))
+        //setSupportActionBar(findViewById(R.id.my_toolbar))
     }
 
     // アクティビティの結果に対するコールバックの登録
@@ -238,10 +239,10 @@ class SettingsActivity : WifiSyncBaseActivity() {
         super.onDestroy()
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
-    }
+    //override fun onSupportNavigateUp(): Boolean {
+    //    finish()
+    //    return true
+    //}
 
     @Suppress("REDUNDANT_MODIFIER_IN_GETTER")
     private val checkedStorageTypeButton: Int
@@ -308,6 +309,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
         return true
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val intent: Intent
         when (item.itemId) {

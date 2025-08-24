@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.compose.ui.platform.ComposeView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
@@ -21,6 +22,9 @@ import kim.tkland.musicbeewifisync.R;
 public final class ActivitySyncStatusBinding implements ViewBinding {
   @NonNull
   private final ConstraintLayout rootView;
+
+  @NonNull
+  public final ComposeView activitySyncStatusComposeView;
 
   @NonNull
   public final Button stopSyncButton;
@@ -41,10 +45,12 @@ public final class ActivitySyncStatusBinding implements ViewBinding {
   public final ProgressBar syncWaitIndicator;
 
   private ActivitySyncStatusBinding(@NonNull ConstraintLayout rootView,
-      @NonNull Button stopSyncButton, @NonNull TextView syncCompletionStatusMessage,
-      @NonNull ListView syncFailedResults, @NonNull ProgressBar syncProgressBar,
-      @NonNull TextView syncProgressMessage, @NonNull ProgressBar syncWaitIndicator) {
+      @NonNull ComposeView activitySyncStatusComposeView, @NonNull Button stopSyncButton,
+      @NonNull TextView syncCompletionStatusMessage, @NonNull ListView syncFailedResults,
+      @NonNull ProgressBar syncProgressBar, @NonNull TextView syncProgressMessage,
+      @NonNull ProgressBar syncWaitIndicator) {
     this.rootView = rootView;
+    this.activitySyncStatusComposeView = activitySyncStatusComposeView;
     this.stopSyncButton = stopSyncButton;
     this.syncCompletionStatusMessage = syncCompletionStatusMessage;
     this.syncFailedResults = syncFailedResults;
@@ -80,6 +86,12 @@ public final class ActivitySyncStatusBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.activity_sync_status_compose_view;
+      ComposeView activitySyncStatusComposeView = ViewBindings.findChildViewById(rootView, id);
+      if (activitySyncStatusComposeView == null) {
+        break missingId;
+      }
+
       id = R.id.stopSyncButton;
       Button stopSyncButton = ViewBindings.findChildViewById(rootView, id);
       if (stopSyncButton == null) {
@@ -116,9 +128,9 @@ public final class ActivitySyncStatusBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivitySyncStatusBinding((ConstraintLayout) rootView, stopSyncButton,
-          syncCompletionStatusMessage, syncFailedResults, syncProgressBar, syncProgressMessage,
-          syncWaitIndicator);
+      return new ActivitySyncStatusBinding((ConstraintLayout) rootView,
+          activitySyncStatusComposeView, stopSyncButton, syncCompletionStatusMessage,
+          syncFailedResults, syncProgressBar, syncProgressMessage, syncWaitIndicator);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

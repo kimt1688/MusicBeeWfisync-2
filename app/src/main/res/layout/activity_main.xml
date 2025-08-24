@@ -7,7 +7,10 @@
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
     tools:context="kim.tkland.musicbeewifisync.MainActivity" >
-
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/activity_main_compose_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -15,21 +18,10 @@
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@+id/syncServerStatus"
         app:layout_constraintTop_toTopOf="parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/my_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorButtonNormal"
-                android:elevation="4dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
             <LinearLayout
                 android:id="@+id/syncFrom"
                 android:layout_width="match_parent"

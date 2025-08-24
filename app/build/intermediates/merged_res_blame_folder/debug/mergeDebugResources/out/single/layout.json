@@ -1,34 +1,38 @@
 [
     {
         "merged": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/layout/activity_playlist_sync.xml",
-        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_playlist_sync.xml"
+        "source": "kim.tkland.musicbeewifisync.app-main-74:/layout/activity_playlist_sync.xml"
     },
     {
         "merged": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/layout/row_item_sync_playlist_selector.xml",
-        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/row_item_sync_playlist_selector.xml"
+        "source": "kim.tkland.musicbeewifisync.app-main-74:/layout/row_item_sync_playlist_selector.xml"
     },
     {
         "merged": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/layout/activity_view_error_log.xml",
-        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_view_error_log.xml"
+        "source": "kim.tkland.musicbeewifisync.app-main-74:/layout/activity_view_error_log.xml"
+    },
+    {
+        "merged": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/layout/dialog_sync_progress.xml",
+        "source": "kim.tkland.musicbeewifisync.app-main-74:/layout/dialog_sync_progress.xml"
     },
     {
         "merged": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/layout/activity_sync_status.xml",
-        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_sync_status.xml"
+        "source": "kim.tkland.musicbeewifisync.app-main-74:/layout/activity_sync_status.xml"
     },
     {
         "merged": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/layout/activity_settings.xml",
-        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_settings.xml"
+        "source": "kim.tkland.musicbeewifisync.app-main-74:/layout/activity_settings.xml"
     },
     {
         "merged": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/layout/activity_sync_preview.xml",
-        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_sync_preview.xml"
+        "source": "kim.tkland.musicbeewifisync.app-main-74:/layout/activity_sync_preview.xml"
     },
     {
         "merged": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/layout/row_item_sync_results.xml",
-        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/row_item_sync_results.xml"
+        "source": "kim.tkland.musicbeewifisync.app-main-74:/layout/row_item_sync_results.xml"
     },
     {
         "merged": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/layout/activity_main.xml",
-        "source": "kim.tkland.musicbeewifisync.app-main-73:/layout/activity_main.xml"
+        "source": "kim.tkland.musicbeewifisync.app-main-74:/layout/activity_main.xml"
     }
 ]

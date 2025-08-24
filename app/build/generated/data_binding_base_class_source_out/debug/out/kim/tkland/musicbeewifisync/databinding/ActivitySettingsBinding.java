@@ -7,12 +7,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
@@ -29,6 +29,9 @@ public final class ActivitySettingsBinding implements ViewBinding {
   public final Button locateServerButton;
 
   @NonNull
+  public final Toolbar myToolbar;
+
+  @NonNull
   public final CheckBox settingsDebugMode;
 
   @NonNull
@@ -36,9 +39,6 @@ public final class ActivitySettingsBinding implements ViewBinding {
 
   @NonNull
   public final TextView settingsDeviceNamePrompt;
-
-  @NonNull
-  public final Button settingsGrantAccessButton;
 
   @NonNull
   public final TextView settingsInfo0;
@@ -64,23 +64,20 @@ public final class ActivitySettingsBinding implements ViewBinding {
   @NonNull
   public final RadioButton settingsStorageSdCard1;
 
-  @NonNull
-  public final ProgressBar settingsWaitIndicator;
-
   private ActivitySettingsBinding(@NonNull ConstraintLayout rootView,
-      @NonNull Button locateServerButton, @NonNull CheckBox settingsDebugMode,
-      @NonNull EditText settingsDeviceName, @NonNull TextView settingsDeviceNamePrompt,
-      @NonNull Button settingsGrantAccessButton, @NonNull TextView settingsInfo0,
+      @NonNull Button locateServerButton, @NonNull Toolbar myToolbar,
+      @NonNull CheckBox settingsDebugMode, @NonNull EditText settingsDeviceName,
+      @NonNull TextView settingsDeviceNamePrompt, @NonNull TextView settingsInfo0,
       @NonNull TextView settingsInfo1, @NonNull TextView settingsInfo2,
       @NonNull TextView settingsLocateServerNoConfig, @NonNull RadioButton settingsStorageInternal,
       @NonNull RadioGroup settingsStorageOptions, @NonNull TextView settingsStoragePrompt,
-      @NonNull RadioButton settingsStorageSdCard1, @NonNull ProgressBar settingsWaitIndicator) {
+      @NonNull RadioButton settingsStorageSdCard1) {
     this.rootView = rootView;
     this.locateServerButton = locateServerButton;
+    this.myToolbar = myToolbar;
     this.settingsDebugMode = settingsDebugMode;
     this.settingsDeviceName = settingsDeviceName;
     this.settingsDeviceNamePrompt = settingsDeviceNamePrompt;
-    this.settingsGrantAccessButton = settingsGrantAccessButton;
     this.settingsInfo0 = settingsInfo0;
     this.settingsInfo1 = settingsInfo1;
     this.settingsInfo2 = settingsInfo2;
@@ -89,7 +86,6 @@ public final class ActivitySettingsBinding implements ViewBinding {
     this.settingsStorageOptions = settingsStorageOptions;
     this.settingsStoragePrompt = settingsStoragePrompt;
     this.settingsStorageSdCard1 = settingsStorageSdCard1;
-    this.settingsWaitIndicator = settingsWaitIndicator;
   }
 
   @Override
@@ -125,6 +121,12 @@ public final class ActivitySettingsBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.my_toolbar;
+      Toolbar myToolbar = ViewBindings.findChildViewById(rootView, id);
+      if (myToolbar == null) {
+        break missingId;
+      }
+
       id = R.id.settingsDebugMode;
       CheckBox settingsDebugMode = ViewBindings.findChildViewById(rootView, id);
       if (settingsDebugMode == null) {
@@ -140,12 +142,6 @@ public final class ActivitySettingsBinding implements ViewBinding {
       id = R.id.settingsDeviceNamePrompt;
       TextView settingsDeviceNamePrompt = ViewBindings.findChildViewById(rootView, id);
       if (settingsDeviceNamePrompt == null) {
-        break missingId;
-      }
-
-      id = R.id.settingsGrantAccessButton;
-      Button settingsGrantAccessButton = ViewBindings.findChildViewById(rootView, id);
-      if (settingsGrantAccessButton == null) {
         break missingId;
       }
 
@@ -197,17 +193,10 @@ public final class ActivitySettingsBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.settingsWaitIndicator;
-      ProgressBar settingsWaitIndicator = ViewBindings.findChildViewById(rootView, id);
-      if (settingsWaitIndicator == null) {
-        break missingId;
-      }
-
-      return new ActivitySettingsBinding((ConstraintLayout) rootView, locateServerButton,
-          settingsDebugMode, settingsDeviceName, settingsDeviceNamePrompt,
-          settingsGrantAccessButton, settingsInfo0, settingsInfo1, settingsInfo2,
-          settingsLocateServerNoConfig, settingsStorageInternal, settingsStorageOptions,
-          settingsStoragePrompt, settingsStorageSdCard1, settingsWaitIndicator);
+      return new ActivitySettingsBinding((ConstraintLayout) rootView, locateServerButton, myToolbar,
+          settingsDebugMode, settingsDeviceName, settingsDeviceNamePrompt, settingsInfo0,
+          settingsInfo1, settingsInfo2, settingsLocateServerNoConfig, settingsStorageInternal,
+          settingsStorageOptions, settingsStoragePrompt, settingsStorageSdCard1);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

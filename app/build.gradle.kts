@@ -51,9 +51,13 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
     }
     kotlinOptions {
         jvmTarget = "19"
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.1.1"
     }
 }
 
@@ -70,7 +74,21 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     }
 }
 
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
+}
+
 dependencies {
+    implementation(libs.androidx.appcompat)
+
+    implementation (libs.androidx.compose.material3.material32)
+    implementation (libs.androidx.material3.window.size.class1)
+    implementation (libs.androidx.material3.adaptive.navigation.suite)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.foundation)
 
     implementation (libs.androidx.constraintlayout)
     implementation (libs.androidx.appcompat.resources)
@@ -85,6 +103,14 @@ dependencies {
     implementation (libs.androidx.leanback)
     implementation(project(":app:poweramp_api_lib"))
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.databinding.runtime)
+    implementation(libs.androidx.foundation.layout)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(platform(libs.androidx.compose.bom.v20250101))
+
     testImplementation (libs.junit)
     androidTestImplementation (libs.androidx.junit)
     testImplementation (libs.androidx.espresso.core)
@@ -103,6 +129,9 @@ dependencies {
     implementation (libs.kotlinx.coroutines.android)
     implementation (platform(libs.compose.bom))
     androidTestImplementation (platform(libs.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
 repositories {
     mavenCentral()

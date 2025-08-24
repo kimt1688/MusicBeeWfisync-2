@@ -6,14 +6,31 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuCompat
 import androidx.core.view.ViewCompat
@@ -34,14 +51,11 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         //enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sync_status)
+        //setContentView(R.layout.activity_sync_status)
         WifiSyncService.resultsActivityReady.set()
-        syncCompletionStatusMessage = findViewById(R.id.syncCompletionStatusMessage)
-        syncFailedResults = findViewById(R.id.syncFailedResults)
-        syncProgressBar = findViewById(R.id.syncProgressBar)
-        syncWaitIndicator = findViewById(R.id.syncWaitIndicator)
-        syncProgressMessage = findViewById(R.id.syncProgressMessage)
-        stopSyncButton = findViewById(R.id.stopSyncButton)
+        setContent{
+            this.CustomView()
+        }
         timerRunnable = object : Runnable {
             override fun run() {
                 try {
@@ -59,8 +73,69 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         }
         timerHandler.postDelayed(timerRunnable!!, 300)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setSupportActionBar(findViewById(R.id.my_toolbar))
+        // setSupportActionBar(findViewById(R.id.my_toolbar))
     }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun CustomView() {
+        val topAppBarState = rememberTopAppBarState()
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+        //val toolbar: androidx.appcompat.widget.Toolbar? = findViewById(R.id.activity_main_compose_view)
+        //toolbar?.setTitle(R.string.title_activity_settings)
+        // Adds view to Compose
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                CenterAlignedTopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    title = {
+                        Text(
+                            getString(R.string.title_activity_sync_status),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    scrollBehavior = scrollBehavior
+                )
+            }
+        ){ innerPadding ->
+            AndroidView(
+                modifier = Modifier
+                    .fillMaxSize() // Fill the available space within the Scaffold
+                    .padding(innerPadding), // Apply padding from the Scaffold (e.g., for the TopAppBar)
+                factory = { context ->
+                    val rootView =
+                        LayoutInflater.from(context).inflate(R.layout.activity_sync_status, null)
+                    rootView.apply {
+                        // Creates view
+                        syncCompletionStatusMessage = findViewById(R.id.syncCompletionStatusMessage)
+                        //syncCompletionStatusMessage!!.visibility = View.VISIBLE
+                        syncFailedResults = findViewById(R.id.syncFailedResults)
+                        syncProgressBar = findViewById(R.id.syncProgressBar)
+                        //syncProgressBar!!.visibility = View.VISIBLE
+                        syncWaitIndicator = findViewById(R.id.syncWaitIndicator)
+                        syncProgressMessage = findViewById(R.id.syncProgressMessage)
+                        stopSyncButton = findViewById(R.id.stopSyncButton)
+                    }
+
+                    // Return the inflated and configured view
+                    rootView
+                },
+                update = { view ->
+                    // Called when the composable recomposes.
+                    // You can update the view here if its state needs to change
+                    // based on changes in Compose state.
+                    // For example, if WifiSyncServiceSettings could change from elsewhere
+                    // and you needed to update the checkboxes.
+                }
+            )
+        }
+    }
+
 
     override fun onDestroy() {
         WifiSyncService.resultsActivityReady.reset()
@@ -81,6 +156,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         return true
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val intent: Intent
         when (item.itemId) {

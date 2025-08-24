@@ -4,14 +4,32 @@ import android.R.color.transparent
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
@@ -20,8 +38,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import androidx.databinding.DataBindingUtil
+import kim.tkland.musicbeewifisync.SyncResultsInfo
+import kim.tkland.musicbeewifisync.databinding.RowItemSyncResultsBinding
 
-abstract class SyncResultsBaseActivity : AppCompatActivity() {
+abstract class SyncResultsBaseActivity : ComponentActivity() {
     @JvmField
     protected var mainWindow: SyncResultsBaseActivity? = this
     @JvmField
@@ -33,7 +54,8 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        //setContentView(R.layout.activity_settings)
         infoColor = ContextCompat.getColor(this, R.color.colorButtonTextDisabled)
         errorColor = ContextCompat.getColor(this, R.color.colorWarning)
         warningColor = ContextCompat.getColor(this, R.color.colorWarning)
@@ -46,12 +68,7 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
 
-            //v.updateLayoutParams() {
-                //v.left = insets.left
-                //v.right = insets.right
-                //v.top = insets.top
-                //v.bottom = insets.bottom
-            //}
+
             v.updatePadding(
             //    left = bars.left,
                 top = bars.top,
@@ -60,8 +77,6 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
             )
             WindowInsetsCompat.CONSUMED
         }
-        //WindowCompat.getInsetsController(window, window.decorView)
-        //    .isAppearanceLightStatusBars = true
     }
 
     override fun onDestroy() {
@@ -71,12 +86,12 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    @Suppress("NAME_SHADOWING")
     protected fun showResults(
         resultsListView: ListView,
         resultsToData: ArrayList<SyncResultsInfo>?,
         resultsFromData: ArrayList<SyncResultsInfo>?
     ) {
+        findViewById<View>(R.id.previewWaitIndicator)?.visibility = View.GONE
         var resultsToData = resultsToData
         var resultsFromData = resultsFromData
         val maxResults = 256

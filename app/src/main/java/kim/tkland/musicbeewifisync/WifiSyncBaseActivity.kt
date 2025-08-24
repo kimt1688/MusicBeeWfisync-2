@@ -1,13 +1,10 @@
 package kim.tkland.musicbeewifisync
 
-import android.R.color.transparent
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.res.Configuration
-import android.content.res.Resources
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -16,19 +13,25 @@ import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowCompat.*
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import kim.tkland.musicbeewifisync.ui.theme.AppCompat
 import java.io.File
 
-abstract class WifiSyncBaseActivity : AppCompatActivity() {
+abstract class WifiSyncBaseActivity : ComponentActivity() {
     protected var mainWindow: WifiSyncBaseActivity? = this
     protected var buttonTextEnabledColor = 0
     protected var buttonTextDisabledColor = 0
@@ -36,7 +39,7 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
-        //WindowCompat.setDecorFitsSystemWindows(window, true)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
         //val resources = resources
         //val transparent = ResourcesCompat.getColor(resources, android.R.color.transparent, theme)
         //val isDarkMode = isDarkMode(resources)
@@ -50,7 +53,7 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
         buttonTextEnabledColor = resources.getColor(R.color.colorButtonTextEnabled, null)
         buttonTextDisabledColor = resources.getColor(R.color.colorButtonTextDisabled, null)
         val windowInsetsController =
-            WindowCompat.getInsetsController(window, window.decorView)
+            getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, windowInsets ->
@@ -75,6 +78,18 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
         }
         //getInsetsController(window, window.decorView)
         //    .isAppearanceLightStatusBars = true
+        /*
+          setContent {
+              //AppCompat {
+                  Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                      Greeting(
+                          name = "Android",
+                          modifier = Modifier.padding(innerPadding)
+                      )
+                  }
+              //}
+          }
+          */
     }
 
     override fun onDestroy() {
@@ -82,6 +97,7 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val intent: Intent
         when (item.itemId) {
@@ -213,7 +229,7 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
         progressDialog!!.thread = WifiSyncAlertDialogThread(thread, progressDialog!!)
         progressDialog!!.msg = msg
 
-        progressDialog!!.show(supportFragmentManager, "WIFISYNC_DIALOG")
+        //progressDialog!!.show(supportFragmentManager, "WIFISYNC_DIALOG")
         progressDialog!!.thread!!.thread!!.start()
     }
 
