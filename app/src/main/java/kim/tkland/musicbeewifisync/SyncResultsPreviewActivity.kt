@@ -9,10 +9,13 @@ import android.view.View
 import android.widget.*
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import android.provider.Settings.Global.getString
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -62,29 +65,105 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             MainAppComposable()
         }
         waitResultsThread = Thread {
-            override fun run() {
+            runOnUiThread {
                 try {
-                    WifiSyncService.waitSyncResults.waitOne()
-                    runOnUiThread {
-
-                        //previewListView.visibility = View.VISIBLE
-                        // showResults(previewListView, previewToData, previewFromData)
-                        //val binding: ActivityMainBinding =
-                        //    ActivityMainBinding.inflate(getLayoutInflater())
-                        //setContentView(binding.root)
-                        //previewListView?.setVisibility(View.VISIBLE)
-// Or
-                        //if (previewListView != null) {
-                        //    previewListView.setVisibility(View.VISIBLE)
-                        //}
-
-                    }//
+                    findViewById<View>(R.id.previewWaitIndicator).visibility = View.GONE
+                    proceedSyncButton?.visibility = View.VISIBLE
+                    val previewStatusMessage = findViewById<TextView>(R.id.previewStatusMessage)
+                    val previewListView = findViewById<ListView>(R.id.previewResults)
+                    val previewErrorMessage = findViewById<TextView>(R.id.previewErrorMessage)
+                    val previewToData = WifiSyncService.syncToResults
+                    val previewFromData = WifiSyncService.syncFromResults
+                    if (mainWindow == null) {
+                        // ignore
+                    } else if (previewToData == null || previewFromData == null) {
+                        disableProceedSyncButton()
+                        var errorMessageId = WifiSyncService.syncErrorMessageId.get()
+                        if (errorMessageId == 0) {
+                            errorMessageId = R.string.errorSyncNonSpecific
+                        }
+                        previewStatusMessage.setText(errorMessageId)
+                        val builder = AlertDialog.Builder(
+                            mainWindow!!
+                        )
+                        builder.setTitle(getString(R.string.syncErrorHeader))
+                        builder.setMessage(getString(errorMessageId))
+                        builder.setIcon(android.R.drawable.ic_dialog_alert)
+                        builder.setCancelable(false)
+                        if (errorMessageId != R.string.errorServerNotFound) {
+                            builder.setPositiveButton(android.R.string.ok) { _, _ ->
+                                previewStatusMessage.visibility = View.VISIBLE
+                            }
+                        } else {
+                            builder.setNegativeButton(R.string.syncCancel) { _, _ ->
+                                previewStatusMessage.visibility = View.VISIBLE
+                            }
+                            builder.setPositiveButton(R.string.syncRetry) { _, _ ->
+                                WifiSyncService.startSynchronisation(
+                                    applicationContext,
+                                    0,
+                                    true,
+                                    false
+                                )
+                                finish()
+                            }
+                        }
+                        builder.show()
+                    } else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
+                        disableProceedSyncButton()
+                        previewStatusMessage.setText(R.string.syncPreviewNoResults)
+                        previewStatusMessage.visibility = View.VISIBLE
+                    } else {
+                        val previewToDataCount = previewToData.size
+                        val previewFromDataCount = previewFromData.size
+                        var okCount = 0
+                        var warningCount = 0
+                        var failedCount = 0
+                        for (index in previewToData.indices) {
+                            when (previewToData[index].alert.toInt()) {
+                                0 -> okCount += 1
+                                1 -> warningCount += 1
+                                2, 3 -> failedCount += 1
+                            }
+                        }
+                        if (warningCount > 0) {
+                            previewErrorMessage.setTextColor(warningColor)
+                            previewErrorMessage.text = String.format(
+                                getString(R.string.reverseSyncWarnings),
+                                if (warningCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
+                                    getString(R.string.reverseSyncFilesWarningN),
+                                    warningCount
+                                )
+                            )
+                            previewErrorMessage.visibility = View.VISIBLE
+                            syncExcludeErrors?.let { it.visibility = View.VISIBLE }
+                        } else if (failedCount > 0) {
+                            previewErrorMessage.setTextColor(errorColor)
+                            previewErrorMessage.text = String.format(
+                                getString(R.string.reverseSyncFailed),
+                                if (failedCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
+                                    getString(R.string.reverseSyncFilesWarningN),
+                                    failedCount
+                                )
+                            )
+                            previewErrorMessage.visibility = View.VISIBLE
+                            syncExcludeErrors?.let { it.visibility = View.INVISIBLE }
+                        } else {
+                            previewErrorMessage.visibility = View.GONE
+                            syncExcludeErrors?.let { it.visibility = View.GONE }
+                        }
+                        if (previewToDataCount > 0 && previewFromDataCount == 0 && okCount == 0 && warningCount == 0) {
+                            disableProceedSyncButton()
+                        }
+                        previewListView.visibility = View.VISIBLE
+                        showResults(previewListView, previewToData, previewFromData)
+                    }
                 } catch (_: InterruptedException) {
                     // ignore
                 } catch (ex: Exception) {
                     ErrorHandler.logError("preview", ex)
                 }
-            }
+            }//
         }
         waitResultsThread!!.start()
         //setSupportActionBar(findViewById(R.id.my_toolbar))
@@ -95,23 +174,24 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         // Define MutableState variables to hold your data and UI state
         val previewToDataState = remember { mutableStateOf<ArrayList<SyncResultsInfo>?>(null) }
         val previewFromDataState = remember { mutableStateOf<ArrayList<SyncResultsInfo>?>(null) }
-        val isLoading = remember { mutableStateOf(true) } // Example loading state
-        val errorMessageIdState =
-            remember { mutableStateOf<Int?>(null) } // Example error message state
-        val showProceedButton = remember { mutableStateOf(false) } // Example for button visibility
+        //val isLoading = remember { mutableStateOf(true) } // Example loading state
+        //val errorMessageIdState =
+        //    remember { mutableStateOf<Int?>(null) } // Example error message state
+        //val showProceedButton = remember { mutableStateOf(false) } // Example for button visibility
         // ... other states as needed
 
         // This is where you would launch your data fetching logic if it wasn't
         // tied to the existing waitResultsThread. For your current structure,
         // we'll update these states from the thread.
 
-        while (isLoading.value) {
+        while (waitResultsThread!!.isAlive) {
             // Show some loading indicator
             // CircularProgressIndicator() // Example
             Text("Loading preview...") // Placeholder
             Thread.sleep(300)
         }
 
+        /*
         if (errorMessageIdState.value != null) {
             // Show error message, potentially an AlertDialog
             // For AlertDialog, you'd manage its visibility with another state
@@ -155,13 +235,15 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             Text(stringResource(R.string.syncPreviewNoResults))
         } else {
             // Call your CustomView (or ShowResultsComposable directly)
+
+         */
             CustomView(
                 title = getString(R.string.title_activity_sync_preview),
                 resultsToData = previewToDataState.value,
                 resultsFromData = previewFromDataState.value
                 // Pass other necessary states like proceedButton visibility
             )
-        }
+        //}
     }
 
 
@@ -194,17 +276,21 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             },
             bottomBar = {
                 Row( // Or a Compose Row
-                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                    //horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+                    //horizontalArrangement = Arrangement.Center,
                     // Your proceed button logic here, adapted to Compose
                     // Example:
 
-                    Alignment.CenterVertically
+                    //verticalAlignment = Alignment.Bottom
+
                 ) {
-                    Button(onClick = { /* Handle proceed click */ }) {
+                    Button(modifier = Modifier.weight(1f), onClick = { /* Handle proceed click */ }) {
+                        Modifier.weight(1f)
+
                         //Icon()
                         //Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text("Sync")
+                        Text("Sync", fontSize = 20.sp)
                     }
                 }
             }
