@@ -38,6 +38,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.TextButton
@@ -61,28 +63,20 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         //setContentView(R.layout.activity_sync_preview)
         //val actionBar = supportActionBar
         //actionBar?.setDisplayHomeAsUpEnabled(true)
-        setContent {
-            MainAppComposable()
-        }
         waitResultsThread = Thread {
             runOnUiThread {
                 try {
-                    findViewById<View>(R.id.previewWaitIndicator).visibility = View.GONE
-                    proceedSyncButton?.visibility = View.VISIBLE
-                    val previewStatusMessage = findViewById<TextView>(R.id.previewStatusMessage)
-                    val previewListView = findViewById<ListView>(R.id.previewResults)
-                    val previewErrorMessage = findViewById<TextView>(R.id.previewErrorMessage)
                     val previewToData = WifiSyncService.syncToResults
                     val previewFromData = WifiSyncService.syncFromResults
                     if (mainWindow == null) {
                         // ignore
+/*
                     } else if (previewToData == null || previewFromData == null) {
-                        disableProceedSyncButton()
+                        //disableProceedSyncButton()
                         var errorMessageId = WifiSyncService.syncErrorMessageId.get()
                         if (errorMessageId == 0) {
                             errorMessageId = R.string.errorSyncNonSpecific
                         }
-                        previewStatusMessage.setText(errorMessageId)
                         val builder = AlertDialog.Builder(
                             mainWindow!!
                         )
@@ -92,11 +86,9 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         builder.setCancelable(false)
                         if (errorMessageId != R.string.errorServerNotFound) {
                             builder.setPositiveButton(android.R.string.ok) { _, _ ->
-                                previewStatusMessage.visibility = View.VISIBLE
                             }
                         } else {
                             builder.setNegativeButton(R.string.syncCancel) { _, _ ->
-                                previewStatusMessage.visibility = View.VISIBLE
                             }
                             builder.setPositiveButton(R.string.syncRetry) { _, _ ->
                                 WifiSyncService.startSynchronisation(
@@ -109,54 +101,44 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             }
                         }
                         builder.show()
-                    } else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
-                        disableProceedSyncButton()
-                        previewStatusMessage.setText(R.string.syncPreviewNoResults)
-                        previewStatusMessage.visibility = View.VISIBLE
+
+ */
+                    //} else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
+                        //disableProceedSyncButton()
                     } else {
-                        val previewToDataCount = previewToData.size
-                        val previewFromDataCount = previewFromData.size
+                        //val previewToDataCount = previewToData.size
+                        //val previewFromDataCount = previewFromData.size
                         var okCount = 0
                         var warningCount = 0
                         var failedCount = 0
-                        for (index in previewToData.indices) {
-                            when (previewToData[index].alert.toInt()) {
-                                0 -> okCount += 1
-                                1 -> warningCount += 1
-                                2, 3 -> failedCount += 1
+                        previewToData?.let {
+                            for (index in it.indices) {
+                                when (previewToData[index].alert.toInt()) {
+                                    0 -> okCount += 1
+                                    1 -> warningCount += 1
+                                    2, 3 -> failedCount += 1
+                                }
                             }
                         }
                         if (warningCount > 0) {
-                            previewErrorMessage.setTextColor(warningColor)
-                            previewErrorMessage.text = String.format(
-                                getString(R.string.reverseSyncWarnings),
-                                if (warningCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
-                                    getString(R.string.reverseSyncFilesWarningN),
-                                    warningCount
-                                )
+                            if (warningCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
+                                getString(R.string.reverseSyncFilesWarningN),
+                                warningCount
                             )
-                            previewErrorMessage.visibility = View.VISIBLE
-                            syncExcludeErrors?.let { it.visibility = View.VISIBLE }
                         } else if (failedCount > 0) {
-                            previewErrorMessage.setTextColor(errorColor)
-                            previewErrorMessage.text = String.format(
-                                getString(R.string.reverseSyncFailed),
-                                if (failedCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
-                                    getString(R.string.reverseSyncFilesWarningN),
-                                    failedCount
-                                )
+                            if (failedCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
+                                getString(R.string.reverseSyncFilesWarningN),
+                                failedCount
                             )
-                            previewErrorMessage.visibility = View.VISIBLE
-                            syncExcludeErrors?.let { it.visibility = View.INVISIBLE }
-                        } else {
-                            previewErrorMessage.visibility = View.GONE
-                            syncExcludeErrors?.let { it.visibility = View.GONE }
                         }
-                        if (previewToDataCount > 0 && previewFromDataCount == 0 && okCount == 0 && warningCount == 0) {
-                            disableProceedSyncButton()
+                        //if (previewToDataCount > 0 && previewFromDataCount == 0 && okCount == 0 && warningCount == 0) {
+                            //disableProceedSyncButton()
+                        //}
+                        setContent {
+                            CustomView(title = getString(R.string.title_activity_sync_preview),
+                                resultsToData = previewToData,
+                                resultsFromData = previewFromData)
                         }
-                        previewListView.visibility = View.VISIBLE
-                        showResults(previewListView, previewToData, previewFromData)
                     }
                 } catch (_: InterruptedException) {
                     // ignore
@@ -167,6 +149,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         }
         waitResultsThread!!.start()
         //setSupportActionBar(findViewById(R.id.my_toolbar))
+
     }
 
     @Composable
@@ -175,26 +158,26 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         val previewToDataState = remember { mutableStateOf<ArrayList<SyncResultsInfo>?>(null) }
         val previewFromDataState = remember { mutableStateOf<ArrayList<SyncResultsInfo>?>(null) }
         //val isLoading = remember { mutableStateOf(true) } // Example loading state
-        //val errorMessageIdState =
-        //    remember { mutableStateOf<Int?>(null) } // Example error message state
-        //val showProceedButton = remember { mutableStateOf(false) } // Example for button visibility
+        val errorMessageIdState =
+            remember { mutableStateOf<Int?>(null) } // Example error message state
+        val showProceedButton = remember { mutableStateOf(false) } // Example for button visibility
         // ... other states as needed
 
         // This is where you would launch your data fetching logic if it wasn't
         // tied to the existing waitResultsThread. For your current structure,
         // we'll update these states from the thread.
 
-        while (waitResultsThread!!.isAlive) {
+        //while (waitResultsThread!!.isAlive) {
             // Show some loading indicator
             // CircularProgressIndicator() // Example
-            Text("Loading preview...") // Placeholder
-            Thread.sleep(300)
-        }
+        //    Text("Loading preview...") // Placeholder
+        //    Thread.sleep(300)
+        //}
 
-        /*
         if (errorMessageIdState.value != null) {
             // Show error message, potentially an AlertDialog
             // For AlertDialog, you'd manage its visibility with another state
+            /*
             val context = LocalContext.current
             androidx.compose.material3.AlertDialog( // Basic example, customize as needed
                 onDismissRequest = { errorMessageIdState.value = null },
@@ -230,20 +213,21 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                     }
                 } else null
             )
+
+             */
         } else if (previewToDataState.value?.isEmpty() == true && previewFromDataState.value?.isEmpty() == true) {
             // Show "no results" message
             Text(stringResource(R.string.syncPreviewNoResults))
         } else {
             // Call your CustomView (or ShowResultsComposable directly)
 
-         */
             CustomView(
                 title = getString(R.string.title_activity_sync_preview),
                 resultsToData = previewToDataState.value,
                 resultsFromData = previewFromDataState.value
                 // Pass other necessary states like proceedButton visibility
             )
-        //}
+        }
     }
 
 
@@ -274,7 +258,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                     scrollBehavior = scrollBehavior
                 )
             },
-            bottomBar = {
+            /*bottomBar = {
                 Row( // Or a Compose Row
                     modifier = Modifier.fillMaxWidth()
                     //horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
@@ -293,7 +277,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         Text("Sync", fontSize = 20.sp)
                     }
                 }
-            }
+            }*/
         ) { innerPadding ->
             ShowResultsComposable(innerPadding, resultsToData, resultsFromData)
         }
@@ -306,11 +290,6 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         resultsToData: ArrayList<SyncResultsInfo>?,
         resultsFromData: ArrayList<SyncResultsInfo>?
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            contentPadding = innerPadding,
-        ) {
             var resultsToData = resultsToData
             var resultsFromData = resultsFromData
             val maxResults = 256
@@ -320,33 +299,65 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             if (resultsFromData == null) {
                 resultsFromData = ArrayList()
             }
-            val resultsToDataCount = resultsToData.size
-            val resultsFromDataCount = resultsFromData.size
+            val resultsToDataCount = if (resultsToData.isNullOrEmpty()) 0 else resultsToData.size
+            val resultsFromDataCount = if (resultsToData.isNullOrEmpty()) 0 else resultsFromData.size
             val filteredPreviewData: ArrayList<SyncResultsInfo>
             if (resultsToDataCount + resultsFromDataCount < maxResults + 16) {
                 filteredPreviewData = ArrayList(resultsToDataCount + resultsFromDataCount)
                 filteredPreviewData.addAll(resultsToData)
                 filteredPreviewData.addAll(resultsFromData)
-                // The items(...) call needs to be *inside* the LazyColumn's content lambda
-                items(
-                    // This was likely outside or misplaced
-                    count = filteredPreviewData.size,
-                    //key = { index -> filteredPreviewData[index].hashCode() } // Provide a stable key if possible
-                ) { index ->
-                    val item = filteredPreviewData[index]
-                    // Your Composable item content here
-                    // For example:
-                    Text(
-                        text = "${item.targetName}",
-                        fontSize = 18.sp
+            } else {
+                filteredPreviewData = ArrayList(maxResults + 2)
+                var filteredPreviewFromCount = resultsFromDataCount
+                var filteredPreviewToCount = resultsToDataCount
+                if (resultsToDataCount < maxResults / 4) {
+                    filteredPreviewFromCount = maxResults - resultsToDataCount
+                } else if (resultsFromDataCount < maxResults / 4) {
+                    filteredPreviewToCount = maxResults - resultsFromDataCount
+                } else {
+                    val scaling =
+                        maxResults.toDouble() / (resultsToDataCount + resultsFromDataCount).toDouble()
+                    filteredPreviewToCount *= scaling.toInt()
+                    filteredPreviewFromCount *= scaling.toInt()
+                }
+                for (index in 0 until filteredPreviewToCount) {
+                    filteredPreviewData.add(resultsToData[index])
+                }
+                if (filteredPreviewToCount < resultsToDataCount) {
+                    filteredPreviewData.add(
+                        SyncResultsInfo(
+                            String.format(
+                                getString(R.string.syncPreviewMoreResults),
+                                resultsToDataCount - filteredPreviewToCount
+                            )
+                        )
                     )
-                    val message =
-                        if (item.estimatedSize!!.isEmpty()) item.action else "${item.action} - ${item.estimatedSize}"
-                    Text(text = "$message", fontSize = 18.sp) // Replace with yo
-                    // ... (rest of your item UI)
+                }
+                for (index in 0 until filteredPreviewFromCount) {
+                    filteredPreviewData.add(resultsFromData[index])
+                }
+                if (filteredPreviewFromCount < resultsFromDataCount) {
+                    filteredPreviewData.add(
+                        SyncResultsInfo(
+                            String.format(
+                                getString(R.string.syncPreviewMoreResults),
+                                resultsFromDataCount - filteredPreviewFromCount
+                            )
+                        )
+                    )
+                }
+                Column (
+                    modifier =
+                        Modifier.padding(all = 8.dp),
+                ) {
+                    Row() {
+                        for (info: SyncResultsInfo in filteredPreviewData) {
+                            Text(text = info.targetName!!)
+                            Text(text = if (info.estimatedSize!!.isEmpty()) info.message!! else "${info.action!!} - ${info.estimatedSize!!}")
+                        }
+                    }
                 }
             }
-        }
     }
 
     override fun onDestroy() {
