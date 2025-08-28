@@ -1,8 +1,9 @@
 package kim.tkland.musicbeewifisync
 
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -10,13 +11,9 @@ import android.widget.*
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,26 +26,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.MenuCompat
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.geometry.isEmpty
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
+import androidx.compose.material3.HorizontalDivider
 
 class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     private var syncExcludeErrors: CheckBox? = null
@@ -60,17 +55,20 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_sync_preview)
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        }        //setContentView(R.layout.activity_sync_preview)
         //val actionBar = supportActionBar
         //actionBar?.setDisplayHomeAsUpEnabled(true)
         waitResultsThread = Thread {
-            runOnUiThread {
-                try {
+            try {
+                runOnUiThread {
+                    WifiSyncService.waitSyncResults.waitOne()
                     val previewToData = WifiSyncService.syncToResults
                     val previewFromData = WifiSyncService.syncFromResults
                     if (mainWindow == null) {
                         // ignore
-/*
+                        /*
                     } else if (previewToData == null || previewFromData == null) {
                         //disableProceedSyncButton()
                         var errorMessageId = WifiSyncService.syncErrorMessageId.get()
@@ -103,11 +101,11 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         builder.show()
 
  */
-                    //} else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
+                        //} else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
                         //disableProceedSyncButton()
                     } else {
-                        //val previewToDataCount = previewToData.size
-                        //val previewFromDataCount = previewFromData.size
+                        val previewToDataCount = previewToData?.size
+                        val previewFromDataCount = previewFromData?.size
                         var okCount = 0
                         var warningCount = 0
                         var failedCount = 0
@@ -132,24 +130,30 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             )
                         }
                         //if (previewToDataCount > 0 && previewFromDataCount == 0 && okCount == 0 && warningCount == 0) {
-                            //disableProceedSyncButton()
+                        //disableProceedSyncButton()
                         //}
                         setContent {
-                            CustomView(title = getString(R.string.title_activity_sync_preview),
+                            //MainAppComposable()
+                            CustomView(
+                                title = getString(R.string.title_activity_sync_preview),
                                 resultsToData = previewToData,
-                                resultsFromData = previewFromData)
+                                resultsFromData = previewFromData
+                            )
                         }
                     }
-                } catch (_: InterruptedException) {
-                    // ignore
-                } catch (ex: Exception) {
-                    ErrorHandler.logError("preview", ex)
                 }
-            }//
+            } catch (_: InterruptedException) {
+                // ignore
+            } catch (ex: Exception) {
+                ErrorHandler.logError("preview", ex)
+            }
         }
         waitResultsThread!!.start()
         //setSupportActionBar(findViewById(R.id.my_toolbar))
 
+    }
+    private fun requireContext(): Context {
+        return applicationContext
     }
 
     @Composable
@@ -258,7 +262,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                     scrollBehavior = scrollBehavior
                 )
             },
-            /*bottomBar = {
+            bottomBar = {
                 Row( // Or a Compose Row
                     modifier = Modifier.fillMaxWidth()
                     //horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
@@ -269,15 +273,29 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                     //verticalAlignment = Alignment.Bottom
 
                 ) {
-                    Button(modifier = Modifier.weight(1f), onClick = { /* Handle proceed click */ }) {
+                    Button(modifier = Modifier.weight(1f),
+                        onClick = {
+                            try {
+                                WifiSyncServiceSettings.syncCustomFiles = false
+                                //syncPreview = false
+                                WifiSyncService.startSynchronisation(applicationContext, 0, false, false)
+                            }catch (ex:Exception){
+                                Log.d("onSyncStartButtonClick", ex.message!!)
+                            } finally {
+                                //syncStartButton!!.isEnabled = true
+                            }
+                        }) {
                         Modifier.weight(1f)
 
-                        //Icon()
+                        Icon(
+                            imageVector = Icons.Filled.Sync,
+                            contentDescription = "Sync",
+                        )
                         //Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                         Text("Sync", fontSize = 20.sp)
                     }
                 }
-            }*/
+            }
         ) { innerPadding ->
             ShowResultsComposable(innerPadding, resultsToData, resultsFromData)
         }
@@ -300,7 +318,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 resultsFromData = ArrayList()
             }
             val resultsToDataCount = if (resultsToData.isNullOrEmpty()) 0 else resultsToData.size
-            val resultsFromDataCount = if (resultsToData.isNullOrEmpty()) 0 else resultsFromData.size
+            val resultsFromDataCount = if (resultsFromData.isNullOrEmpty()) 0 else resultsFromData.size
             val filteredPreviewData: ArrayList<SyncResultsInfo>
             if (resultsToDataCount + resultsFromDataCount < maxResults + 16) {
                 filteredPreviewData = ArrayList(resultsToDataCount + resultsFromDataCount)
@@ -346,18 +364,28 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         )
                     )
                 }
-                Column (
-                    modifier =
-                        Modifier.padding(all = 8.dp),
-                ) {
-                    Row() {
-                        for (info: SyncResultsInfo in filteredPreviewData) {
-                            Text(text = info.targetName!!)
-                            Text(text = if (info.estimatedSize!!.isEmpty()) info.message!! else "${info.action!!} - ${info.estimatedSize!!}")
-                        }
-                    }
+            }
+        LazyColumn (
+            modifier =
+                Modifier.padding(innerPadding),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.Start,
+        ) {
+            for (info: SyncResultsInfo in filteredPreviewData) {
+                item {
+                    Text(text = if (info.targetName.isNullOrEmpty()) "" else info.targetName, fontSize = 24.sp)
+                }
+                item {
+                    Text(
+                        text = if (info.estimatedSize.isNullOrEmpty()) info.message!! else "${info.action!!} - ${info.estimatedSize}",
+                        fontSize = 24.sp
+                    )
+                }
+                item {
+                    HorizontalDivider(thickness = 2.dp)
                 }
             }
+        }
     }
 
     override fun onDestroy() {

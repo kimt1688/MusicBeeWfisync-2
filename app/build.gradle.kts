@@ -15,8 +15,8 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 127
-        versionName = "2.8.5"
+        versionCode = 130
+        versionName = "2.9.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         targetSdk = 35
@@ -76,7 +76,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 composeCompiler {
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
-    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
 }
 
 dependencies {
@@ -89,6 +88,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.foundation)
+    implementation(libs.litert.metadata)
 
     implementation (libs.androidx.constraintlayout)
     implementation (libs.androidx.appcompat.resources)
@@ -110,6 +110,7 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.navigation3.runtime)
     implementation(platform(libs.androidx.compose.bom.v20250101))
+    implementation(libs.litert.metadata)
 
     testImplementation (libs.junit)
     androidTestImplementation (libs.androidx.junit)

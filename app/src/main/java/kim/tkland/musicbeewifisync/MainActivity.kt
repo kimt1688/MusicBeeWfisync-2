@@ -6,28 +6,29 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
-import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,37 +38,39 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.MenuCompat
 import androidx.core.net.toUri
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 class MainActivity() : WifiSyncBaseActivity() {
-    private var syncPreview = false
     private var syncToPlaylists: CheckBox? = null
     private var syncToPlaylistsPath: EditText? = null
-    private var syncPreviewButton: Button? = null
-    private var syncStartButton: LinearLayout? = null
     private var serverStatusThread: Thread? = null
-    private var syncPlayerGoneMad: RadioButton? = null
-    private var syncPlayerPoweramp: RadioButton? = null
-    private var syncPlayerNone: RadioButton? = null
     private var syncToPlayCounts: CheckBox? = null
     private var syncToRatings: CheckBox? = null
 
@@ -88,7 +91,11 @@ class MainActivity() : WifiSyncBaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        ComposeView(applicationContext).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        }
         //setContentView(R.layout.activity_settings)
         ErrorHandler.initialise(this)
         // needed so android "Recent Views" actually shows the icon - only seems to be an issue with P
@@ -112,15 +119,19 @@ class MainActivity() : WifiSyncBaseActivity() {
             startActivity(intent)
         } else {
             setContent {
-               val navController = rememberNavController()
-               //CustomView(onNavigateToViewErrorLog = {navController.navigate("ViewErrorLogActivityScreen")})
+                val navController = rememberNavController()
+                //CustomView(onNavigateToViewErrorLog = {navController.navigate("ViewErrorLogActivityScreen")})
                 //AppCompat {
-                    NavHost(navController = navController, startDestination = "CustomView") {
-                        composable(route = "CustomView") {
-                            CustomView(navController)
-                        }
-                        composable(route = "ViewErrorLogActivityScreen") { ViewErrorLogActivityScreen(navController) }
+                NavHost(navController = navController, startDestination = "CustomView") {
+                    composable(route = "CustomView") {
+                        CustomView(navController)
                     }
+                    composable(route = "ViewErrorLogActivityScreen") {
+                        ViewErrorLogActivityScreen(
+                            navController
+                        )
+                    }
+                }
                 //}
             }
 
@@ -134,8 +145,6 @@ class MainActivity() : WifiSyncBaseActivity() {
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         }
-        //setSupportActionBar(findViewById(R.id.my_toolbar))
-
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -143,11 +152,22 @@ class MainActivity() : WifiSyncBaseActivity() {
     fun CustomView(navController: NavController) {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
-        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
         var expanded by remember { mutableStateOf(false) }
 
+        var isSyncFromMusicBeeChecked by remember { mutableStateOf(WifiSyncServiceSettings.syncFromMusicBee) }
+        var isSyncToPlaycountsChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayCounts) }
+        var isSyncToRatingChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncRatings) }
+        var isSyncToPlaylistsChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlaylists) }
+        var initialReverseSyncPlayer: Int = 0
+        when(WifiSyncServiceSettings.reverseSyncPlayer) {
+            WifiSyncServiceSettings.PLAYER_POWERAMP -> initialReverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
+            WifiSyncServiceSettings.PLAYER_GONEMAD -> initialReverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+            0 -> initialReverseSyncPlayer = 0
+        }
+        var reverseSyncPrayerSelected by remember { mutableIntStateOf(value = initialReverseSyncPlayer) }
+
         Scaffold(
-            modifier = Modifier.fillMaxSize().padding(statusBarPadding),
+            modifier = Modifier.fillMaxSize(),
 
             topBar = {
                 CenterAlignedTopAppBar(
@@ -163,8 +183,9 @@ class MainActivity() : WifiSyncBaseActivity() {
                         )
                     },
                     actions = {
-                        Box(modifier = Modifier
-                            .padding(16.dp)
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
                         ) {
                             IconButton(onClick = { expanded = !expanded }) {
                                 Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
@@ -177,7 +198,10 @@ class MainActivity() : WifiSyncBaseActivity() {
                                     text = { Text("View error log...") },
                                     onClick = {
                                         // navController.navigate("ViewErrorLogActivityScreen")
-                                        val intent = Intent(applicationContext, ViewErrorLogActivity::class.java)
+                                        val intent = Intent(
+                                            applicationContext,
+                                            ViewErrorLogActivity::class.java
+                                        )
                                         startActivity(intent)
                                         //navController.navigate("ViewErrorLogActivityScreen")
 
@@ -190,24 +214,250 @@ class MainActivity() : WifiSyncBaseActivity() {
                             }
                         }
                     },
-                            scrollBehavior = scrollBehavior,
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+            bottomBar = {
+                Row( // Or a Compose Row
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(
+                        modifier = Modifier.weight(0.5f),
+                        onClick = {
+                            try {
+                                //syncStartButton!!.isEnabled = false
+                                WifiSyncServiceSettings.syncCustomFiles = false
+                                // 画面情報を保存する
+                                WifiSyncServiceSettings.syncFromMusicBee = isSyncFromMusicBeeChecked
+                                WifiSyncServiceSettings.reverseSyncPlayCounts = isSyncToPlaycountsChecked
+                                WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatingChecked
+                                WifiSyncServiceSettings.reverseSyncPlaylists = isSyncToPlaylistsChecked
+                                when(reverseSyncPrayerSelected) {
+                                    1 -> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
+                                    2 -> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+                                    3 -> WifiSyncServiceSettings.reverseSyncPlayer = 0
+                                }
+                                //WifiSyncServiceSettings.reverseSyncPlayer = reverseSyncPrayerSelected
+
+                                //syncPreview = false
+                                WifiSyncService.startSynchronisation(
+                                    applicationContext,
+                                    0,
+                                    true,
+                                    false
+                                )
+                            } catch (ex: Exception) {
+                                Log.d("onPreviewButtonClick", ex.message!!)
+                            } finally {
+                                // syncStartButton!!.isEnabled = true
+                            }
+                        }) {
+                        Modifier.weight(1f)
+
+                        //Icon(
+                        //imageVector = Icons.Filled.Sync,
+                        //contentDescription = "Sync",
+                        //)
+                        //Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text("Preview", fontSize = 24.sp)
+                    }
+                    Button(
+                        modifier = Modifier.weight(0.5f),
+                        onClick = {
+                            try {
+                                WifiSyncServiceSettings.syncCustomFiles = false
+                                //syncPreview = false
+                                WifiSyncServiceSettings.syncFromMusicBee = isSyncFromMusicBeeChecked
+                                WifiSyncServiceSettings.reverseSyncPlayCounts = isSyncToPlaycountsChecked
+                                WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatingChecked
+                                WifiSyncServiceSettings.reverseSyncPlaylists = isSyncToPlaylistsChecked
+                                when(reverseSyncPrayerSelected) {
+                                    1 -> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
+                                    2 -> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+                                    3 -> WifiSyncServiceSettings.reverseSyncPlayer = 0
+                                }
+                                WifiSyncService.startSynchronisation(
+                                    applicationContext,
+                                    0,
+                                    false,
+                                    false
+                                )
+                            } catch (ex: Exception) {
+                                Log.d("onSyncStartButtonClick", ex.message!!)
+                            } finally {
+                                //syncStartButton!!.isEnabled = true
+                            }
+                        }) {
+                        Modifier.weight(1f)
+
+                        Icon(
+                            imageVector = Icons.Filled.Sync,
+                            contentDescription = "Sync",
+                        )
+                        Text("Sync", fontSize = 24.sp)
+                    }
+                }
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Row() {
+                    Image(
+                        painter = painterResource(R.drawable.ic_arrow_forward),
+                        contentDescription = "Header"
+                    )
+                    Text(
+                        text = applicationContext.getString(R.string.syncFromPrompt),
+                        fontSize = 16.sp
                     )
                 }
-        ) { innerPadding ->
-            AndroidView(
-                modifier = Modifier
-                    .fillMaxSize() // Fill the available space within the Scaffold
-                    //.background(Black)
-                    //.windowInsetsPadding(WindowInsets.statusBars),
-                    .padding(innerPadding),
-                factory = { context ->
-                    var rootView =
-                        LayoutInflater.from(context).inflate(R.layout.activity_main, null)
+                Row() {
+                    CheckableRow(
+                        text = applicationContext.getString(R.string.syncFromDefault),
+                        checked = WifiSyncServiceSettings.syncFromMusicBee,
+                        onCheckedChange = {
+                            isSyncFromMusicBeeChecked = it
+                        }
+                    )
+                }
+                Row() {
+                    Image(
+                        painter = painterResource(R.drawable.ic_arrow_back),
+                        contentDescription = "ReverseSync"
+                    )
+                    Text(
+                        text = applicationContext.getString(R.string.syncToPrompt), fontSize = 16.sp
+                    )
+                }
+                Row() {
+                    CheckableRow(
+                        text = applicationContext.getString(R.string.syncToPlaycounts),
+                        checked = WifiSyncServiceSettings.reverseSyncPlayCounts,
+                        onCheckedChange = {
+                            isSyncToPlaycountsChecked = it
+                        }
+                    )
+                }
+                Row() {
+                    CheckableRow(
+                        text = applicationContext.getString(R.string.syncToRatings),
+                        checked = WifiSyncServiceSettings.reverseSyncRatings,
+                        onCheckedChange = {
+                            isSyncToRatingChecked = it
+                        }
+                    )
+                }
+                Row() {
+                    CheckableRow(
+                        text = applicationContext.getString(R.string.syncToPlaylists),
+                        checked = WifiSyncServiceSettings.reverseSyncPlaylists,
+                        onCheckedChange = {
+                            isSyncToPlaylistsChecked = it
+                        }
+                    )
+                }
+                Row() {
+                    Text(
+                        text = applicationContext.getString(R.string.syncToUsingPlayer),
+                        fontSize = 16.sp
+                    )
+                }
+                Row() {
+                    PlayerRadioGroup(20)
+                }
+            }
+        }
+    }
 
-                    rootView.apply {
+
+    @Composable
+    private fun CheckableRow(text: String, checked: Boolean, onCheckedChange: (Boolean)->Unit) {
+        MaterialTheme {
+            var checked by remember { mutableStateOf(checked) }
+            Row(
+                modifier = Modifier
+                    .toggleable(
+                        value = checked,
+                        role = Role.Checkbox,
+                        onValueChange = { checked = !checked }
+                    )
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+            ) {
+                Checkbox(
+                    checked = checked,
+                    onCheckedChange = onCheckedChange
+                )
+                Text(text, fontSize = 20.sp)
+            }
+        }
+    }
+
+    data class RadioOption(val text: String, val value: String, val index: Int)
+
+    @Composable
+    fun PlayerRadioGroup(fontSize: Int) {
+        val options = listOf(
+            RadioOption(
+                "Poweramp",
+                "reverceFromPoweramp",
+                index = 0
+            ),
+            RadioOption(
+                "GoneMAD",
+                "reverceFromGoneMAD",
+                index = 1
+            ),
+            RadioOption("None", "reverceFromNone", index = 2)
+        )
+
+        var initialSelectIndex = 2
+        if (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) {
+            initialSelectIndex = 1
+        } else if (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_POWERAMP) {
+            initialSelectIndex = 0
+        } else {
+            initialSelectIndex = 2
+        }
+
+        val (selectedOption, onOptionSelected) = remember { mutableIntStateOf(initialSelectIndex) }
+
+        Column {
+            options.forEach { option ->
+                Row(
+                    modifier = Modifier
+                        //.padding(8.dp)
+                        .selectable(
+                            selected = (option.index == selectedOption),
+                            onClick = { onOptionSelected(option.index) }
+                        )
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+
+                    ) {
+                    RadioButton(
+                        selected = (option.index == selectedOption),
+                        onClick = { onOptionSelected(option.index) }
+                    )
+                    Text(text = option.text, fontSize = fontSize.sp)
+                }
+            }
+        }
+    }
+
+    /*
+                    rootView.apply
+
+
                         // Creates view
-                        syncPreviewButton = findViewById(R.id.syncPreviewButton)
-                        syncStartButton = findViewById(R.id.syncStartButton)
                         syncToPlaylists = findViewById(R.id.syncToPlaylists)
                         syncToPlaylistsPath = findViewById(R.id.syncToPlaylistPath)
                         syncPlayerGoneMad = findViewById(R.id.reverceFromGoneMAD)
@@ -296,38 +546,18 @@ class MainActivity() : WifiSyncBaseActivity() {
                             WifiSyncServiceSettings.saveSettings(this@MainActivity)
                         }
 
-                        // You also have click listeners (onSyncPreviewButtonClick, etc.) in your XML.
-                        // You can set them here programmatically:
-                        syncPreviewButton?.setOnClickListener {
-                            onSyncPreviewButtonClick(it) // 'it' is the clicked view
-                            rootView = LayoutInflater.from(context)
-                                .inflate(R.layout.activity_sync_preview, null)
-                        }
-                        syncStartButton?.setOnClickListener {
-                            // The view passed to onSyncStartButtonClick might not be syncStartButton directly
-                            // if it's a LinearLayout with children. You might need to adjust.
-                            onSyncStartButtonClick(it)
-                        }
                         syncPlayerGoneMad?.setOnClickListener { onGoneMADCheckClick(it) }
                         syncPlayerPoweramp?.setOnClickListener { onPowerampCheckClick(it) }
                         // ... and so on for other click listeners defined in XML
-
-
                     }
 
                     // Return the inflated and configured view
                     rootView
-                },
-                update = { view ->
-                    // Called when the composable recomposes.
-                    // You can update the view here if its state needs to change
-                    // based on changes in Compose state.
-                    // For example, if WifiSyncServiceSettings could change from elsewhere
-                    // and you needed to update the checkboxes.
-                }
-            )
+            }
         }
     }
+
+ */
 
     private fun setPlaylistsEnabled(enabled: Boolean) {
         if (!enabled) {
@@ -360,92 +590,29 @@ class MainActivity() : WifiSyncBaseActivity() {
         return true
     }
 
-    fun onSyncPreviewButtonClick(view: View) {
-        if (isConfigOK) {
-            syncPreviewButton!!.isEnabled = false
-            try {
-                WifiSyncServiceSettings.syncCustomFiles = false
-                syncPreview = true
-                WifiSyncService.startSynchronisation(this, 0, true, false)
-            }catch (ex:Exception){
-                Log.d("onSyncPreviewButtonClick", ex.message!!)
-            } finally {
-                syncPreviewButton!!.isEnabled = true
-            }
-        }
-    }
 
-    fun onSyncStartButtonClick(view: View) {
-        if (isConfigOK) {
-            syncStartButton!!.isEnabled = false
-            try {
-                WifiSyncServiceSettings.syncCustomFiles = false
-                syncPreview = false
-                WifiSyncService.startSynchronisation(this, 0, false, false)
-            }catch (ex:Exception){
-                Log.d("onSyncStartButtonClick", ex.message!!)
-            } finally {
-                syncStartButton!!.isEnabled = true
-            }
-        }
-    }
-
-    fun onGoneMADCheckClick(view: View) {
+    fun onGoneMADCheckClick(isSelected: Boolean) {
         WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
         syncToPlayCounts!!.isEnabled = true
         syncToRatings!!.isEnabled = true
         setPlaylistsEnabled(true)
     }
 
-    fun onPowerampCheckClick(view: View) {
+    fun onPowerampCheckClick(isSelected: Boolean) {
         WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
         syncToPlayCounts!!.isEnabled = true
         syncToRatings!!.isEnabled = true
         setPlaylistsEnabled(false)
     }
 
-    fun onNoneCheckClick(view: View) {
+    fun onNoneCheckClick(isSelected: Boolean) {
         WifiSyncServiceSettings.reverseSyncPlayer = 0
         syncToPlayCounts!!.isEnabled = false
         syncToRatings!!.isEnabled = false
         setPlaylistsEnabled(false)
     }
 
-    private val isConfigOK: Boolean
-        get () {
-            var message: String? = null
-            if (serverStatusThread != null) {
-                message = getString(R.string.errorServerNotFound)
-            }
-            val anyReverseSync =
-                WifiSyncServiceSettings.reverseSyncPlaylists || WifiSyncServiceSettings.reverseSyncRatings || WifiSyncServiceSettings.reverseSyncPlayCounts
-            if (!anyReverseSync) {
-                if (!WifiSyncServiceSettings.syncFromMusicBee) {
-                    message = getString(R.string.errorSyncParamsNoneSelected)
-                }
-            } else {
-                if (syncPlayerGoneMad!!.isChecked)
-                    WifiSyncServiceSettings.reverseSyncPlayer = 1
-                else if (syncPlayerPoweramp!!.isChecked)
-                    WifiSyncServiceSettings.reverseSyncPlayer = 2
-                else
-                    WifiSyncServiceSettings.reverseSyncPlayer = 0
-            }
-            return if (message == null) {
-                true
-            } else {
-                val builder = AlertDialog.Builder(mainWindow!!)
-                builder.setTitle(getString(R.string.syncErrorHeader))
-                builder.setMessage(message)
-                builder.setIcon(android.R.drawable.ic_dialog_alert)
-                builder.setCancelable(false)
-                builder.setPositiveButton(android.R.string.ok, null)
-                builder.show()
-                false
-            }
-        }
-
-        private fun checkServerStatus() {
+    private fun checkServerStatus() {
         serverStatusThread = Thread {
             try {
                 var statusDisplayed = false

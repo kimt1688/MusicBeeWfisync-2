@@ -203,10 +203,10 @@
         android:textColor="@color/colorError"
         android:textSize="20sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/syncPreviewButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_editor_absoluteX="15dp" />
 
-    <androidx.constraintlayout.widget.Guideline
+    <!--<androidx.constraintlayout.widget.Guideline
         android:id="@+id/syncHalfWidthGuideline"
         android:layout_width="1dp"
         android:layout_height="wrap_content"
@@ -262,6 +262,6 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Colored"
             android:textColor="@color/colorButtonTextEnabled"
             android:textSize="17sp" />
-    </LinearLayout>
+    </LinearLayout>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

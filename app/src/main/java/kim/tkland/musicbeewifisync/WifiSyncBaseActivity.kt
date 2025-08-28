@@ -38,8 +38,8 @@ abstract class WifiSyncBaseActivity : ComponentActivity() {
     protected var progressDialog: WifiSyncAlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+        //enableEdgeToEdge()
+
         //val resources = resources
         //val transparent = ResourcesCompat.getColor(resources, android.R.color.transparent, theme)
         //val isDarkMode = isDarkMode(resources)
@@ -52,6 +52,7 @@ abstract class WifiSyncBaseActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         buttonTextEnabledColor = resources.getColor(R.color.colorButtonTextEnabled, null)
         buttonTextDisabledColor = resources.getColor(R.color.colorButtonTextDisabled, null)
+        /*
         val windowInsetsController =
             getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior =
@@ -76,6 +77,8 @@ abstract class WifiSyncBaseActivity : ComponentActivity() {
             )
             WindowInsetsCompat.CONSUMED
         }
+
+         */
         //getInsetsController(window, window.decorView)
         //    .isAppearanceLightStatusBars = true
         /*

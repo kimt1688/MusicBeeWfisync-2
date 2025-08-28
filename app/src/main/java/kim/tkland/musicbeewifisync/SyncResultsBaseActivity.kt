@@ -1,46 +1,19 @@
 package kim.tkland.musicbeewifisync
 
-import android.R.color.transparent
-import android.content.res.Configuration
-import android.content.res.Resources
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import androidx.databinding.DataBindingUtil
-import kim.tkland.musicbeewifisync.SyncResultsInfo
-import kim.tkland.musicbeewifisync.databinding.RowItemSyncResultsBinding
 
 abstract class SyncResultsBaseActivity : ComponentActivity() {
     @JvmField
@@ -52,7 +25,6 @@ abstract class SyncResultsBaseActivity : ComponentActivity() {
     @JvmField
     protected var warningColor = 0
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         //setContentView(R.layout.activity_settings)
@@ -60,6 +32,7 @@ abstract class SyncResultsBaseActivity : ComponentActivity() {
         errorColor = ContextCompat.getColor(this, R.color.colorWarning)
         warningColor = ContextCompat.getColor(this, R.color.colorWarning)
 
+        /*
         val windowInsetsController =
             WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior =
@@ -77,6 +50,8 @@ abstract class SyncResultsBaseActivity : ComponentActivity() {
             )
             WindowInsetsCompat.CONSUMED
         }
+
+         */
     }
 
     override fun onDestroy() {

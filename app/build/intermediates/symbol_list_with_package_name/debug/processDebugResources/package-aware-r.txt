@@ -3684,6 +3684,7 @@ drawable ic_mtrl_chip_checked_black
 drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
 drawable ic_search_black_24
+drawable ic_sync_background
 drawable indeterminate_static
 drawable lb_action_bg
 drawable lb_action_bg_focused
@@ -4492,7 +4493,6 @@ id syncFileSelectorName
 id syncFrom
 id syncFromMusicBee
 id syncFromPrompt
-id syncHalfWidthGuideline
 id syncNoPlaylistsMessage
 id syncPlaylistsCountMessage
 id syncPlaylistsDeleteFiles
@@ -4503,7 +4503,6 @@ id syncPlaylistsSelector
 id syncPlaylistsStartButton
 id syncPlaylistsStartButtonImage
 id syncPlaylistsStartButtonText
-id syncPreviewButton
 id syncProgressBar
 id syncProgressMessage
 id syncResultsDirectionIcon
@@ -4512,9 +4511,6 @@ id syncResultsLine1
 id syncResultsLine2
 id syncResultsStatusIcon
 id syncServerStatus
-id syncStartButton
-id syncStartButtonImage
-id syncStartButtonText
 id syncTo
 id syncToPlayCounts
 id syncToPlaylistPath
@@ -4953,6 +4949,9 @@ menu menu_sync_status
 mipmap ic_launcher
 mipmap ic_launcher_foreground
 mipmap ic_launcher_round
+mipmap ic_sync
+mipmap ic_sync_foreground
+mipmap ic_sync_round
 plurals mtrl_badge_content_description
 raw lb_voice_failure
 raw lb_voice_no_input

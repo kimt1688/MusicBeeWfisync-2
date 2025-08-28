@@ -4,10 +4,8 @@ package kim.tkland.musicbeewifisync.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -16,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.compose.ui.platform.ComposeView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.Guideline;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import java.lang.NullPointerException;
@@ -50,22 +47,7 @@ public final class ActivityMainBinding implements ViewBinding {
   public final TextView syncFromPrompt;
 
   @NonNull
-  public final Guideline syncHalfWidthGuideline;
-
-  @NonNull
-  public final Button syncPreviewButton;
-
-  @NonNull
   public final TextView syncServerStatus;
-
-  @NonNull
-  public final LinearLayout syncStartButton;
-
-  @NonNull
-  public final ImageView syncStartButtonImage;
-
-  @NonNull
-  public final TextView syncStartButtonText;
 
   @NonNull
   public final LinearLayout syncTo;
@@ -95,14 +77,11 @@ public final class ActivityMainBinding implements ViewBinding {
       @NonNull ComposeView activityMainComposeView, @NonNull RadioButton reverceFromGoneMAD,
       @NonNull RadioButton reverceFromNone, @NonNull RadioButton reverceFromPoweramp,
       @NonNull LinearLayout syncFrom, @NonNull CheckBox syncFromMusicBee,
-      @NonNull TextView syncFromPrompt, @NonNull Guideline syncHalfWidthGuideline,
-      @NonNull Button syncPreviewButton, @NonNull TextView syncServerStatus,
-      @NonNull LinearLayout syncStartButton, @NonNull ImageView syncStartButtonImage,
-      @NonNull TextView syncStartButtonText, @NonNull LinearLayout syncTo,
-      @NonNull CheckBox syncToPlayCounts, @NonNull EditText syncToPlaylistPath,
-      @NonNull CheckBox syncToPlaylists, @NonNull TextView syncToPrompt,
-      @NonNull CheckBox syncToRatings, @NonNull RadioGroup syncToUsingPlayer,
-      @NonNull TextView syncToUsingPrompt) {
+      @NonNull TextView syncFromPrompt, @NonNull TextView syncServerStatus,
+      @NonNull LinearLayout syncTo, @NonNull CheckBox syncToPlayCounts,
+      @NonNull EditText syncToPlaylistPath, @NonNull CheckBox syncToPlaylists,
+      @NonNull TextView syncToPrompt, @NonNull CheckBox syncToRatings,
+      @NonNull RadioGroup syncToUsingPlayer, @NonNull TextView syncToUsingPrompt) {
     this.rootView = rootView;
     this.activityMainComposeView = activityMainComposeView;
     this.reverceFromGoneMAD = reverceFromGoneMAD;
@@ -111,12 +90,7 @@ public final class ActivityMainBinding implements ViewBinding {
     this.syncFrom = syncFrom;
     this.syncFromMusicBee = syncFromMusicBee;
     this.syncFromPrompt = syncFromPrompt;
-    this.syncHalfWidthGuideline = syncHalfWidthGuideline;
-    this.syncPreviewButton = syncPreviewButton;
     this.syncServerStatus = syncServerStatus;
-    this.syncStartButton = syncStartButton;
-    this.syncStartButtonImage = syncStartButtonImage;
-    this.syncStartButtonText = syncStartButtonText;
     this.syncTo = syncTo;
     this.syncToPlayCounts = syncToPlayCounts;
     this.syncToPlaylistPath = syncToPlaylistPath;
@@ -196,39 +170,9 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.syncHalfWidthGuideline;
-      Guideline syncHalfWidthGuideline = ViewBindings.findChildViewById(rootView, id);
-      if (syncHalfWidthGuideline == null) {
-        break missingId;
-      }
-
-      id = R.id.syncPreviewButton;
-      Button syncPreviewButton = ViewBindings.findChildViewById(rootView, id);
-      if (syncPreviewButton == null) {
-        break missingId;
-      }
-
       id = R.id.syncServerStatus;
       TextView syncServerStatus = ViewBindings.findChildViewById(rootView, id);
       if (syncServerStatus == null) {
-        break missingId;
-      }
-
-      id = R.id.syncStartButton;
-      LinearLayout syncStartButton = ViewBindings.findChildViewById(rootView, id);
-      if (syncStartButton == null) {
-        break missingId;
-      }
-
-      id = R.id.syncStartButtonImage;
-      ImageView syncStartButtonImage = ViewBindings.findChildViewById(rootView, id);
-      if (syncStartButtonImage == null) {
-        break missingId;
-      }
-
-      id = R.id.syncStartButtonText;
-      TextView syncStartButtonText = ViewBindings.findChildViewById(rootView, id);
-      if (syncStartButtonText == null) {
         break missingId;
       }
 
@@ -282,10 +226,8 @@ public final class ActivityMainBinding implements ViewBinding {
 
       return new ActivityMainBinding((ConstraintLayout) rootView, activityMainComposeView,
           reverceFromGoneMAD, reverceFromNone, reverceFromPoweramp, syncFrom, syncFromMusicBee,
-          syncFromPrompt, syncHalfWidthGuideline, syncPreviewButton, syncServerStatus,
-          syncStartButton, syncStartButtonImage, syncStartButtonText, syncTo, syncToPlayCounts,
-          syncToPlaylistPath, syncToPlaylists, syncToPrompt, syncToRatings, syncToUsingPlayer,
-          syncToUsingPrompt);
+          syncFromPrompt, syncServerStatus, syncTo, syncToPlayCounts, syncToPlaylistPath,
+          syncToPlaylists, syncToPrompt, syncToRatings, syncToUsingPlayer, syncToUsingPrompt);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
