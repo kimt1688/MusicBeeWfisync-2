@@ -1,5 +1,6 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.attr.onClick
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -12,32 +13,54 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.currentWindowSize
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.setMargins
-import androidx.core.view.updatePadding
-import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     private var syncProgressBar: ProgressBar? = null
@@ -53,9 +76,21 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_sync_status)
         WifiSyncService.resultsActivityReady.set()
+        // OnBackPressedDispatcher を取得
+        onBackPressedDispatcher.addCallback(
+            this, // LifecycleOwner を指定
+            object : OnBackPressedCallback(true) { // trueでコールバックを有効にする
+                override fun handleOnBackPressed() {
+                    // 「戻る」操作をインターセプトする処理をここに書く
+                    // 何もせず、あるいは特定の処理を行う場合は、super.handleOnBackPressed() を呼ばない
+                    // 例: 何もしない
+                }
+            }
+        )
         setContent{
-            this.CustomView()
+            CustomView()
         }
+        /*
         timerRunnable = object : Runnable {
             override fun run() {
                 try {
@@ -72,6 +107,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             }
         }
         timerHandler.postDelayed(timerRunnable!!, 300)
+         */
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         // setSupportActionBar(findViewById(R.id.my_toolbar))
     }
@@ -81,9 +117,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     fun CustomView() {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
-        //val toolbar: androidx.appcompat.widget.Toolbar? = findViewById(R.id.activity_main_compose_view)
-        //toolbar?.setTitle(R.string.title_activity_settings)
-        // Adds view to Compose
+
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
@@ -101,8 +135,10 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                     },
                     scrollBehavior = scrollBehavior
                 )
-            }
+            },
         ){ innerPadding ->
+            ShowSyncStatusComposable(innerPadding)
+            /*
             AndroidView(
                 modifier = Modifier
                     .fillMaxSize() // Fill the available space within the Scaffold
@@ -133,22 +169,155 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                     // and you needed to update the checkboxes.
                 }
             )
+
+             */
+        }
+    }
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+    fun ShowSyncStatusComposable(innerPadding: PaddingValues) {
+    var rawTargetSyncProgress by remember { mutableFloatStateOf(0f) }
+    var loading by remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope() // Create a coroutine scope
+    var currentSyncMessage by remember { mutableStateOf("") }
+    var showEndOfSyncInfo by remember { mutableStateOf(false) }
+    var buttonText by remember { mutableStateOf("STOP") }
+    var completeMessage by remember { mutableStateOf("") }
+
+    val animatedSyncProgress by animateFloatAsState(
+        targetValue = rawTargetSyncProgress,
+        label = "syncProgressAnimation" // Optional but good for debugging
+    )
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            if (WifiSyncService.syncPercentCompleted.get() != -1) {
+                rawTargetSyncProgress = WifiSyncService.syncPercentCompleted.get() / 100f
+                currentSyncMessage = WifiSyncService.syncProgressMessage.get()
+                showEndOfSyncInfo = false
+                buttonText = "STOP"
+            } else {
+                rawTargetSyncProgress = 1f // Or whatever the final state should be
+                currentSyncMessage = "Sync finished" // Or a message from WifiSyncService
+                showEndOfSyncInfo = true
+                buttonText = "Sync More"
+                loading = false
+                break
+            }
+            delay(300)
+        }
+    }
+    Scaffold(
+        //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        bottomBar = {
+            Column (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Text(
+                    modifier = Modifier.fillMaxWidth()
+                        .height(170.dp),
+                    text = currentSyncMessage,
+                    maxLines = 7,
+                    fontSize = 20.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Start
+                )
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        if (buttonText == "STOP") {
+                            try {
+                                WifiSyncServiceSettings.syncCustomFiles = false
+                                runOnUiThread {
+                                    WifiSyncService.waitSyncResults.waitOne()
+                                    WifiSyncService.startSynchronisation(
+                                        applicationContext,
+                                        0,
+                                        false,
+                                        false
+                                    )
+                                }
+                                buttonText = "Sync More"
+                            } catch (ex: Exception) {
+                                Log.d("onSyncStartButtonClick", ex.message!!)
+                            }
+                        } else {
+                            val intent =
+                                Intent(this@SyncResultsStatusActivity, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                    }
+                    ){
+                    //Modifier.weight(1f)
+
+                    Text(buttonText, fontSize = 20.sp)
+                        }
+                    }
+                }
+        ){ scaffoldPadding ->
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPadding)
+        ) {
+            LinearProgressIndicator(
+                { animatedSyncProgress },
+                modifier = Modifier.padding(top = 120.dp, start = 15.dp, end = 15.dp)
+                    .fillMaxWidth()
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, start = 15.dp, end = 15.dp)
+                    .height(30.dp),
+                //.padding(start = 15.dp, top = 200.dp),
+                text = completeMessage,
+                maxLines = 3,
+                fontSize = 18.sp
+            )
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.width(64.dp),
+                )
+            }
+
+            if (showEndOfSyncInfo) {
+                currentSyncMessage = ""
+                completeMessage = getString(R.string.syncCompleted)
+                ShowEndOfSyncInformation() // Call your composable here based on state
+            }
+        }
         }
     }
 
+    suspend fun loadProgress(updateProgress: (Float) -> Unit, updateText: (String) -> Unit, onComplete: () -> Unit) {
+        while (WifiSyncService.syncPercentCompleted.get() != -1) {
+            val currentProgress = WifiSyncService.syncPercentCompleted.get() / 100f
+            val currentMessage = WifiSyncService.syncProgressMessage.get()
+
+            updateProgress(currentProgress)
+            updateText(currentMessage)
+            // timerHandler.postDelayed(this, 300)
+            delay(300)
+        }
+        onComplete()
+    }
 
     override fun onDestroy() {
         WifiSyncService.resultsActivityReady.reset()
-        timerHandler.removeCallbacks(timerRunnable!!)
+        //timerHandler.removeCallbacks(timerRunnable!!)
         mainWindow = null
         super.onDestroy()
     }
 
-    @SuppressLint("MissingSuperCall")
-    @Deprecated("This method has been deprecated in favor of using the\n      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.\n      The OnBackPressedDispatcher controls how back button events are dispatched\n      to one or more {@link OnBackPressedCallback} objects.")
-    override fun onBackPressed() {
-        // disable back button
-    }
+    //@SuppressLint("MissingSuperCall")
+    //@/Deprecated("This method has been deprecated in favor of using the\n      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.\n      The OnBackPressedDispatcher controls how back button events are dispatched\n      to one or more {@link OnBackPressedCallback} objects.")
+    //override fun onBackPressed() {
+    //    // disable back button
+    //}
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_sync_status, menu)
@@ -176,7 +345,9 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    @Composable
     fun onStopSyncButton_Click(view: View) {
+        /*
         if (stopSyncButton!!.text == getString(R.string.syncMore)) {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -190,10 +361,12 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             stopProgressTimer()
             WifiSyncServiceSettings.saveSettings(this)
             WifiSyncService.syncErrorMessageId.set(R.string.syncCancelled)
-            showEndOfSyncInformation()
+            ShowEndOfSyncInformation()
         }
+         */
     }
 
+    /*
     private fun stopProgressTimer() {
         syncProgressBar!!.visibility = View.INVISIBLE
         syncWaitIndicator!!.visibility = View.INVISIBLE
@@ -201,15 +374,27 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         timerHandler.removeCallbacks(timerRunnable!!)
         stopSyncButton!!.text = getString(R.string.syncMore)
     }
+         */
 
-    private fun showEndOfSyncInformation() {
+    @Composable
+    private fun ShowEndOfSyncInformation() {
         val errorMessageId = WifiSyncService.syncErrorMessageId.getAndSet(0)
         WifiSyncServiceSettings.saveSettings(this)
-        stopProgressTimer()
+        // stopProgressTimer()
         if (errorMessageId == 0 || errorMessageId == R.string.syncCompletedFail) {
             val messageId = if (errorMessageId != 0) errorMessageId else R.string.syncCompleted
-            syncCompletionStatusMessage!!.setText(messageId)
-            syncCompletionStatusMessage!!.visibility = View.VISIBLE
+            /*
+            Text(modifier = Modifier
+                .fillMaxWidth()
+                .height(30.dp)
+                .padding(start = 15.dp, top = 200.dp),
+                text = getString(R.string.syncCompleted),
+                maxLines = 3,
+                fontSize = 18.sp
+            )
+             */
+            //syncCompletionStatusMessage!!.setText(messageId)
+            //syncCompletionStatusMessage!!.visibility = View.VISIBLE
             if (errorMessageId == R.string.syncCompletedFail) {
                 if ((WifiSyncService.syncToResults == null || WifiSyncService.syncToResults!!.isEmpty()) && WifiSyncService.syncFailedFiles.isEmpty()) {
                     syncCompletionStatusMessage!!.setText(R.string.syncCompletedFailErrorLog)
@@ -240,6 +425,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                     showResults(syncFailedResults!!, WifiSyncService.syncToResults, failedFrom)
                 }
             }
+                /*
             val snackbar =
                 Snackbar.make(stopSyncButton!!, getString(messageId), Snackbar.LENGTH_LONG)
             try {
@@ -251,6 +437,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                 Log.d("showEndOfSyncInformation", ex.message!!)
             }
             snackbar.show()
+                 */
         } else if (errorMessageId == R.string.syncCancelled) {
             syncCompletionStatusMessage!!.setText(errorMessageId)
             syncCompletionStatusMessage!!.visibility = View.VISIBLE

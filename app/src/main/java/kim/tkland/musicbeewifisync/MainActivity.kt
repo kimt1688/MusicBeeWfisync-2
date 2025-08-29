@@ -119,6 +119,8 @@ class MainActivity() : WifiSyncBaseActivity() {
             startActivity(intent)
         } else {
             setContent {
+                CustomView()
+                /*
                 val navController = rememberNavController()
                 //CustomView(onNavigateToViewErrorLog = {navController.navigate("ViewErrorLogActivityScreen")})
                 //AppCompat {
@@ -132,6 +134,7 @@ class MainActivity() : WifiSyncBaseActivity() {
                         )
                     }
                 }
+                 */
                 //}
             }
 
@@ -149,7 +152,7 @@ class MainActivity() : WifiSyncBaseActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun CustomView(navController: NavController) {
+    fun CustomView() {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
         var expanded by remember { mutableStateOf(false) }
@@ -158,13 +161,13 @@ class MainActivity() : WifiSyncBaseActivity() {
         var isSyncToPlaycountsChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayCounts) }
         var isSyncToRatingChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncRatings) }
         var isSyncToPlaylistsChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlaylists) }
-        var initialReverseSyncPlayer: Int = 0
+        var initialReverseSyncPlayer: Int = 2
         when(WifiSyncServiceSettings.reverseSyncPlayer) {
-            WifiSyncServiceSettings.PLAYER_POWERAMP -> initialReverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
-            WifiSyncServiceSettings.PLAYER_GONEMAD -> initialReverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
-            0 -> initialReverseSyncPlayer = 0
+            WifiSyncServiceSettings.PLAYER_POWERAMP -> initialReverseSyncPlayer = 0
+            WifiSyncServiceSettings.PLAYER_GONEMAD -> initialReverseSyncPlayer = 1
+            0 -> initialReverseSyncPlayer = 2
         }
-        var reverseSyncPrayerSelected by remember { mutableIntStateOf(value = initialReverseSyncPlayer) }
+        // var reverseSyncPrayerSelected by remember { mutableIntStateOf(value = initialReverseSyncPlayer) }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -232,11 +235,6 @@ class MainActivity() : WifiSyncBaseActivity() {
                                 WifiSyncServiceSettings.reverseSyncPlayCounts = isSyncToPlaycountsChecked
                                 WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatingChecked
                                 WifiSyncServiceSettings.reverseSyncPlaylists = isSyncToPlaylistsChecked
-                                when(reverseSyncPrayerSelected) {
-                                    1 -> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
-                                    2 -> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
-                                    3 -> WifiSyncServiceSettings.reverseSyncPlayer = 0
-                                }
                                 //WifiSyncServiceSettings.reverseSyncPlayer = reverseSyncPrayerSelected
 
                                 //syncPreview = false
@@ -271,11 +269,6 @@ class MainActivity() : WifiSyncBaseActivity() {
                                 WifiSyncServiceSettings.reverseSyncPlayCounts = isSyncToPlaycountsChecked
                                 WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatingChecked
                                 WifiSyncServiceSettings.reverseSyncPlaylists = isSyncToPlaylistsChecked
-                                when(reverseSyncPrayerSelected) {
-                                    1 -> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
-                                    2 -> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
-                                    3 -> WifiSyncServiceSettings.reverseSyncPlayer = 0
-                                }
                                 WifiSyncService.startSynchronisation(
                                     applicationContext,
                                     0,
@@ -368,12 +361,11 @@ class MainActivity() : WifiSyncBaseActivity() {
                     )
                 }
                 Row() {
-                    PlayerRadioGroup(20)
+                    PlayerRadioGroup(initialReverseSyncPlayer, 20)
                 }
             }
         }
     }
-
 
     @Composable
     private fun CheckableRow(text: String, checked: Boolean, onCheckedChange: (Boolean)->Unit) {
@@ -403,7 +395,7 @@ class MainActivity() : WifiSyncBaseActivity() {
     data class RadioOption(val text: String, val value: String, val index: Int)
 
     @Composable
-    fun PlayerRadioGroup(fontSize: Int) {
+    fun PlayerRadioGroup(initialReverseSyncPlayer: Int, fontSize: Int) {
         val options = listOf(
             RadioOption(
                 "Poweramp",
@@ -418,7 +410,8 @@ class MainActivity() : WifiSyncBaseActivity() {
             RadioOption("None", "reverceFromNone", index = 2)
         )
 
-        var initialSelectIndex = 2
+        /*
+        var initialSelectIndex: Int
         if (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) {
             initialSelectIndex = 1
         } else if (WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_POWERAMP) {
@@ -426,8 +419,9 @@ class MainActivity() : WifiSyncBaseActivity() {
         } else {
             initialSelectIndex = 2
         }
+        */
 
-        val (selectedOption, onOptionSelected) = remember { mutableIntStateOf(initialSelectIndex) }
+        val (selectedOption, onOptionSelected) = remember { mutableIntStateOf(initialReverseSyncPlayer) }
 
         Column {
             options.forEach { option ->
@@ -436,7 +430,14 @@ class MainActivity() : WifiSyncBaseActivity() {
                         //.padding(8.dp)
                         .selectable(
                             selected = (option.index == selectedOption),
-                            onClick = { onOptionSelected(option.index) }
+                            onClick = { onOptionSelected(option.index)
+                                when(option.index) {
+                                    0-> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
+                                    1-> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+                                    2-> WifiSyncServiceSettings.reverseSyncPlayer = 0
+                                }
+                            //Log.d("Radio:", option.index.toString())
+                            }
                         )
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -445,7 +446,14 @@ class MainActivity() : WifiSyncBaseActivity() {
                     ) {
                     RadioButton(
                         selected = (option.index == selectedOption),
-                        onClick = { onOptionSelected(option.index) }
+                        onClick = { onOptionSelected(option.index)
+                            when(option.index) {
+                                0-> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
+                                1-> WifiSyncServiceSettings.reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+                                2-> WifiSyncServiceSettings.reverseSyncPlayer = 0
+                            }
+                            //Log.d("Radio:", option.index.toString())
+                        }
                     )
                     Text(text = option.text, fontSize = fontSize.sp)
                 }
