@@ -11,8 +11,8 @@ class WifiSyncAlertDialog : DialogFragment() {
     var thread: WifiSyncAlertDialogThread? = null
     var msg: String? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        var msgView = layoutInflater.inflate(R.layout.dialog_sync_progress, null)
-        var dialogText = msgView.findViewById<TextView>(R.id.textView)
+        val msgView = layoutInflater.inflate(R.layout.dialog_sync_progress, null)
+        val dialogText = msgView.findViewById<TextView>(R.id.textView)
         dialogText.text = this.msg
         return activity?.let {
             // Use the Builder class for convenient dialog construction.

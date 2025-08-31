@@ -43,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.HorizontalDivider
 
 class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
@@ -273,7 +274,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                     //verticalAlignment = Alignment.Bottom
 
                 ) {
-                    Button(modifier = Modifier.weight(1f),
+                    Button(modifier = Modifier.weight(1f)
+                                                .height(80.dp),
                         onClick = {
                             try {
                                 WifiSyncServiceSettings.syncCustomFiles = false

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -15,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 
-abstract class SyncResultsBaseActivity : ComponentActivity() {
+abstract class SyncResultsBaseActivity : AppCompatActivity() {
     @JvmField
     protected var mainWindow: SyncResultsBaseActivity? = this
     @JvmField
@@ -32,7 +33,6 @@ abstract class SyncResultsBaseActivity : ComponentActivity() {
         errorColor = ContextCompat.getColor(this, R.color.colorWarning)
         warningColor = ContextCompat.getColor(this, R.color.colorWarning)
 
-        /*
         val windowInsetsController =
             WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior =
@@ -44,14 +44,12 @@ abstract class SyncResultsBaseActivity : ComponentActivity() {
 
             v.updatePadding(
             //    left = bars.left,
-                top = bars.top,
+            //    top = bars.top,
             //    right = bars.right,
                 bottom = bars.bottom,
             )
             WindowInsetsCompat.CONSUMED
         }
-
-         */
     }
 
     override fun onDestroy() {

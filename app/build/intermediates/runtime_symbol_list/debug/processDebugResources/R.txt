@@ -5182,8 +5182,8 @@ int string material_timepicker_pm 0x7f1200de
 int string material_timepicker_select_time 0x7f1200df
 int string material_timepicker_text_input_mode_description 0x7f1200e0
 int string mc2_snackbar_pane_title 0x7f1200e1
-int string menuAllPlaylitsDelete 0x7f1200e2
-int string menuAllPlaylitsDeleteConfirm 0x7f1200e3
+int string menuAllPlaylistsDelete 0x7f1200e2
+int string menuAllPlaylistsDeleteConfirm 0x7f1200e3
 int string menuFullScanFiles 0x7f1200e4
 int string menuSyncSettings 0x7f1200e5
 int string menuWifiFullSync 0x7f1200e6

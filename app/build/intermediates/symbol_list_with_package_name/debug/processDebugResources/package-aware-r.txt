@@ -5183,8 +5183,8 @@ string material_timepicker_pm
 string material_timepicker_select_time
 string material_timepicker_text_input_mode_description
 string mc2_snackbar_pane_title
-string menuAllPlaylitsDelete
-string menuAllPlaylitsDeleteConfirm
+string menuAllPlaylistsDelete
+string menuAllPlaylistsDeleteConfirm
 string menuFullScanFiles
 string menuSyncSettings
 string menuWifiFullSync

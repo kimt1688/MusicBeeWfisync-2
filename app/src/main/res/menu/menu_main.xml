@@ -16,7 +16,7 @@
         <item
             android:id="@+id/deleteAllPlaylistsMenuItem"
             android:onClick="onDeleteAllPlaylistsClick"
-            android:title="@string/menuAllPlaylitsDelete"
+            android:title="@string/menuAllPlaylistsDelete"
             app:showAsAction="never" />
     </group>
     <group android:id="@+id/wifiErrorLogGroup">

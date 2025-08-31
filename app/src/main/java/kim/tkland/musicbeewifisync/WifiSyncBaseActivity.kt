@@ -31,7 +31,7 @@ import androidx.core.view.updatePadding
 import kim.tkland.musicbeewifisync.ui.theme.AppCompat
 import java.io.File
 
-abstract class WifiSyncBaseActivity : ComponentActivity() {
+abstract class WifiSyncBaseActivity : AppCompatActivity() {
     protected var mainWindow: WifiSyncBaseActivity? = this
     protected var buttonTextEnabledColor = 0
     protected var buttonTextDisabledColor = 0
@@ -52,36 +52,28 @@ abstract class WifiSyncBaseActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         buttonTextEnabledColor = resources.getColor(R.color.colorButtonTextEnabled, null)
         buttonTextDisabledColor = resources.getColor(R.color.colorButtonTextDisabled, null)
-        /*
+
         val windowInsetsController =
-            getInsetsController(window, window.decorView)
+            WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val bars =
-                windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
 
-            //v.updateLayoutParams() {
-                //v.top = (insets.top).toInt()
-                //v.left = (insets.left).toInt()
-                //v.bottom = (insets.bottom).toInt()
-                //v.right = (insets.right).toInt()
-            //}
 
             v.updatePadding(
-            //    left = bars.left,
-                top = bars.top,
-            //    right = bars.right,
+                //    left = bars.left,
+                //    top = bars.top,
+                //    right = bars.right,
                 bottom = bars.bottom,
             )
             WindowInsetsCompat.CONSUMED
         }
 
-         */
-        //getInsetsController(window, window.decorView)
+
+        /*getInsetsController(window, window.decorView)
         //    .isAppearanceLightStatusBars = true
-        /*
           setContent {
               //AppCompat {
                   Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -141,7 +133,8 @@ abstract class WifiSyncBaseActivity : ComponentActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun onFullScanMenuItemClick(item: MenuItem) {
+    fun onFullScanMenuItemClick() {
+    //fun onFullScanMenuItemClick(item: MenuItem) {
         AlertDialog.Builder(this)
             .setTitle(R.string.progressDialogTitle)
             .setMessage(R.string.alertDialogMessage)
@@ -232,15 +225,16 @@ abstract class WifiSyncBaseActivity : ComponentActivity() {
         progressDialog!!.thread = WifiSyncAlertDialogThread(thread, progressDialog!!)
         progressDialog!!.msg = msg
 
-        //progressDialog!!.show(supportFragmentManager, "WIFISYNC_DIALOG")
+        progressDialog!!.show(supportFragmentManager, "WIFISYNC_DIALOG")
         progressDialog!!.thread!!.thread!!.start()
     }
 
-    fun onDeleteAllPlaylistsClick(item: MenuItem) {
+    fun onDeleteAllPlaylistsClick() {
+//    fun onDeleteAllPlaylistsClick(item: MenuItem) {
         /// 確認ダイアログを出してOKの時に処理
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle(R.string.progressDialogTitle)
-            .setMessage(R.string.menuAllPlaylitsDeleteConfirm)
+            .setMessage(R.string.menuAllPlaylistsDeleteConfirm)
             .setCancelable(true)
             .setPositiveButton("OK") { dialog: DialogInterface, _ ->
                 // OKボタン押下時に実行したい処理を記述

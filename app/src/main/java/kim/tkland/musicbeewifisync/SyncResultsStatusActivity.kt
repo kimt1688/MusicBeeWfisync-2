@@ -223,7 +223,8 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                     textAlign = androidx.compose.ui.text.style.TextAlign.Start
                 )
                 Button(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                                        .height(80.dp),
                     onClick = {
                         if (buttonText == "STOP") {
                             try {
