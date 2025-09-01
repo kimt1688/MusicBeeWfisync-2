@@ -75,6 +75,7 @@ import androidx.core.view.MenuCompat
 import java.io.File
 import androidx.core.content.edit
 import androidx.core.net.toUri
+import com.example.compose.AppTheme
 import kim.tkland.musicbeewifisync.MainActivity.RadioOption
 
 class SettingsActivity : WifiSyncBaseActivity() {
@@ -135,7 +136,9 @@ class SettingsActivity : WifiSyncBaseActivity() {
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = true
             setContent {
-                FirstSettingView()
+                AppTheme {
+                    FirstSettingView()
+                }
             }
             //debugMode?.let { it.visibility = View.GONE }
 
@@ -181,7 +184,9 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         } else {
             setContent {
-                OptionSettingView()
+                AppTheme {
+                    OptionSettingView()
+                }
             }
             //val actionBar = supportActionBar
             //if (actionBar != null) {

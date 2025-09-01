@@ -20,6 +20,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -29,12 +30,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -59,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuCompat
+import com.example.compose.AppTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -88,7 +94,9 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             }
         )
         setContent{
-            CustomView()
+            AppTheme {
+                CustomView()
+            }
         }
         /*
         timerRunnable = object : Runnable {
@@ -117,6 +125,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     fun CustomView() {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+        var expanded by remember { mutableStateOf(false) }
 
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -132,6 +141,43 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+                    },
+                    actions = {
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                        ) {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
+                            }
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.menuSyncSettings)) },
+                                    onClick = {
+                                        val intent = Intent(
+                                            applicationContext,
+                                            SettingsActivity::class.java
+                                        )
+                                        expanded = false
+                                        startActivity(intent)
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.menuWifiSyncLog)) },
+                                    onClick = {
+                                        val intent = Intent(
+                                            applicationContext,
+                                            ViewErrorLogActivity::class.java
+                                        )
+                                        expanded = false
+                                        startActivity(intent)
+                                    }
+                                )
+                            }
+                        }
                     },
                     scrollBehavior = scrollBehavior
                 )

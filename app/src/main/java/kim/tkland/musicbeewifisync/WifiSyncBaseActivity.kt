@@ -28,7 +28,6 @@ import androidx.core.view.WindowCompat.*
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
-import kim.tkland.musicbeewifisync.ui.theme.AppCompat
 import java.io.File
 
 abstract class WifiSyncBaseActivity : AppCompatActivity() {

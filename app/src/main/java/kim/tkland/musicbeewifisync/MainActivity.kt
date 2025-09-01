@@ -61,12 +61,14 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.compose.AppTheme
 
 class MainActivity() : WifiSyncBaseActivity() {
     private var syncToPlaylists: CheckBox? = null
@@ -74,22 +76,6 @@ class MainActivity() : WifiSyncBaseActivity() {
     private var serverStatusThread: Thread? = null
     private var syncToPlayCounts: CheckBox? = null
     private var syncToRatings: CheckBox? = null
-
-    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-    @Composable
-    fun MainActivityScreen(onNavigateToConversation: () -> Unit) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(8.dp),
-                verticalArrangement = Arrangement.Center,
-            ) {
-                IconButton(onClick = onNavigateToConversation) {
-                    Icon(Icons.Filled.Info, contentDescription = "View Error Log")
-                }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -108,7 +94,6 @@ class MainActivity() : WifiSyncBaseActivity() {
         )
 
         WifiSyncServiceSettings.loadSettings(applicationContext)
-        //WifiSyncServiceSettings.loadSettings(this)
         if (WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()) {
             val intent = Intent(this, SettingsActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -121,23 +106,9 @@ class MainActivity() : WifiSyncBaseActivity() {
             startActivity(intent)
         } else {
             setContent {
-                CustomView()
-                /*
-                val navController = rememberNavController()
-                //CustomView(onNavigateToViewErrorLog = {navController.navigate("ViewErrorLogActivityScreen")})
-                //AppCompat {
-                NavHost(navController = navController, startDestination = "CustomView") {
-                    composable(route = "CustomView") {
-                        CustomView(navController)
-                    }
-                    composable(route = "ViewErrorLogActivityScreen") {
-                        ViewErrorLogActivityScreen(
-                            navController
-                        )
-                    }
+                AppTheme {
+                    CustomView()
                 }
-                 */
-                //}
             }
 
             checkServerStatus()
@@ -374,14 +345,30 @@ class MainActivity() : WifiSyncBaseActivity() {
                     )
                 }
                 Row() {
-                    CheckableRow(
-                        text = applicationContext.getString(R.string.syncFromDefault),
-                        checked = WifiSyncServiceSettings.syncFromMusicBee,
-                        enabled = true,
-                        onCheckedChange = {
-                            isSyncFromMusicBeeChecked = it
+                    MaterialTheme {
+                        Row(
+                            modifier = Modifier
+                                .toggleable(
+                                    value = isSyncFromMusicBeeChecked,
+                                    enabled = true,
+                                    role = Role.Checkbox,
+                                    onValueChange = { isSyncFromMusicBeeChecked = !isSyncFromMusicBeeChecked }
+                                )
+                                .padding(8.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start,
+                        ) {
+                            Checkbox(
+                                checked = isSyncFromMusicBeeChecked,
+                                enabled = true,
+                                onCheckedChange = {
+                                    isSyncFromMusicBeeChecked = it
+                                }
+                            )
+                            Text(getString(R.string.syncFromDefault), fontSize = 20.sp)
                         }
-                    )
+                    }
                 }
                 Row(modifier = Modifier.padding(top = 15.dp)) {
                     Image(
@@ -393,93 +380,58 @@ class MainActivity() : WifiSyncBaseActivity() {
                     )
                 }
                 Row() {
-                    CheckableRow(
-                        text = applicationContext.getString(R.string.syncToPlaycounts),
-                        checked = isSyncToPlaycountsChecked,
-                        enabled = isSyncToPlaycountsEnabled,
-                        onCheckedChange = {
-                            isSyncToPlaycountsChecked = it
-                        }
-                    )
-                }
-//                Row() {
-                /*
-                    Row() {
-                        MaterialTheme {
-                            Row(
-                                modifier = Modifier
-                                    .toggleable(
-                                        value = isSyncToPlaycountsChecked,
-                                        enabled = isSyncToPlaycountsEnabled,
-                                        role = Role.Checkbox,
-                                        onValueChange = { isSyncToPlaycountsChecked = !isSyncToPlaycountsChecked }
-                                    )
-                                    .padding(8.dp)
-                                    .fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start,
-                            ) {
-                                Checkbox(
-                                    checked = isSyncToPlaycountsChecked,
+                    MaterialTheme {
+                        Row(
+                            modifier = Modifier
+                                .toggleable(
+                                    value = isSyncToPlaycountsChecked,
                                     enabled = isSyncToPlaycountsEnabled,
-                                    onCheckedChange = {
-                                        isSyncToPlaycountsChecked = it
-                                    }
+                                    role = Role.Checkbox,
+                                    onValueChange = { isSyncToPlaycountsChecked = !isSyncToPlaycountsChecked }
                                 )
-                                Text(getString(R.string.syncToPlaycounts), fontSize = 20.sp)
-                            }
+                                .padding(8.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start,
+                        ) {
+                            Checkbox(
+                                checked = isSyncToPlaycountsChecked,
+                                enabled = isSyncToPlaycountsEnabled,
+                                onCheckedChange = {
+                                    isSyncToPlaycountsChecked = it
+                                }
+                            )
+                            Text(getString(R.string.syncToPlaycounts), fontSize = 20.sp)
                         }
                     }
-              }
-                     */
-                Row() {
-                    CheckableRow(
-                        text = applicationContext.getString(R.string.syncToRatings),
-                        checked = isSyncToRatingChecked,
-                        enabled = isSyncToRatingEnabled,
-                        onCheckedChange = {
-                            isSyncToRatingChecked = it
-                        }
-                    )
                 }
-                /*
-                    Row() {
-                        MaterialTheme {
-                            Row(
-                                modifier = Modifier
-                                    .toggleable(
-                                        value = isSyncToRatingChecked,
-                                        enabled = isSyncToRatingEnabled,
-                                        role = Role.Checkbox,
-                                        onValueChange = { isSyncToRatingChecked = !isSyncToRatingChecked }
-                                    )
-                                    .padding(8.dp)
-                                    .fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start,
-                            ) {
-                                Checkbox(
-                                    checked = isSyncToRatingChecked,
+                Row() {
+                    MaterialTheme {
+                        Row(
+                            modifier = Modifier
+                                .toggleable(
+                                    value = isSyncToRatingChecked,
                                     enabled = isSyncToRatingEnabled,
-                                    onCheckedChange = {
-                                        isSyncToRatingChecked = it
-                                    }
+                                    role = Role.Checkbox,
+                                    onValueChange = { isSyncToRatingChecked = !isSyncToRatingChecked }
                                 )
-                                Text(getString(R.string.syncToRatings), fontSize = 20.sp)
-                            }
+                                .padding(8.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start,
+                        ) {
+                            Checkbox(
+                                checked = isSyncToRatingChecked,
+                                enabled = isSyncToRatingEnabled,
+                                onCheckedChange = {
+                                    isSyncToRatingChecked = it
+                                }
+                            )
+                            Text(getString(R.string.syncToRatings), fontSize = 20.sp)
                         }
                     }
-*/
+                }
                 Row() {
-                    CheckableRow(
-                        text = applicationContext.getString(R.string.syncToPlaylists),
-                        checked = isSyncToPlaylistsChecked,
-                        enabled = isSyncToPlaylistsEnabled,
-                        onCheckedChange = {
-                            isSyncToPlaylistsChecked = it
-                        }
-                    )
-                    /*
                     MaterialTheme {
                         Row(
                             modifier = Modifier
@@ -504,8 +456,6 @@ class MainActivity() : WifiSyncBaseActivity() {
                             Text(getString(R.string.syncToPlaylists), fontSize = 20.sp)
                         }
                     }
-
-                     */
                 }
                 Row() {
                     Text(
@@ -550,6 +500,9 @@ class MainActivity() : WifiSyncBaseActivity() {
                                                     isSyncToPlaycountsEnabled = true
                                                     isSyncToRatingEnabled = true
                                                     isSyncToPlaylistsEnabled = false
+                                                    WifiSyncServiceSettings.reverseSyncPlayCounts = true
+                                                    WifiSyncServiceSettings.reverseSyncRatings = true
+                                                    WifiSyncServiceSettings.reverseSyncPlaylists = false
                                                 }
 
                                                 1 -> {
@@ -558,6 +511,9 @@ class MainActivity() : WifiSyncBaseActivity() {
                                                     isSyncToPlaycountsEnabled = true
                                                     isSyncToRatingEnabled = true
                                                     isSyncToPlaylistsEnabled = true
+                                                    WifiSyncServiceSettings.reverseSyncRatings = true
+                                                    WifiSyncServiceSettings.reverseSyncPlayCounts = true
+                                                    WifiSyncServiceSettings.reverseSyncPlaylists = true
                                                 }
 
                                                 2 -> {
@@ -565,6 +521,9 @@ class MainActivity() : WifiSyncBaseActivity() {
                                                     isSyncToPlaycountsEnabled = false
                                                     isSyncToRatingEnabled = false
                                                     isSyncToPlaylistsEnabled = false
+                                                    WifiSyncServiceSettings.reverseSyncPlayCounts = false
+                                                    WifiSyncServiceSettings.reverseSyncRatings = false
+                                                    WifiSyncServiceSettings.reverseSyncPlaylists = false
                                                 }
                                             }
                                         }
@@ -579,13 +538,35 @@ class MainActivity() : WifiSyncBaseActivity() {
                                     onClick = {
                                         onOptionSelected(option.index)
                                         when (option.index) {
-                                            0 -> WifiSyncServiceSettings.reverseSyncPlayer =
-                                                WifiSyncServiceSettings.PLAYER_POWERAMP
-
-                                            1 -> WifiSyncServiceSettings.reverseSyncPlayer =
-                                                WifiSyncServiceSettings.PLAYER_GONEMAD
-
-                                            2 -> WifiSyncServiceSettings.reverseSyncPlayer = 0
+                                            0 -> {
+                                                WifiSyncServiceSettings.reverseSyncPlayer =
+                                                    WifiSyncServiceSettings.PLAYER_POWERAMP
+                                                isSyncToPlaycountsEnabled = true
+                                                isSyncToRatingEnabled = true
+                                                isSyncToPlaylistsEnabled = false
+                                                WifiSyncServiceSettings.reverseSyncPlayCounts = true
+                                                WifiSyncServiceSettings.reverseSyncRatings = true
+                                                WifiSyncServiceSettings.reverseSyncPlaylists = false
+                                            }
+                                            1 -> {
+                                                WifiSyncServiceSettings.reverseSyncPlayer =
+                                                    WifiSyncServiceSettings.PLAYER_GONEMAD
+                                                isSyncToPlaycountsEnabled = true
+                                                isSyncToRatingEnabled = true
+                                                isSyncToPlaylistsEnabled = true
+                                                WifiSyncServiceSettings.reverseSyncRatings = true
+                                                WifiSyncServiceSettings.reverseSyncPlayCounts = true
+                                                WifiSyncServiceSettings.reverseSyncPlaylists = true
+                                            }
+                                            2 -> {
+                                                WifiSyncServiceSettings.reverseSyncPlayer = 0
+                                                isSyncToPlaycountsEnabled = false
+                                                isSyncToRatingEnabled = false
+                                                isSyncToPlaylistsEnabled = false
+                                                WifiSyncServiceSettings.reverseSyncPlayCounts = false
+                                                WifiSyncServiceSettings.reverseSyncRatings = false
+                                                WifiSyncServiceSettings.reverseSyncPlaylists = false
+                                            }
                                         }
                                     }
                                 )
@@ -599,151 +580,7 @@ class MainActivity() : WifiSyncBaseActivity() {
     }
 
 
-    @Composable
-    private fun CheckableRow(text: String, checked: Boolean, enabled: Boolean, onCheckedChange: (Boolean)->Unit) {
-        MaterialTheme {
-            var checked by remember { mutableStateOf(checked) }
-            Row(
-                modifier = Modifier
-                    .toggleable(
-                        value = checked,
-                        enabled = enabled,
-                        role = Role.Checkbox,
-                        onValueChange = { checked = !checked }
-                    )
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-            ) {
-                Checkbox(
-                    checked = checked,
-                    enabled = enabled,
-                    onCheckedChange = onCheckedChange
-                )
-                Text(text, fontSize = 20.sp)
-            }
-        }
-    }
-
     data class RadioOption(val text: String, val value: String, val index: Int)
-
-
-    /*
-                    rootView.apply
-
-
-                        // Creates view
-                        syncToPlaylists = findViewById(R.id.syncToPlaylists)
-                        syncToPlaylistsPath = findViewById(R.id.syncToPlaylistPath)
-                        syncPlayerGoneMad = findViewById(R.id.reverceFromGoneMAD)
-                        syncPlayerPoweramp = findViewById(R.id.reverceFromPoweramp)
-                        syncPlayerNone = findViewById(R.id.reverceFromNone)
-
-                        val syncFromMusicBee = findViewById<CheckBox>(R.id.syncFromMusicBee)
-                        syncFromMusicBee.isChecked = WifiSyncServiceSettings.syncFromMusicBee
-                        syncFromMusicBee.setOnCheckedChangeListener { _, isChecked ->
-                            WifiSyncServiceSettings.syncFromMusicBee = isChecked
-                            // Consider how you get 'mainWindow' here. If it's the activity,
-                            // you might pass 'context as YourActivityInterface' or use a ViewModel.
-                            WifiSyncServiceSettings.saveSettings(this@MainActivity) // Or pass context
-                        }
-
-                        syncToRatings = findViewById<CheckBox>(R.id.syncToRatings)
-                        syncToPlayCounts = findViewById<CheckBox>(R.id.syncToPlayCounts)
-                        val syncToUsingPlayer = findViewById<RadioGroup>(R.id.syncToUsingPlayer)
-                        var playlistsSupported = false
-                        // syncToUsingPlayer.check(R.id.reverceFromGoneMAD) // This seems to be set below
-
-                        when (WifiSyncServiceSettings.reverseSyncPlayer) {
-                            WifiSyncServiceSettings.PLAYER_GONEMAD -> {
-                                playlistsSupported = true
-                                syncToUsingPlayer.check(R.id.reverceFromGoneMAD)
-                            }
-
-                            WifiSyncServiceSettings.PLAYER_POWERAMP -> {
-                                playlistsSupported = false
-                                syncToUsingPlayer.check(R.id.reverceFromPoweramp)
-                            }
-
-                            0 -> syncToUsingPlayer.check(R.id.reverceFromNone)
-                        }
-
-                        syncToUsingPlayer.setOnCheckedChangeListener { group, checkedId ->
-                            if (syncPlayerGoneMad!!.isChecked) { // Or if (checkedId == R.id.reverceFromGoneMAD)
-                                WifiSyncServiceSettings.reverseSyncPlaylistsPath =
-                                    "/gmmp/playlists"
-                                WifiSyncServiceSettings.reverseSyncPlayer =
-                                    WifiSyncServiceSettings.PLAYER_GONEMAD
-                                // You'll need a way to call setPlaylistsEnabled from here.
-                                // This might involve passing a lambda or having setPlaylistsEnabled
-                                // operate on the views directly obtained via findViewById within this factory.
-                                // For now, let's assume you'll update the views directly.
-                                syncToPlaylists?.isEnabled = true
-                                syncToPlaylists?.isChecked =
-                                    WifiSyncServiceSettings.reverseSyncPlaylists
-                                syncToPlaylistsPath?.isEnabled = true
-                                syncToPlaylistsPath?.setText(WifiSyncServiceSettings.reverseSyncPlaylistsPath)
-                            }
-                            WifiSyncServiceSettings.saveSettings(this@MainActivity) // Or pass context
-                        }
-
-                        // Call the logic from your original setPlaylistsEnabled here,
-                        // using the view references obtained above.
-                        syncToPlaylists?.isEnabled = playlistsSupported
-                        syncToPlaylists?.isChecked =
-                            if (playlistsSupported) WifiSyncServiceSettings.reverseSyncPlaylists else false
-                        syncToPlaylistsPath?.isEnabled = playlistsSupported
-                        syncToPlaylistsPath?.setText(WifiSyncServiceSettings.reverseSyncPlaylistsPath)
-
-
-                        syncToPlaylists?.setOnCheckedChangeListener { _, isChecked ->
-                            WifiSyncServiceSettings.reverseSyncPlaylists = isChecked
-                            WifiSyncServiceSettings.saveSettings(this@MainActivity)
-                        }
-
-                        syncToPlaylistsPath?.setOnEditorActionListener { v, actionId, event ->
-                            WifiSyncServiceSettings.reverseSyncPlaylistsPath =
-                                syncToPlaylistsPath?.text?.toString() ?: ""
-                            WifiSyncServiceSettings.saveSettings(this@MainActivity)
-                            false
-                        }
-
-                        syncToRatings?.isChecked = WifiSyncServiceSettings.reverseSyncRatings
-                        syncToRatings?.setOnCheckedChangeListener { _, isChecked ->
-                            WifiSyncServiceSettings.reverseSyncRatings = isChecked
-                            WifiSyncServiceSettings.saveSettings(this@MainActivity)
-                        }
-
-                        syncToPlayCounts?.isChecked =
-                            WifiSyncServiceSettings.reverseSyncPlayCounts
-                        syncToPlayCounts?.setOnCheckedChangeListener { _, isChecked ->
-                            WifiSyncServiceSettings.reverseSyncPlayCounts = isChecked
-                            WifiSyncServiceSettings.saveSettings(this@MainActivity)
-                        }
-
-                        syncPlayerGoneMad?.setOnClickListener { onGoneMADCheckClick(it) }
-                        syncPlayerPoweramp?.setOnClickListener { onPowerampCheckClick(it) }
-                        // ... and so on for other click listeners defined in XML
-                    }
-
-                    // Return the inflated and configured view
-                    rootView
-            }
-        }
-    }
-
- */
-
-    private fun setPlaylistsEnabled(enabled: Boolean) {
-        if (!enabled) {
-            WifiSyncServiceSettings.reverseSyncPlaylists = false
-        }
-        syncToPlaylists!!.isEnabled = enabled
-        syncToPlaylists!!.isChecked = WifiSyncServiceSettings.reverseSyncPlaylists
-        syncToPlaylistsPath!!.isEnabled = enabled
-        syncToPlaylistsPath!!.setText(WifiSyncServiceSettings.reverseSyncPlaylistsPath)
-    }
 
     override fun onDestroy() {
         if (serverStatusThread != null) {
@@ -753,19 +590,6 @@ class MainActivity() : WifiSyncBaseActivity() {
         mainWindow = null
         super.onDestroy()
     }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        val fullSyncItem = menu.findItem(R.id.fullSyncMenuItem)
-        fullSyncItem.isCheckable = true
-        fullSyncItem.isChecked = true
-        // val playlistSyncMenuItem = menu.findItem(R.id.playlistSyncMenuItem)
-        // playlistSyncMenuItem.isCheckable = false
-        // playlistSyncMenuItem.isChecked = false
-        return true
-    }
-
 
     private fun checkServerStatus() {
         serverStatusThread = Thread {

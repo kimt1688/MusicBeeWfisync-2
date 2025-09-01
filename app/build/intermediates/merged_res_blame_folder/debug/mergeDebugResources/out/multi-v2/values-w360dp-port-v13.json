@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-69:/values-w360dp-port-v13/values-w360dp-port-v13.xml",
+            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/values-w360dp-port-v13/values-w360dp-port-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\d307d9942d92591e67120080b9796280\\transformed\\material-1.12.0\\res\\values-w360dp-port-v13\\values-w360dp-port-v13.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\0dded3bb5bd36419f065bfdedcc68a08\\transformed\\material-1.12.0\\res\\values-w360dp-port-v13\\values-w360dp-port-v13.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",

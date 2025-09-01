@@ -7,7 +7,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -19,11 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
+import com.example.compose.AppTheme
 
 
 class ViewErrorLogActivity : ComponentActivity() {
@@ -38,7 +39,6 @@ class ViewErrorLogActivity : ComponentActivity() {
         windowInsetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
 
 
@@ -51,14 +51,15 @@ class ViewErrorLogActivity : ComponentActivity() {
             WindowInsetsCompat.CONSUMED
         }
         setContent {
-            ViewErrorLog()
+            AppTheme {
+                ViewErrorLog()
+            }
         }
     }
 
    private fun requireContext(): Context {
         return applicationContext
     }
-
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -76,7 +77,7 @@ class ViewErrorLogActivity : ComponentActivity() {
                     ),
                     title = {
                         Text(
-                            getString(R.string.title_activity_view_error_log),
+                            text = getString(R.string.title_activity_view_error_log),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -109,28 +110,20 @@ class ViewErrorLogActivity : ComponentActivity() {
                 )
             },
         ) { innerPadding ->
-            ScrollContent(innerPadding)
-        }
-    }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = innerPadding,
 
-    @Composable
-    fun ScrollContent(innerPadding: PaddingValues) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = innerPadding,
-
-
-        ) {
-            //val errorText = findViewById<TextView>(R.id.errorText)
-            //errorText?.let{ it.movementMethod = ScrollingMovementMethod() }
-            val errorLog = ErrorHandler.log
-            if (!errorLog.isNullOrEmpty()) {
-                item {
-                    Text(errorLog)
-                }
-            } else {
-                item {
-                    Text("")
+                ) {
+                val errorLog = ErrorHandler.log
+                if (!errorLog.isNullOrEmpty()) {
+                    item {
+                        Text(errorLog)
+                    }
+                } else {
+                    item {
+                        Text("")
+                    }
                 }
             }
         }

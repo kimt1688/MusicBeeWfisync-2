@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-69:/values-ldrtl-v17/values-ldrtl-v17.xml",
+            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/values-ldrtl-v17/values-ldrtl-v17.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\d307d9942d92591e67120080b9796280\\transformed\\material-1.12.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\0dded3bb5bd36419f065bfdedcc68a08\\transformed\\material-1.12.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\defac7b95b2e1a367663b33830da27a0\\transformed\\leanback-1.2.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\1ffbea447cbbff06c9324763a7ba90fd\\transformed\\leanback-1.2.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
                     "from": {
                         "startLines": "2,3,4",
                         "startColumns": "4,4,4",

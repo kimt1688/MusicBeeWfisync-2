@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.activity.compose.setContent
@@ -27,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import androidx.core.view.MenuCompat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.padding
@@ -41,10 +38,16 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.example.compose.AppTheme
 
 class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     private var syncExcludeErrors: CheckBox? = null
@@ -58,7 +61,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         super.onCreate(savedInstanceState)
         ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        }        //setContentView(R.layout.activity_sync_preview)
+        }
+        //setContentView(R.layout.activity_sync_preview)
         //val actionBar = supportActionBar
         //actionBar?.setDisplayHomeAsUpEnabled(true)
         waitResultsThread = Thread {
@@ -135,11 +139,13 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         //}
                         setContent {
                             //MainAppComposable()
-                            CustomView(
-                                title = getString(R.string.title_activity_sync_preview),
-                                resultsToData = previewToData,
-                                resultsFromData = previewFromData
-                            )
+                            AppTheme {
+                                CustomView(
+                                    title = getString(R.string.title_activity_sync_preview),
+                                    resultsToData = previewToData,
+                                    resultsFromData = previewFromData
+                                )
+                            }
                         }
                     }
                 }
@@ -150,8 +156,6 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             }
         }
         waitResultsThread!!.start()
-        //setSupportActionBar(findViewById(R.id.my_toolbar))
-
     }
     private fun requireContext(): Context {
         return applicationContext
@@ -245,6 +249,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     ) {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+        var expanded by remember { mutableStateOf(false) }
+
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
@@ -260,19 +266,49 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             overflow = TextOverflow.Ellipsis
                         )
                     },
+                    actions = {
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                        ) {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
+                            }
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.menuSyncSettings)) },
+                                    onClick = {
+                                        val intent = Intent(
+                                            applicationContext,
+                                            SettingsActivity::class.java
+                                        )
+                                        expanded = false
+                                        startActivity(intent)
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.menuWifiSyncLog)) },
+                                    onClick = {
+                                        val intent = Intent(
+                                            applicationContext,
+                                            ViewErrorLogActivity::class.java
+                                        )
+                                        expanded = false
+                                        startActivity(intent)
+                                    }
+                                )
+                            }
+                        }
+                    },
                     scrollBehavior = scrollBehavior
                 )
             },
             bottomBar = {
                 Row( // Or a Compose Row
                     modifier = Modifier.fillMaxWidth()
-                    //horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-                    //horizontalArrangement = Arrangement.Center,
-                    // Your proceed button logic here, adapted to Compose
-                    // Example:
-
-                    //verticalAlignment = Alignment.Bottom
-
                 ) {
                     Button(modifier = Modifier.weight(1f)
                                                 .height(80.dp),
@@ -396,38 +432,6 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         }
         super.onDestroy()
     }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_sync_status, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        return true
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val intent: Intent
-        when (item.itemId) {
-            R.id.wifiSyncSettingsMenuItem -> {
-                intent = Intent(this, SettingsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-                return true
-            }
-
-            R.id.wifiSyncLogMenuItem -> {
-                intent = Intent(this, ViewErrorLogActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-//override fun onSupportNavigateUp(): Boolean {
-//    finish()
-//    return true
-//}
 
     private fun disableProceedSyncButton() {
         proceedSyncButton?.isEnabled = false

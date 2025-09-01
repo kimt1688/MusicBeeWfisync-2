@@ -50,7 +50,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_19
     }
     buildFeatures {
-        viewBinding = true
+        //viewBinding = true
         compose = true
     }
     kotlinOptions {
@@ -89,6 +89,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.foundation)
     implementation(libs.litert.metadata)
+    implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.tooling)
 
     implementation (libs.androidx.constraintlayout)
     implementation (libs.androidx.appcompat.resources)
