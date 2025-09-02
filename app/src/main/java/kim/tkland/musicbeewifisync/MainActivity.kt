@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.captionBarPadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +53,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,11 +74,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.compose.AppTheme
 
 class MainActivity() : WifiSyncBaseActivity() {
-    private var syncToPlaylists: CheckBox? = null
-    private var syncToPlaylistsPath: EditText? = null
     private var serverStatusThread: Thread? = null
-    private var syncToPlayCounts: CheckBox? = null
-    private var syncToRatings: CheckBox? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -106,9 +105,9 @@ class MainActivity() : WifiSyncBaseActivity() {
             startActivity(intent)
         } else {
             setContent {
-                AppTheme {
+                //AppTheme {
                     CustomView()
-                }
+                //}
             }
 
             checkServerStatus()
@@ -137,7 +136,7 @@ class MainActivity() : WifiSyncBaseActivity() {
         var isSyncToPlaycountsEnabled by remember { mutableStateOf(false) }
         var isSyncToRatingEnabled by remember { mutableStateOf(false) }
         var isSyncToPlaylistsEnabled by remember { mutableStateOf(false) }
-        var isFullSyncChecked by remember { mutableStateOf(WifiSyncServiceSettings.syncCustomFiles) }
+        var isFullSyncChecked by remember { mutableStateOf(true) }
         var initialReverseSyncPlayer: Int = 2
         when (WifiSyncServiceSettings.reverseSyncPlayer) {
             WifiSyncServiceSettings.PLAYER_POWERAMP -> initialReverseSyncPlayer = 0
@@ -151,15 +150,22 @@ class MainActivity() : WifiSyncBaseActivity() {
 
             topBar = {
                 CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
+                        modifier = Modifier.height(75.dp),
+                        colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.primary
                     ),
                     title = {
-                        Text(
-                            getString(R.string.app_name),
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Box( // Wrap the Text in a Box
+                            modifier = Modifier.fillMaxHeight(), // Fill the available height in the title slot
+                            contentAlignment = Alignment.BottomCenter // Align content to the bottom start
+                        ) {
+                            Text(
+                                text = getString(R.string.app_name),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     },
                     actions = {
                         Box(

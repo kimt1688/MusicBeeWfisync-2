@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
@@ -53,9 +54,6 @@ import androidx.compose.ui.graphics.Color
 
 class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     private var syncExcludeErrors: CheckBox? = null
-    private var proceedSyncButton: LinearLayout? = null
-    private var proceedSyncButtonImage: ImageView? = null
-    private var proceedSyncButtonText: TextView? = null
     private var waitResultsThread: Thread? = null
 
     private var showDialogState = mutableStateOf(false)
@@ -250,7 +248,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             }catch (ex:Exception){
                                 Log.d("onSyncStartButtonClick", ex.message!!)
                             } finally {
-                                //syncStartButton!!.isEnabled = true
+                                isSyncButtonEnabled.value = true
                             }
                         }) {
                         Modifier.weight(1f)
@@ -339,18 +337,24 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
+                        modifier = Modifier.height(75.dp),
+                        colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.primary,
                     ),
                     title = {
-                        Text(
-                            title,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Box( // Wrap the Text in a Box
+                            modifier = Modifier.fillMaxHeight(), // Fill the available height in the title slot
+                            contentAlignment = Alignment.BottomCenter // Align content to the bottom start
+                        ) {
+                            Text(
+                                text = title,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     },
-                    actions = {
+                   actions = {
                         Box(
                             modifier = Modifier
                                 .padding(8.dp)
@@ -422,103 +426,6 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             }
         ) { innerPadding ->
             ShowResultsComposable(innerPadding, resultsToData, resultsFromData)
-        }
-    }
-
-    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-    @Composable
-    fun ShowResultsComposable(
-        innerPadding: PaddingValues,
-        resultsToData: ArrayList<SyncResultsInfo>?,
-        resultsFromData: ArrayList<SyncResultsInfo>?
-    ) {
-            var resultsToData = resultsToData
-            var resultsFromData = resultsFromData
-            val maxResults = 256
-            if (resultsToData == null) {
-                resultsToData = ArrayList()
-            }
-            if (resultsFromData == null) {
-                resultsFromData = ArrayList()
-            }
-            val resultsToDataCount = if (resultsToData.isEmpty()) 0 else resultsToData.size
-            val resultsFromDataCount = if (resultsFromData.isEmpty()) 0 else resultsFromData.size
-            val filteredPreviewData: ArrayList<SyncResultsInfo>
-            if (resultsToDataCount + resultsFromDataCount < maxResults + 16) {
-                filteredPreviewData = ArrayList(resultsToDataCount + resultsFromDataCount)
-                filteredPreviewData.addAll(resultsToData)
-                filteredPreviewData.addAll(resultsFromData)
-            } else {
-                filteredPreviewData = ArrayList(maxResults + 2)
-                var filteredPreviewFromCount = resultsFromDataCount
-                var filteredPreviewToCount = resultsToDataCount
-                if (resultsToDataCount < maxResults / 4) {
-                    filteredPreviewFromCount = maxResults - resultsToDataCount
-                } else if (resultsFromDataCount < maxResults / 4) {
-                    filteredPreviewToCount = maxResults - resultsFromDataCount
-                } else {
-                    val scaling =
-                        maxResults.toDouble() / (resultsToDataCount + resultsFromDataCount).toDouble()
-                    filteredPreviewToCount *= scaling.toInt()
-                    filteredPreviewFromCount *= scaling.toInt()
-                }
-                for (index in 0 until filteredPreviewToCount) {
-                    filteredPreviewData.add(resultsToData[index])
-                }
-                if (filteredPreviewToCount < resultsToDataCount) {
-                    filteredPreviewData.add(
-                        SyncResultsInfo(
-                            String.format(
-                                getString(R.string.syncPreviewMoreResults),
-                                resultsToDataCount - filteredPreviewToCount
-                            )
-                        )
-                    )
-                }
-                for (index in 0 until filteredPreviewFromCount) {
-                    filteredPreviewData.add(resultsFromData[index])
-                }
-                if (filteredPreviewFromCount < resultsFromDataCount) {
-                    filteredPreviewData.add(
-                        SyncResultsInfo(
-                            String.format(
-                                getString(R.string.syncPreviewMoreResults),
-                                resultsFromDataCount - filteredPreviewFromCount
-                            )
-                        )
-                    )
-                }
-            }
-        LazyColumn (
-            modifier =
-                Modifier.padding(innerPadding),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.Start,
-        ) {
-            for (info: SyncResultsInfo in filteredPreviewData) {
-                val iconid = if (info.direction == SyncResultsInfo.DIRECTION_REVERSE_SYNC) R.drawable.ic_arrow_back else R.drawable.ic_arrow_forward
-                item {
-                    Row() {
-                        Icon(
-                            painter = painterResource(id = iconid),
-                            contentDescription = "Sync Direction Icon", // Provide a content description
-                        )
-                        Text(
-                            text = if (info.targetName.isNullOrEmpty()) "" else info.targetName,
-                            fontSize = 24.sp
-                        )
-                    }
-                }
-                item {
-                    Text(
-                        text = if (info.estimatedSize.isNullOrEmpty()) info.message!! else "${info.action!!} - ${info.estimatedSize}",
-                        fontSize = 24.sp
-                    )
-                }
-                item {
-                    HorizontalDivider(thickness = 2.dp)
-                }
-            }
         }
     }
 

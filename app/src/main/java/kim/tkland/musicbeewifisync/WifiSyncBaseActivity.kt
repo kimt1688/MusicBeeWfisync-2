@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import java.io.File
 
@@ -52,6 +53,12 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
 
+            //v.updateLayoutParams() {
+            //    v.top = (insets.top).toInt()
+            //v.left = (insets.left).toInt()
+            //    v.bottom = (insets.bottom).toInt()
+            //v.right = (insets.right).toInt()
+            //}
 
             v.updatePadding(
                 //    left = bars.left,
@@ -61,21 +68,6 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
             )
             WindowInsetsCompat.CONSUMED
         }
-
-
-        /*getInsetsController(window, window.decorView)
-        //    .isAppearanceLightStatusBars = true
-          setContent {
-              //AppCompat {
-                  Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                      Greeting(
-                          name = "Android",
-                          modifier = Modifier.padding(innerPadding)
-                      )
-                  }
-              //}
-          }
-          */
     }
 
     override fun onDestroy() {
