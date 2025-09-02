@@ -36,18 +36,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
 import com.example.compose.AppTheme
+import androidx.compose.ui.graphics.Color
 
 class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     private var syncExcludeErrors: CheckBox? = null
@@ -56,15 +58,16 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     private var proceedSyncButtonText: TextView? = null
     private var waitResultsThread: Thread? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    private var showDialogState = mutableStateOf(false)
+
+    private var isSyncButtonEnabled = mutableStateOf(true)
+
+      override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
-        //setContentView(R.layout.activity_sync_preview)
-        //val actionBar = supportActionBar
-        //actionBar?.setDisplayHomeAsUpEnabled(true)
         waitResultsThread = Thread {
             try {
                 runOnUiThread {
@@ -73,48 +76,35 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                     val previewFromData = WifiSyncService.syncFromResults
                     if (mainWindow == null) {
                         // ignore
-                        /*
                     } else if (previewToData == null || previewFromData == null) {
-                        //disableProceedSyncButton()
+                        setContent {
+                            disableProceedSyncButton()
+                        }
                         var errorMessageId = WifiSyncService.syncErrorMessageId.get()
                         if (errorMessageId == 0) {
                             errorMessageId = R.string.errorSyncNonSpecific
                         }
-                        val builder = AlertDialog.Builder(
-                            mainWindow!!
-                        )
-                        builder.setTitle(getString(R.string.syncErrorHeader))
-                        builder.setMessage(getString(errorMessageId))
-                        builder.setIcon(android.R.drawable.ic_dialog_alert)
-                        builder.setCancelable(false)
-                        if (errorMessageId != R.string.errorServerNotFound) {
-                            builder.setPositiveButton(android.R.string.ok) { _, _ ->
-                            }
-                        } else {
-                            builder.setNegativeButton(R.string.syncCancel) { _, _ ->
-                            }
-                            builder.setPositiveButton(R.string.syncRetry) { _, _ ->
-                                WifiSyncService.startSynchronisation(
-                                    applicationContext,
-                                    0,
-                                    true,
-                                    false
-                                )
-                                finish()
-                            }
+                        setContent {
+                            ShowErrorDialog(errorMessageId)
                         }
-                        builder.show()
 
- */
-                        //} else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
-                        //disableProceedSyncButton()
+
+                    } else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
+                        setContent {
+                            disableProceedSyncButton()
+                            ShowErrorMessageView(
+                                getString(R.string.title_activity_sync_preview),
+                                getString(R.string.syncPreviewNoResults),
+                                getColor(R.color.colorError)
+                            )
+                        }
                     } else {
-                        val previewToDataCount = previewToData?.size
-                        val previewFromDataCount = previewFromData?.size
+                        val previewToDataCount = previewToData.size
+                        val previewFromDataCount = previewFromData.size
                         var okCount = 0
                         var warningCount = 0
                         var failedCount = 0
-                        previewToData?.let {
+                        previewToData.let {
                             for (index in it.indices) {
                                 when (previewToData[index].alert.toInt()) {
                                     0 -> okCount += 1
@@ -124,19 +114,40 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             }
                         }
                         if (warningCount > 0) {
+                            val warningColor = getColor(R.color.colorWarning)
+                            val warningText = String.format(
+                                getString(R.string.reverseSyncWarnings),
                             if (warningCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
                                 getString(R.string.reverseSyncFilesWarningN),
                                 warningCount
-                            )
+                            ))
+                            setContent {
+                                ShowErrorMessageView(
+                                    getString(R.string.title_activity_sync_preview),
+                                    warningText,
+                                    warningColor
+                                )
+                            }
                         } else if (failedCount > 0) {
+                            val failedText = String.format(
+                                getString(R.string.reverseSyncFailed),
                             if (failedCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
                                 getString(R.string.reverseSyncFilesWarningN),
                                 failedCount
-                            )
+                            ))
+                            setContent {
+                                ShowErrorMessageView(
+                                    getString(R.string.title_activity_sync_preview),
+                                    failedText,
+                                    getColor(R.color.colorButtonTextEnabled)
+                                )
+                            }
                         }
-                        //if (previewToDataCount > 0 && previewFromDataCount == 0 && okCount == 0 && warningCount == 0) {
-                        //disableProceedSyncButton()
-                        //}
+                        if (previewToDataCount > 0 && previewFromDataCount == 0 && okCount == 0 && warningCount == 0) {
+                            setContent {
+                                disableProceedSyncButton()
+                            }
+                        }
                         setContent {
                             //MainAppComposable()
                             AppTheme {
@@ -161,84 +172,157 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         return applicationContext
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun MainAppComposable() {
-        // Define MutableState variables to hold your data and UI state
-        val previewToDataState = remember { mutableStateOf<ArrayList<SyncResultsInfo>?>(null) }
-        val previewFromDataState = remember { mutableStateOf<ArrayList<SyncResultsInfo>?>(null) }
-        //val isLoading = remember { mutableStateOf(true) } // Example loading state
-        val errorMessageIdState =
-            remember { mutableStateOf<Int?>(null) } // Example error message state
-        val showProceedButton = remember { mutableStateOf(false) } // Example for button visibility
-        // ... other states as needed
+    fun ShowErrorMessageView(title: String, message: String, color: Int) {
+        val topAppBarState = rememberTopAppBarState()
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+        var expanded by remember { mutableStateOf(false) }
 
-        // This is where you would launch your data fetching logic if it wasn't
-        // tied to the existing waitResultsThread. For your current structure,
-        // we'll update these states from the thread.
-
-        //while (waitResultsThread!!.isAlive) {
-            // Show some loading indicator
-            // CircularProgressIndicator() // Example
-        //    Text("Loading preview...") // Placeholder
-        //    Thread.sleep(300)
-        //}
-
-        if (errorMessageIdState.value != null) {
-            // Show error message, potentially an AlertDialog
-            // For AlertDialog, you'd manage its visibility with another state
-            /*
-            val context = LocalContext.current
-            androidx.compose.material3.AlertDialog( // Basic example, customize as needed
-                onDismissRequest = { errorMessageIdState.value = null },
-                title = { Text(stringResource(R.string.syncErrorHeader)) },
-                text = { Text(stringResource(errorMessageIdState.value!!)) },
-                confirmButton = {
-                    Button(onClick = {
-                        errorMessageIdState.value = null
-                        if (errorMessageIdState.value == R.string.errorServerNotFound) {
-                            // Handle retry logic if needed by updating state or calling a ViewModel function
-                            WifiSyncService.startSynchronisation(
-                                context.applicationContext,
-                                0,
-                                true,
-                                false
-                            )
-                            // Potentially finish activity or reset state
-                            (context as? Activity)?.finish()
-                        }
-                    }) {
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                CenterAlignedTopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    title = {
                         Text(
-                            if (errorMessageIdState.value == R.string.errorServerNotFound) stringResource(
-                                R.string.syncRetry
-                            ) else stringResource(android.R.string.ok)
+                            title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                    }
-                },
-                dismissButton = if (errorMessageIdState.value == R.string.errorServerNotFound) {
-                    {
-                        Button(onClick = { errorMessageIdState.value = null }) {
-                            Text(stringResource(R.string.syncCancel))
+                    },
+                    actions = {
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                        ) {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
+                            }
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.menuSyncSettings)) },
+                                    onClick = {
+                                        val intent = Intent(
+                                            applicationContext,
+                                            SettingsActivity::class.java
+                                        )
+                                        expanded = false
+                                        startActivity(intent)
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.menuWifiSyncLog)) },
+                                    onClick = {
+                                        val intent = Intent(
+                                            applicationContext,
+                                            ViewErrorLogActivity::class.java
+                                        )
+                                        expanded = false
+                                        startActivity(intent)
+                                    }
+                                )
+                            }
                         }
+                    },
+                    scrollBehavior = scrollBehavior
+                )
+            },
+            bottomBar = {
+                Row( // Or a Compose Row
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(modifier = Modifier
+                        .weight(1f)
+                        .height(80.dp),
+                        enabled = isSyncButtonEnabled.value,
+                        onClick = {
+                            try {
+                                WifiSyncServiceSettings.syncCustomFiles = false
+                                //syncPreview = false
+                                WifiSyncService.startSynchronisation(applicationContext, 0, false, false)
+                            }catch (ex:Exception){
+                                Log.d("onSyncStartButtonClick", ex.message!!)
+                            } finally {
+                                //syncStartButton!!.isEnabled = true
+                            }
+                        }) {
+                        Modifier.weight(1f)
+
+                        Icon(
+                            imageVector = Icons.Filled.Sync,
+                            contentDescription = "Sync",
+                        )
+                        //Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text("Sync", fontSize = 20.sp)
                     }
-                } else null
-            )
-
-             */
-        } else if (previewToDataState.value?.isEmpty() == true && previewFromDataState.value?.isEmpty() == true) {
-            // Show "no results" message
-            Text(stringResource(R.string.syncPreviewNoResults))
-        } else {
-            // Call your CustomView (or ShowResultsComposable directly)
-
-            CustomView(
-                title = getString(R.string.title_activity_sync_preview),
-                resultsToData = previewToDataState.value,
-                resultsFromData = previewFromDataState.value
-                // Pass other necessary states like proceedButton visibility
+                }
+            }
+        ) { innerPadding ->
+            Text(message,
+                modifier = Modifier.padding(top = 100.dp, start = 20.dp, end = 20.dp),
+                color = Color(color),
+                fontSize = 20.sp,
             )
         }
     }
 
+    @Composable
+    fun ShowErrorDialog(errorMessageId: Int) {
+        val confirmButtonComposable: @Composable () -> Unit
+        val dismissButtonComposable: (@Composable () -> Unit)? // Dismiss button is optional
+
+        if (errorMessageId != R.string.errorServerNotFound) {
+            confirmButtonComposable = {
+                Button(onClick = {
+                    // はいボタンがクリックされたときの処理
+                    showDialogState.value = false
+                }) {
+                    Text(getString(android.R.string.ok))
+                }
+            }
+            dismissButtonComposable = null // No dismiss button in this case
+        } else {
+            dismissButtonComposable = {
+                Button(onClick = { showDialogState.value = false }) {
+                    Text(getString(R.string.syncCancel))
+                }
+            }
+            confirmButtonComposable = {
+                Button(onClick = {
+                    // はいボタンがクリックされたときの処理
+                    WifiSyncService.startSynchronisation(
+                        applicationContext,
+                        0,
+                        true,
+                        false
+                    )
+                    finish()
+                }) {
+                    Text(getString(R.string.syncRetry))
+                }
+            }
+        }
+        AlertDialog(
+            onDismissRequest = { showDialogState.value = false }, // ダイアログの外側をクリックしたときの処理
+            icon = { // Use the dedicated 'icon' parameter
+                Icon(
+                    painter = painterResource(id = android.R.drawable.ic_dialog_alert),
+                    contentDescription = "Error Icon" // Provide a content description
+                )
+            },
+            title = { getString(R.string.syncErrorHeader) },
+            text = { getString(errorMessageId) },
+            confirmButton = confirmButtonComposable,
+            dismissButton = dismissButtonComposable // Pass the conditionally defined dismiss button
+        )
+    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -310,8 +394,10 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 Row( // Or a Compose Row
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Button(modifier = Modifier.weight(1f)
-                                                .height(80.dp),
+                    Button(modifier = Modifier
+                        .weight(1f)
+                        .height(80.dp),
+                        enabled = isSyncButtonEnabled.value,
                         onClick = {
                             try {
                                 WifiSyncServiceSettings.syncCustomFiles = false
@@ -355,8 +441,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             if (resultsFromData == null) {
                 resultsFromData = ArrayList()
             }
-            val resultsToDataCount = if (resultsToData.isNullOrEmpty()) 0 else resultsToData.size
-            val resultsFromDataCount = if (resultsFromData.isNullOrEmpty()) 0 else resultsFromData.size
+            val resultsToDataCount = if (resultsToData.isEmpty()) 0 else resultsToData.size
+            val resultsFromDataCount = if (resultsFromData.isEmpty()) 0 else resultsFromData.size
             val filteredPreviewData: ArrayList<SyncResultsInfo>
             if (resultsToDataCount + resultsFromDataCount < maxResults + 16) {
                 filteredPreviewData = ArrayList(resultsToDataCount + resultsFromDataCount)
@@ -410,8 +496,18 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 horizontalAlignment = Alignment.Start,
         ) {
             for (info: SyncResultsInfo in filteredPreviewData) {
+                val iconid = if (info.direction == SyncResultsInfo.DIRECTION_REVERSE_SYNC) R.drawable.ic_arrow_back else R.drawable.ic_arrow_forward
                 item {
-                    Text(text = if (info.targetName.isNullOrEmpty()) "" else info.targetName, fontSize = 24.sp)
+                    Row() {
+                        Icon(
+                            painter = painterResource(id = iconid),
+                            contentDescription = "Sync Direction Icon", // Provide a content description
+                        )
+                        Text(
+                            text = if (info.targetName.isNullOrEmpty()) "" else info.targetName,
+                            fontSize = 24.sp
+                        )
+                    }
                 }
                 item {
                     Text(
@@ -433,11 +529,13 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         super.onDestroy()
     }
 
+    @Composable
     private fun disableProceedSyncButton() {
-        proceedSyncButton?.isEnabled = false
+        isSyncButtonEnabled.value = false
+        //proceedSyncButton?.isEnabled = false
         //DrawableCompat.setTint(proceedSyncButtonImage.getDrawable(), infoColor);
-        proceedSyncButtonImage?.setColorFilter(infoColor)
-        proceedSyncButtonText?.setTextColor(infoColor)
+        //proceedSyncButtonImage?.setColorFilter(infoColor)
+        //proceedSyncButtonText?.setTextColor(infoColor)
     }
 
     fun onProceedSyncButton_Click(view: View) {

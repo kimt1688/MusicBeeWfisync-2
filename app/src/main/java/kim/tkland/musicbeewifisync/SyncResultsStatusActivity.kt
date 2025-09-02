@@ -184,39 +184,6 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             },
         ){ innerPadding ->
             ShowSyncStatusComposable(innerPadding)
-            /*
-            AndroidView(
-                modifier = Modifier
-                    .fillMaxSize() // Fill the available space within the Scaffold
-                    .padding(innerPadding), // Apply padding from the Scaffold (e.g., for the TopAppBar)
-                factory = { context ->
-                    val rootView =
-                        LayoutInflater.from(context).inflate(R.layout.activity_sync_status, null)
-                    rootView.apply {
-                        // Creates view
-                        syncCompletionStatusMessage = findViewById(R.id.syncCompletionStatusMessage)
-                        //syncCompletionStatusMessage!!.visibility = View.VISIBLE
-                        syncFailedResults = findViewById(R.id.syncFailedResults)
-                        syncProgressBar = findViewById(R.id.syncProgressBar)
-                        //syncProgressBar!!.visibility = View.VISIBLE
-                        syncWaitIndicator = findViewById(R.id.syncWaitIndicator)
-                        syncProgressMessage = findViewById(R.id.syncProgressMessage)
-                        stopSyncButton = findViewById(R.id.stopSyncButton)
-                    }
-
-                    // Return the inflated and configured view
-                    rootView
-                },
-                update = { view ->
-                    // Called when the composable recomposes.
-                    // You can update the view here if its state needs to change
-                    // based on changes in Compose state.
-                    // For example, if WifiSyncServiceSettings could change from elsewhere
-                    // and you needed to update the checkboxes.
-                }
-            )
-
-             */
         }
     }
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -319,7 +286,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp, start = 15.dp, end = 15.dp)
-                    .height(30.dp),
+                    .height(90.dp),
                 //.padding(start = 15.dp, top = 200.dp),
                 text = completeMessage,
                 maxLines = 3,
@@ -340,6 +307,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         }
     }
 
+    /*
     suspend fun loadProgress(updateProgress: (Float) -> Unit, updateText: (String) -> Unit, onComplete: () -> Unit) {
         while (WifiSyncService.syncPercentCompleted.get() != -1) {
             val currentProgress = WifiSyncService.syncPercentCompleted.get() / 100f
@@ -352,44 +320,13 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         }
         onComplete()
     }
+    */
 
     override fun onDestroy() {
         WifiSyncService.resultsActivityReady.reset()
         //timerHandler.removeCallbacks(timerRunnable!!)
         mainWindow = null
         super.onDestroy()
-    }
-
-    //@SuppressLint("MissingSuperCall")
-    //@/Deprecated("This method has been deprecated in favor of using the\n      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.\n      The OnBackPressedDispatcher controls how back button events are dispatched\n      to one or more {@link OnBackPressedCallback} objects.")
-    //override fun onBackPressed() {
-    //    // disable back button
-    //}
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_sync_status, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        return true
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val intent: Intent
-        when (item.itemId) {
-            R.id.wifiSyncLogMenuItem -> {
-                intent = Intent(this, ViewErrorLogActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-                return true
-            }
-            R.id.wifiSyncSettingsMenuItem -> {
-                intent = Intent(this, SettingsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     @Composable
