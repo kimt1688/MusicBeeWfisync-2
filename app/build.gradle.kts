@@ -92,6 +92,8 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.ui.tooling.preview)
     debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.kotlinx.coroutines.core) // Or the latest version
+    implementation(libs.kotlinx.coroutines.android)
 
     implementation (libs.androidx.constraintlayout)
     implementation (libs.androidx.appcompat.resources)

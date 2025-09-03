@@ -429,6 +429,107 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @Composable
+    fun ShowResultsComposable(
+        innerPadding: PaddingValues,
+        resultsToData: ArrayList<SyncResultsInfo>?,
+        resultsFromData: ArrayList<SyncResultsInfo>?
+    ) {
+        var resultsToData = resultsToData
+        var resultsFromData = resultsFromData
+        val maxResults = 256
+        if (resultsToData == null) {
+            resultsToData = ArrayList()
+        }
+        if (resultsFromData == null) {
+            resultsFromData = ArrayList()
+        }
+        val resultsToDataCount = if (resultsToData.isEmpty()) 0 else resultsToData.size
+        val resultsFromDataCount = if (resultsFromData.isEmpty()) 0 else resultsFromData.size
+        val filteredPreviewData: ArrayList<SyncResultsInfo>
+        if (resultsToDataCount + resultsFromDataCount < maxResults + 16) {
+            filteredPreviewData = ArrayList(resultsToDataCount + resultsFromDataCount)
+            filteredPreviewData.addAll(resultsToData)
+            filteredPreviewData.addAll(resultsFromData)
+        } else {
+            filteredPreviewData = ArrayList(maxResults + 2)
+            var filteredPreviewFromCount = resultsFromDataCount
+            var filteredPreviewToCount = resultsToDataCount
+            if (resultsToDataCount < maxResults / 4) {
+                filteredPreviewFromCount = maxResults - resultsToDataCount
+            } else if (resultsFromDataCount < maxResults / 4) {
+                filteredPreviewToCount = maxResults - resultsFromDataCount
+            } else {
+                val scaling =
+                    maxResults.toDouble() / (resultsToDataCount + resultsFromDataCount).toDouble()
+                filteredPreviewToCount *= scaling.toInt()
+                filteredPreviewFromCount *= scaling.toInt()
+            }
+            for (index in 0 until filteredPreviewToCount) {
+                filteredPreviewData.add(resultsToData[index])
+            }
+            if (filteredPreviewToCount < resultsToDataCount) {
+                filteredPreviewData.add(
+                    SyncResultsInfo(
+                        String.format(
+                            getString(R.string.syncPreviewMoreResults),
+                            resultsToDataCount - filteredPreviewToCount
+                        )
+                    )
+                )
+            }
+            for (index in 0 until filteredPreviewFromCount) {
+                filteredPreviewData.add(resultsFromData[index])
+            }
+            if (filteredPreviewFromCount < resultsFromDataCount) {
+                filteredPreviewData.add(
+                    SyncResultsInfo(
+                        String.format(
+                            getString(R.string.syncPreviewMoreResults),
+                            resultsFromDataCount - filteredPreviewFromCount
+                        )
+                    )
+                )
+            }
+        }
+        LazyColumn (
+            modifier =
+                Modifier.padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start,
+        ) {
+            for (info: SyncResultsInfo in filteredPreviewData) {
+                val iconid = if (info.direction == SyncResultsInfo.DIRECTION_REVERSE_SYNC) R.drawable.ic_arrow_back else R.drawable.ic_arrow_forward
+                item {
+                    Row() {
+                        Icon(
+                            painter = painterResource(id = iconid),
+                            contentDescription = "Sync Direction Icon", // Provide a content description
+                        )
+                        Text(
+                            text = if (info.targetName.isNullOrEmpty()) "" else info.targetName,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 24.sp
+                        )
+                    }
+                }
+                item {
+                    Text(
+                        text = if (info.estimatedSize.isNullOrEmpty()) info.message!! else "${info.action!!} - ${info.estimatedSize}",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 24.sp
+                    )
+                }
+                item {
+                    HorizontalDivider(thickness = 2.dp)
+                }
+            }
+        }
+    }
+
     override fun onDestroy() {
         if (waitResultsThread != null) {
             waitResultsThread!!.interrupt()

@@ -18,6 +18,7 @@ kotlin = "2.1.10"
 androidGradlePlugin = "8.12.2"
 kotlinStdlib = "2.1.21"
 kotlinxCoroutinesAndroid = "1.10.2"
+kotlinxCoroutinesAndroidVersion = "1.7.3"
 leanback = "1.2.0"
 lifecycleLivedataKtx = "2.9.1"
 material = "1.12.0"
@@ -79,6 +80,8 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version = "2.
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version = "2.2.0" }
 kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version = "2.2.0" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+kotlinx-coroutines-android-v173 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroidVersion" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlinxCoroutinesAndroid" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
