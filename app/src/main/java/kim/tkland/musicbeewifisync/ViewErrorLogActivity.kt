@@ -130,12 +130,6 @@ class ViewErrorLogActivity : ComponentActivity() {
                                 imageVector = Icons.Filled.ContentCopy,
                                 contentDescription = "Copy to Clipboard",
                                 tint = Color(getColor(R.color.colorButtonTextEnabled)),
-
-
-                                //colors = IconButtonDefaults.colors(
-                                //    containerColor = Color(getColor(R.color.colorButtonBackground)),
-                                //    contentColor = Color(getColor(R.color.colorButtonTextEnabled))
-                                //)
                             )
                         }
                     },

@@ -75,7 +75,6 @@ import com.example.compose.AppTheme
 
 class SettingsActivity : WifiSyncBaseActivity() {
     private var initialSetup = false
-
     private val PERMISSION_READ_EXTERNAL_STORAGE = 1000
 
     override fun onCreate(savedInstanceState: Bundle?) {

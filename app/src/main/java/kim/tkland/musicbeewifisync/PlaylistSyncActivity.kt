@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -15,7 +14,6 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -43,15 +40,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,13 +53,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.MenuCompat
-import kim.tkland.musicbeewifisync.MainActivity.RadioOption
 import java.net.SocketTimeoutException
 
 class PlaylistSyncActivity : WifiSyncBaseActivity() {
@@ -75,14 +66,13 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
     private var syncPlaylistsSelector: ListView? = null
     private var syncNoPlaylistsMessage: TextView? = null
     private var syncPlaylistSelectorAdapter: ArrayAdapter<FileSelectedInfo>? = null
-    private var syncPlaylistsCountMessage: TextView? = null
     private var syncPlaylistsPreviewButton: Button? = null
     private var syncPlaylistsStartButton: LinearLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         syncPlaylistsDeleteFiles?.setChecked(WifiSyncServiceSettings.syncDeleteUnselectedFiles)
-        //setSupportActionBar(findViewById(R.id.my_toolbar))
+
         setContent {
             CustomView()
         }
@@ -263,7 +253,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
                         //contentDescription = "Sync",
                         //)
                         //Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text("Preview", fontSize = 24.sp)
+                        Text(getString(R.string.syncPreview), fontSize = 24.sp)
                     }
                     Button(
                         modifier = Modifier
@@ -281,7 +271,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
                         onClick = {
                             try {
                                 WifiSyncServiceSettings.syncCustomFiles = false
-                                //syncPreview = false
+
                                 WifiSyncService.startSynchronisation(
                                     applicationContext,
                                     0,
@@ -291,7 +281,6 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
                             } catch (ex: Exception) {
                                 Log.d("onSyncStartButtonClick", ex.message!!)
                             } finally {
-                                //syncStartButton!!.isEnabled = true
                             }
                         }) {
                         Modifier.weight(1f)
@@ -300,7 +289,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
                             imageVector = Icons.Filled.Sync,
                             contentDescription = "Sync",
                         )
-                        Text("Sync", fontSize = 24.sp)
+                        Text(getString(R.string.syncNow), fontSize = 24.sp)
                     }
                 }
             }
@@ -402,20 +391,6 @@ class PlaylistSyncActivity : WifiSyncBaseActivity() {
         }
         super.onDestroy()
     }
-
-    /*
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        val fullSyncItem = menu.findItem(R.id.fullSyncMenuItem)
-        fullSyncItem.isCheckable = false
-        fullSyncItem.isChecked = false
-        val playlistSyncMenuItem = menu.findItem(R.id.playlistSyncMenuItem)
-        playlistSyncMenuItem.isCheckable = true
-        playlistSyncMenuItem.isChecked = true
-        return true
-    }
-     */
 
     fun onSyncPlaylistsPreviewButton_Click(view: View) {
         syncPlaylistsPreviewButton!!.isEnabled = false

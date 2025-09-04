@@ -282,7 +282,7 @@ class MainActivity() : WifiSyncBaseActivity() {
                         //contentDescription = "Sync",
                         //)
                         //Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text("Preview", fontSize = 24.sp)
+                        Text(getString(R.string.syncPreview), fontSize = 24.sp)
                     }
                     Button(
                         modifier = Modifier
@@ -318,7 +318,6 @@ class MainActivity() : WifiSyncBaseActivity() {
                                 } catch (ex: Exception) {
                                     Log.d("onSyncStartButtonClick", ex.message!!)
                                 } finally {
-                                    //syncStartButton!!.isEnabled = true
                                 }
                             }
                         }) {
@@ -328,7 +327,7 @@ class MainActivity() : WifiSyncBaseActivity() {
                             imageVector = Icons.Filled.Sync,
                             contentDescription = "Sync",
                         )
-                        Text("Sync", fontSize = 24.sp)
+                        Text(getString(R.string.syncNow), fontSize = 24.sp)
                     }
                 }
             }

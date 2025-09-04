@@ -38,7 +38,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -61,7 +60,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.compose.AppTheme
 import kotlinx.coroutines.delay
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
@@ -82,7 +80,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             }
         )
         setContent{
-            var buttonText by remember { mutableStateOf("STOP") }
+            var buttonText by remember { mutableStateOf(getString(R.string.syncStop))}
             var currentSyncMessage by remember { mutableStateOf("") }
 
             CustomView(
@@ -187,7 +185,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
                         ),
                         onClick = {
-                            if (buttonText == "STOP") {
+                            if (buttonText == getString(R.string.syncStop)) {
                                 try {
                                     WifiSyncServiceSettings.syncCustomFiles = false
                                     runOnUiThread {
@@ -203,7 +201,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                                 } catch (ex: Exception) {
                                     Log.d("onSyncStartButtonClick", ex.message!!)
                                 }
-                            } else if (buttonText == "Sync More"){
+                            } else if (buttonText == getString(R.string.syncMore)){
                                 val intent =
                                     Intent(context, MainActivity::class.java) // Use the context
                                 context.startActivity(intent)

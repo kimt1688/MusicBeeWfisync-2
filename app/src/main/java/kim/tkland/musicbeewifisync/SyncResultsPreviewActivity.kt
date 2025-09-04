@@ -437,7 +437,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             contentDescription = "Sync",
                         )
                         //Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text("Sync", fontSize = 20.sp)
+                        Text(getString(R.string.syncNow), fontSize = 20.sp)
                     }
                 }
             }
