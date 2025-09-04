@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.view.View
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -93,8 +93,6 @@ class MainActivity() : WifiSyncBaseActivity() {
             setContent {
                 CustomView()
             }
-
-            checkServerStatus()
         }
 
         if (!MediaStore.canManageMedia(this)) {
@@ -120,7 +118,6 @@ class MainActivity() : WifiSyncBaseActivity() {
         var isSyncToPlaycountsEnabled by remember { mutableStateOf(false) }
         var isSyncToRatingEnabled by remember { mutableStateOf(false) }
         var isSyncToPlaylistsEnabled by remember { mutableStateOf(false) }
-        var isFullSyncChecked by remember { mutableStateOf(true) }
         var initialReverseSyncPlayer: Int = 2
         when (WifiSyncServiceSettings.reverseSyncPlayer) {
             WifiSyncServiceSettings.PLAYER_POWERAMP -> initialReverseSyncPlayer = 0
@@ -134,11 +131,11 @@ class MainActivity() : WifiSyncBaseActivity() {
 
             topBar = {
                 CenterAlignedTopAppBar(
-                        modifier = Modifier.height(75.dp),
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color(getColor(R.color.colorButtonBackground)),
-                            titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
-                        ),
+                    modifier = Modifier.height(75.dp),
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                        titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                    ),
                     title = {
                         Box( // Wrap the Text in a Box
                             modifier = Modifier.fillMaxHeight(), // Fill the available height in the title slot
@@ -178,7 +175,7 @@ class MainActivity() : WifiSyncBaseActivity() {
                                             )
                                         }
                                     }
-                               },
+                                },
                                 onClick = {
                                     expanded = false
                                 }
@@ -253,29 +250,29 @@ class MainActivity() : WifiSyncBaseActivity() {
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
                         ),
                         onClick = {
-                            try {
-                                //syncStartButton!!.isEnabled = false
-                                WifiSyncServiceSettings.syncCustomFiles = false
-                                // 画面情報を保存する
-                                WifiSyncServiceSettings.syncFromMusicBee = isSyncFromMusicBeeChecked
-                                WifiSyncServiceSettings.reverseSyncPlayCounts =
-                                    isSyncToPlaycountsChecked
-                                WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatingChecked
-                                WifiSyncServiceSettings.reverseSyncPlaylists =
-                                    isSyncToPlaylistsChecked
-                                //WifiSyncServiceSettings.reverseSyncPlayer = reverseSyncPrayerSelected
-
-                                //syncPreview = false
-                                WifiSyncService.startSynchronisation(
-                                    applicationContext,
-                                    0,
-                                    true,
-                                    false
-                                )
-                            } catch (ex: Exception) {
-                                Log.d("onPreviewButtonClick", ex.message!!)
-                            } finally {
-                                // syncStartButton!!.isEnabled = true
+                            WifiSyncServiceSettings.syncCustomFiles = false
+                            // 画面情報を保存する
+                            WifiSyncServiceSettings.syncFromMusicBee =
+                                isSyncFromMusicBeeChecked
+                            WifiSyncServiceSettings.reverseSyncPlayCounts =
+                                isSyncToPlaycountsChecked
+                            WifiSyncServiceSettings.reverseSyncRatings =
+                                isSyncToRatingChecked
+                            WifiSyncServiceSettings.reverseSyncPlaylists =
+                                isSyncToPlaylistsChecked
+                            if (isConfigOK()) {
+                                try {
+                                    WifiSyncService.startSynchronisation(
+                                        applicationContext,
+                                        0,
+                                        true,
+                                        false
+                                    )
+                                } catch (ex: Exception) {
+                                    Log.d("onPreviewButtonClick", ex.message!!)
+                                } finally {
+                                    // syncStartButton!!.isEnabled = true
+                                }
                             }
                         }) {
                         Modifier.weight(1f)
@@ -301,25 +298,28 @@ class MainActivity() : WifiSyncBaseActivity() {
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
                         ),
                         onClick = {
-                            try {
-                                WifiSyncServiceSettings.syncCustomFiles = false
-                                //syncPreview = false
-                                WifiSyncServiceSettings.syncFromMusicBee = isSyncFromMusicBeeChecked
-                                WifiSyncServiceSettings.reverseSyncPlayCounts =
-                                    isSyncToPlaycountsChecked
-                                WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatingChecked
-                                WifiSyncServiceSettings.reverseSyncPlaylists =
-                                    isSyncToPlaylistsChecked
-                                WifiSyncService.startSynchronisation(
-                                    applicationContext,
-                                    0,
-                                    false,
-                                    false
-                                )
-                            } catch (ex: Exception) {
-                                Log.d("onSyncStartButtonClick", ex.message!!)
-                            } finally {
-                                //syncStartButton!!.isEnabled = true
+                            WifiSyncServiceSettings.syncCustomFiles = false
+                            WifiSyncServiceSettings.syncFromMusicBee =
+                                isSyncFromMusicBeeChecked
+                            WifiSyncServiceSettings.reverseSyncPlayCounts =
+                                isSyncToPlaycountsChecked
+                            WifiSyncServiceSettings.reverseSyncRatings =
+                                isSyncToRatingChecked
+                            WifiSyncServiceSettings.reverseSyncPlaylists =
+                                isSyncToPlaylistsChecked
+                            if (isConfigOK()) {
+                                try {
+                                    WifiSyncService.startSynchronisation(
+                                        applicationContext,
+                                        0,
+                                        false,
+                                        false
+                                    )
+                                } catch (ex: Exception) {
+                                    Log.d("onSyncStartButtonClick", ex.message!!)
+                                } finally {
+                                    //syncStartButton!!.isEnabled = true
+                                }
                             }
                         }) {
                         Modifier.weight(1f)
@@ -357,7 +357,9 @@ class MainActivity() : WifiSyncBaseActivity() {
                                 value = isSyncFromMusicBeeChecked,
                                 enabled = true,
                                 role = Role.Checkbox,
-                                onValueChange = { isSyncFromMusicBeeChecked = !isSyncFromMusicBeeChecked }
+                                onValueChange = {
+                                    isSyncFromMusicBeeChecked = !isSyncFromMusicBeeChecked
+                                }
                             )
                             .padding(8.dp)
                             .fillMaxWidth(),
@@ -394,7 +396,9 @@ class MainActivity() : WifiSyncBaseActivity() {
                                 value = isSyncToPlaycountsChecked,
                                 enabled = isSyncToPlaycountsEnabled,
                                 role = Role.Checkbox,
-                                onValueChange = { isSyncToPlaycountsChecked = !isSyncToPlaycountsChecked }
+                                onValueChange = {
+                                    isSyncToPlaycountsChecked = !isSyncToPlaycountsChecked
+                                }
                             )
                             .padding(8.dp)
                             .fillMaxWidth(),
@@ -450,7 +454,9 @@ class MainActivity() : WifiSyncBaseActivity() {
                                 value = isSyncToPlaylistsChecked,
                                 enabled = isSyncToPlaylistsEnabled,
                                 role = Role.Checkbox,
-                                onValueChange = { isSyncToPlaylistsChecked = !isSyncToPlaylistsChecked }
+                                onValueChange = {
+                                    isSyncToPlaylistsChecked = !isSyncToPlaylistsChecked
+                                }
                             )
                             .padding(8.dp)
                             .fillMaxWidth(),
@@ -514,9 +520,12 @@ class MainActivity() : WifiSyncBaseActivity() {
                                                     isSyncToPlaycountsEnabled = true
                                                     isSyncToRatingEnabled = true
                                                     isSyncToPlaylistsEnabled = false
-                                                    WifiSyncServiceSettings.reverseSyncPlayCounts = true
-                                                    WifiSyncServiceSettings.reverseSyncRatings = true
-                                                    WifiSyncServiceSettings.reverseSyncPlaylists = false
+                                                    WifiSyncServiceSettings.reverseSyncPlayCounts =
+                                                        true
+                                                    WifiSyncServiceSettings.reverseSyncRatings =
+                                                        true
+                                                    WifiSyncServiceSettings.reverseSyncPlaylists =
+                                                        false
                                                 }
 
                                                 1 -> {
@@ -525,9 +534,12 @@ class MainActivity() : WifiSyncBaseActivity() {
                                                     isSyncToPlaycountsEnabled = true
                                                     isSyncToRatingEnabled = true
                                                     isSyncToPlaylistsEnabled = true
-                                                    WifiSyncServiceSettings.reverseSyncRatings = true
-                                                    WifiSyncServiceSettings.reverseSyncPlayCounts = true
-                                                    WifiSyncServiceSettings.reverseSyncPlaylists = true
+                                                    WifiSyncServiceSettings.reverseSyncRatings =
+                                                        true
+                                                    WifiSyncServiceSettings.reverseSyncPlayCounts =
+                                                        true
+                                                    WifiSyncServiceSettings.reverseSyncPlaylists =
+                                                        true
                                                 }
 
                                                 2 -> {
@@ -535,9 +547,12 @@ class MainActivity() : WifiSyncBaseActivity() {
                                                     isSyncToPlaycountsEnabled = false
                                                     isSyncToRatingEnabled = false
                                                     isSyncToPlaylistsEnabled = false
-                                                    WifiSyncServiceSettings.reverseSyncPlayCounts = false
-                                                    WifiSyncServiceSettings.reverseSyncRatings = false
-                                                    WifiSyncServiceSettings.reverseSyncPlaylists = false
+                                                    WifiSyncServiceSettings.reverseSyncPlayCounts =
+                                                        false
+                                                    WifiSyncServiceSettings.reverseSyncRatings =
+                                                        false
+                                                    WifiSyncServiceSettings.reverseSyncPlaylists =
+                                                        false
                                                 }
                                             }
                                         }
@@ -566,6 +581,7 @@ class MainActivity() : WifiSyncBaseActivity() {
                                                 WifiSyncServiceSettings.reverseSyncRatings = true
                                                 WifiSyncServiceSettings.reverseSyncPlaylists = false
                                             }
+
                                             1 -> {
                                                 WifiSyncServiceSettings.reverseSyncPlayer =
                                                     WifiSyncServiceSettings.PLAYER_GONEMAD
@@ -576,12 +592,14 @@ class MainActivity() : WifiSyncBaseActivity() {
                                                 WifiSyncServiceSettings.reverseSyncPlayCounts = true
                                                 WifiSyncServiceSettings.reverseSyncPlaylists = true
                                             }
+
                                             2 -> {
                                                 WifiSyncServiceSettings.reverseSyncPlayer = 0
                                                 isSyncToPlaycountsEnabled = false
                                                 isSyncToRatingEnabled = false
                                                 isSyncToPlaylistsEnabled = false
-                                                WifiSyncServiceSettings.reverseSyncPlayCounts = false
+                                                WifiSyncServiceSettings.reverseSyncPlayCounts =
+                                                    false
                                                 WifiSyncServiceSettings.reverseSyncRatings = false
                                                 WifiSyncServiceSettings.reverseSyncPlaylists = false
                                             }
@@ -592,6 +610,11 @@ class MainActivity() : WifiSyncBaseActivity() {
                             }
                         }
                     }
+                }
+
+                Row(modifier = Modifier.padding(top = 15.dp)) {
+                    var status = checkServerStatus()
+                    Text(text = status, color = Color.Red, fontSize = 20.sp)
                 }
             }
         }
@@ -609,7 +632,40 @@ class MainActivity() : WifiSyncBaseActivity() {
         super.onDestroy()
     }
 
-    private fun checkServerStatus() {
+    private fun isConfigOK(): Boolean {
+        var message: String? = null
+        if (serverStatusThread != null)
+        {
+            message = getString(R.string.errorServerNotFound)
+        }
+
+        val anyReverseSync =
+            (WifiSyncServiceSettings.reverseSyncPlayer == 1 || WifiSyncServiceSettings.reverseSyncPlayer == 2) &&
+                    (WifiSyncServiceSettings.reverseSyncPlaylists || WifiSyncServiceSettings.reverseSyncRatings || WifiSyncServiceSettings.reverseSyncPlayCounts)
+        if (!anyReverseSync)
+        {
+            if (!WifiSyncServiceSettings.syncFromMusicBee) {
+                message = getString(R.string.errorSyncParamsNoneSelected)
+            }
+        }
+        return if (message == null)
+        {
+            true
+        } else
+        {
+            val builder = AlertDialog.Builder(mainWindow!!)
+            builder.setTitle(getString(R.string.syncErrorHeader))
+            builder.setMessage(message)
+            builder.setIcon(android.R.drawable.ic_dialog_alert)
+            builder.setCancelable(false)
+            builder.setPositiveButton(android.R.string.ok, null)
+            builder.show()
+            false
+        }
+    }
+
+    private fun checkServerStatus(): String {
+        var returnValue = ""
         serverStatusThread = Thread {
             try {
                 var statusDisplayed = false
@@ -619,7 +675,7 @@ class MainActivity() : WifiSyncBaseActivity() {
                             runOnUiThread {
                                 if (serverStatusThread != null) {
                                     serverStatusThread = null
-                                    findViewById<View>(R.id.syncServerStatus).visibility = View.GONE
+                                    //findViewById<View>(R.id.syncServerStatus).visibility = View.GONE
                                 }
                             }
                         }
@@ -627,7 +683,7 @@ class MainActivity() : WifiSyncBaseActivity() {
                     }
                     if (!statusDisplayed) {
                         runOnUiThread {
-                            findViewById<View>(R.id.syncServerStatus).visibility = View.VISIBLE
+                            returnValue = getString(R.string.errorServerNotFound)
                         }
                         statusDisplayed = true
                     }
@@ -638,5 +694,6 @@ class MainActivity() : WifiSyncBaseActivity() {
             serverStatusThread = null
         }
         serverStatusThread!!.start()
+        return returnValue
     }
 }

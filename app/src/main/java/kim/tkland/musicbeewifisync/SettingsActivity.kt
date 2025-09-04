@@ -180,17 +180,31 @@ class SettingsActivity : WifiSyncBaseActivity() {
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
                         ),
                         onClick = {
-                            WifiSyncServiceSettings.defaultIpAddressValue =
-                                WifiSyncService.getMusicBeeServerAddress(applicationContext, null)
-                                    .toString()
                             WifiSyncServiceSettings.deviceStorageIndex = initialStorage
                             WifiSyncServiceSettings.saveSettings(applicationContext)
-                            val intent = Intent(mainWindow, MainActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            startActivity(intent)
-                        }) {
-
+                            val locateServerThread = Thread(Runnable {
+                                val serverIPAddress = WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
+                                runOnUiThread {
+                                    if (mainWindow != null) {
+                                        if (serverIPAddress == null) {
+                                            val errorDialog = AlertDialog.Builder(mainWindow!!)
+                                            errorDialog.setMessage(getText(R.string.errorServerNotFound))
+                                            errorDialog.setPositiveButton(android.R.string.ok, null)
+                                            errorDialog.show()
+                                        } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
+                                            showNoConfigMatchedSettings()
+                                        } else {
+                                            WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
+                                            WifiSyncServiceSettings.saveSettings(mainWindow)
+                                            val intent = Intent(mainWindow, MainActivity::class.java)
+                                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                            startActivity(intent)
+                                        }
+                                    }
+                                }
+                            })
+                            locateServerThread.start()                        }) {
                         Text(getString(R.string.settingsLocate), fontSize = 24.sp)
                     }
                 }
