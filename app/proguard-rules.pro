@@ -30,7 +30,6 @@
     -keep public class * extends androidx.core.app.ComponentActivity {
         public <init>();
     }
-    // Or more generally for any class an Activity might extend from
     -keep public class * extends android.app.Application
     -keep public class * extends android.app.Service
     -keep public class * extends android.content.BroadcastReceiver

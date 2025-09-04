@@ -6,13 +6,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.Toolbar
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -50,10 +50,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -61,18 +61,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.WindowCompat
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.compose.AppTheme
-import kim.tkland.musicbeewifisync.ui.theme.AppShapes
 import kotlinx.coroutines.delay
-import java.util.concurrent.atomic.AtomicInteger
-import kotlinx.coroutines.runBlocking
-import java.util.Collections.list
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,34 +85,16 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             var buttonText by remember { mutableStateOf("STOP") }
             var currentSyncMessage by remember { mutableStateOf("") }
 
-            AppTheme() {
-                CustomView(
-                    currentSyncMessage = currentSyncMessage,
-                    onCurrentSyncMessageChange = { newText ->
-                        currentSyncMessage = newText
-                    },
-                    buttonText = buttonText,
-                    onButtonTextChange = { newText ->
-                            buttonText = newText
-                    }
-                )
-                /*
-                val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "CustomView") {
-                    composable(route = "CustomView") {
-                        CustomView(navController, buttonText){ newText->
-                            buttonText = newText
-                        }
-                    }
-                    composable(route = "CustomErrorView") {
-                        CustomErrorView(buttonText){ newText->
-                            buttonText = newText
-                        }
-                    }
+            CustomView(
+                currentSyncMessage = currentSyncMessage,
+                onCurrentSyncMessageChange = { newText ->
+                    currentSyncMessage = newText
+                },
+                buttonText = buttonText,
+                onButtonTextChange = { newText ->
+                        buttonText = newText
                 }
-
-                 */
-            }
+            )
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
@@ -141,8 +113,8 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                 CenterAlignedTopAppBar(
                         modifier = Modifier.height(75.dp),
                         colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
                     ),
                     title = {
                         Box( // Wrap the Text in a Box
@@ -204,7 +176,16 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(80.dp),
+                            .height(80.dp)
+                            .border(
+                                width = 2.dp, // 枠線の幅
+                                color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                            ),
+                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                        ),
                         onClick = {
                             if (buttonText == "STOP") {
                                 try {
@@ -218,16 +199,6 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                                             false
                                         )
                                         onButtonTextChange("Sync More")
-                                        /*
-                                        (context as? SyncResultsStatusActivity)?.runOnUiThread {
-                                            WifiSyncService.waitSyncResults.waitOne() // Be careful with blocking calls on the main thread
-                                            WifiSyncService.startSynchronisation(
-                                                context.applicationContext,
-                                                0,
-                                                false,
-                                                false
-                                            )
-                                        }*/
                                     }
                                 } catch (ex: Exception) {
                                     Log.d("onSyncStartButtonClick", ex.message!!)
@@ -240,8 +211,6 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                             }
                         }
                     ){
-                        //Modifier.weight(1f)
-
                         Text(buttonText, fontSize = 20.sp)
                     }
                 }
@@ -360,9 +329,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                     fontSize = 18.sp
                 )
             }
-            //ShowEndOfSyncInformation(innerPadding) // Call your composable here based on state
         } else {
-            //navController.navigate("CustomErrorView")
             isErrorEnd = true
             ShowEndOfSyncInformation(innerPadding, completeMessage, { completeMessage = it })
         }
@@ -371,7 +338,6 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
 
     override fun onDestroy() {
         WifiSyncService.resultsActivityReady.reset()
-        //timerHandler.removeCallbacks(timerRunnable!!)
         mainWindow = null
         super.onDestroy()
     }
@@ -407,119 +373,6 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
     }
          */
 
-    /*
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-    @Composable
-    fun CustomErrorView(buttonText: String, onButtonTextChange: (String) -> Unit) {
-        val topAppBarState = rememberTopAppBarState()
-        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
-        var expanded by remember { mutableStateOf(false) }
-
-        //WindowCompat.setDecorFitsSystemWindows(false)
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            CenterAlignedTopAppBar(
-                modifier = Modifier.height(75.dp),
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Box( // Wrap the Text in a Box
-                        modifier = Modifier.fillMaxHeight(), // Fill the available height in the title slot
-                        contentAlignment = Alignment.BottomCenter // Align content to the bottom start
-                    ) {
-                        Text(
-                            text = getString(R.string.title_activity_sync_status),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                },
-                actions = {
-                    Box(
-                        modifier = Modifier
-                            .padding(8.dp)
-                    ) {
-                        IconButton(onClick = { expanded = !expanded }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuSyncSettings)) },
-                                onClick = {
-                                    val intent = Intent(
-                                        applicationContext,
-                                        SettingsActivity::class.java
-                                    )
-                                    expanded = false
-                                    startActivity(intent)
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuWifiSyncLog)) },
-                                onClick = {
-                                    val intent = Intent(
-                                        applicationContext,
-                                        ViewErrorLogActivity::class.java
-                                    )
-                                    expanded = false
-                                    startActivity(intent)
-                                }
-                            )
-                        }
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
-        bottomBar = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp),
-                    shape = androidx.compose.ui.graphics.RectangleShape,
-                    onClick = {
-                        if (buttonText == "STOP") {
-                            try {
-                                WifiSyncServiceSettings.syncCustomFiles = false
-                                runOnUiThread {
-                                    WifiSyncService.waitSyncResults.waitOne()
-                                    WifiSyncService.startSynchronisation(
-                                        applicationContext,
-                                        0,
-                                        false,
-                                        false
-                                    )
-                                }
-                                onButtonTextChange("Sync More")
-                            } catch (ex: Exception) {
-                                Log.d("onSyncStartButtonClick", ex.message!!)
-                            }
-                        } else {
-                            val intent =
-                                Intent(this@SyncResultsStatusActivity, MainActivity::class.java)
-                            startActivity(intent)
-                            finish()
-                        }
-                    },
-                ) { Text(buttonText, fontSize = 20.sp) }
-            }
-        }
-    ) { innerPadding ->
-        ShowEndOfSyncInformation(innerPadding)
-    }
-    }
-
-     */
     @Composable
     private fun ShowEndOfSyncInformation(innerPadding: PaddingValues, completeMessage: String, onCompleteTextChange: (String) -> Unit) {
         val errorMessageId = WifiSyncService.syncErrorMessageId.getAndSet(0)
@@ -527,27 +380,14 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
         var errorMessage = ""
         if (errorMessageId == 0 || errorMessageId == R.string.syncCompletedFail) {
             val messageId = if (errorMessageId != 0) errorMessageId else R.string.syncCompleted
-            //syncCompletionStatusMessage!!.setText(messageId)
-            //syncCompletionStatusMessage!!.visibility = View.VISIBLE
             if (errorMessageId == R.string.syncCompletedFail) {
                 if ((WifiSyncService.syncToResults == null || WifiSyncService.syncToResults!!.isEmpty()) && WifiSyncService.syncFailedFiles.isEmpty()) {
                     errorMessage = getString(R.string.syncCompletedFailErrorLog)
                     onCompleteTextChange(errorMessage)
-                    //syncCompletionStatusMessage!!.setText(R.string.syncCompletedFailErrorLog)
-                    //syncFailedResults!!.visibility = View.VISIBLE
                 } else {
-                    //val params =
-                    //    syncCompletionStatusMessage!!.layoutParams as ConstraintLayout.LayoutParams
-                    //params.topToTop = findViewById<Toolbar>(R.id.my_toolbar).top
-                    //params.setMargins(0, findViewById<Toolbar>(R.id.my_toolbar).height, 0, 0)
-                    //params.bottomToTop = findViewById<Button>(R.id.stopSyncButton).top
-                    //params.verticalBias = 0.0f
 
                     errorMessage = getString(R.string.syncCompletedFailMessage)
                     onCompleteTextChange(errorMessage)
-                    //syncCompletionStatusMessage!!.layoutParams = params
-                    //syncCompletionStatusMessage!!.setText(R.string.syncCompletedFailMessage)
-                    //syncFailedResults!!.visibility = View.VISIBLE
                     val failedFrom = ArrayList<SyncResultsInfo>()
                     for (info in WifiSyncService.syncFailedFiles) {
                         failedFrom.add(
@@ -560,15 +400,13 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                             )
                         )
                     }
-                    //Text(text = getString(errorMessageId))
                     ShowResultsComposable(innerPadding, errorMessage, WifiSyncService.syncToResults,failedFrom)
                 }
             }
         } else if (errorMessageId == R.string.syncCancelled) {
             errorMessage = getString(errorMessageId)
             onCompleteTextChange(errorMessage)
-            //syncCompletionStatusMessage!!.setText(errorMessageId)
-            //syncCompletionStatusMessage!!.visibility = View.VISIBLE
+            ShowResultsComposable(innerPadding, errorMessage, WifiSyncService.syncToResults,null)
         } else {
             val builder = AlertDialog.Builder(this)
             builder.setTitle(getString(R.string.syncErrorHeader))
@@ -579,15 +417,11 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 builder.setPositiveButton(android.R.string.ok) { _, _ ->
                     errorMessage = getString(errorMessageId)
                     onCompleteTextChange(errorMessage)
-                    //syncCompletionStatusMessage!!.setText(errorMessageId)
-                    //syncCompletionStatusMessage!!.visibility = View.VISIBLE
                 }
             } else {
                 builder.setNegativeButton(R.string.syncCancel) { _, _ ->
                     errorMessage = getString(errorMessageId)
                     onCompleteTextChange(errorMessage)
-                    //syncCompletionStatusMessage!!.setText(errorMessageId)
-                    //syncCompletionStatusMessage!!.visibility = View.VISIBLE
                 }
                 builder.setPositiveButton(R.string.syncRetry) { _, _ ->
                     WifiSyncService.startSynchronisation(
@@ -598,6 +432,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                     )
                 }
             }
+            ShowResultsComposable(innerPadding, errorMessage, WifiSyncService.syncToResults,null)
             builder.show()
         }
     }

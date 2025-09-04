@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -48,7 +48,6 @@ class ViewErrorLogActivity : ComponentActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, windowInsets ->
             val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
 
-
             v.updatePadding(
                 //    left = bars.left,
                 //    top = bars.top,
@@ -58,9 +57,7 @@ class ViewErrorLogActivity : ComponentActivity() {
             WindowInsetsCompat.CONSUMED
         }
         setContent {
-            AppTheme {
-                ViewErrorLog()
-            }
+            ViewErrorLog()
         }
     }
 
@@ -79,8 +76,8 @@ class ViewErrorLogActivity : ComponentActivity() {
                 CenterAlignedTopAppBar(
                     modifier = Modifier.height(75.dp),
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
+                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                        titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
                     ),
                     title = {
                         Box( // Wrap the Text in a Box
@@ -103,19 +100,42 @@ class ViewErrorLogActivity : ComponentActivity() {
                         }
                     },
                     actions = {
-                        Button(onClick = {
-                            val clipboard =
-                                getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                            val logData = ErrorHandler.log
-                            if (!logData.isNullOrEmpty()) {
-                                val clipData =
-                                    ClipData.newPlainText("plain text", logData)
-                                clipboard.setPrimaryClip(clipData)
+                        Button(
+                            modifier = Modifier.border(
+                                width = 2.dp, // 枠線の幅
+                                color = Color(getColor(R.color.colorButtonTextEnabled)),
+                                shape = androidx.compose.ui.graphics.RectangleShape
+                            ),
+                            shape = androidx.compose.ui.graphics.RectangleShape,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                            ),
+                            onClick = {
+                                val clipboard =
+                                    getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                                val logData = ErrorHandler.log
+                                if (!logData.isNullOrEmpty()) {
+                                    val clipData =
+                                        ClipData.newPlainText("plain text", logData)
+                                    clipboard.setPrimaryClip(clipData)
                             }
                         }) {
                             Icon(
+                                modifier = Modifier.border(
+                                                        width = 2.dp, // 枠線の幅
+                                                        color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                                                    )
+                                                    .background(Color(getColor(R.color.colorButtonBackground))),
                                 imageVector = Icons.Filled.ContentCopy,
-                                contentDescription = "Copy to Clipboard"
+                                contentDescription = "Copy to Clipboard",
+                                tint = Color(getColor(R.color.colorButtonTextEnabled)),
+
+
+                                //colors = IconButtonDefaults.colors(
+                                //    containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                //    contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                                //)
                             )
                         }
                     },

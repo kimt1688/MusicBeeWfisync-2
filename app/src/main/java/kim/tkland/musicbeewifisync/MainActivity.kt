@@ -6,20 +6,15 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.view.Menu
 import android.view.View
-import android.widget.CheckBox
-import android.widget.EditText
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.captionBarPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,12 +23,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -41,37 +35,29 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.core.view.MenuCompat
 import androidx.core.net.toUri
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.compose.AppTheme
+import androidx.compose.material3.RadioButtonDefaults
 
 class MainActivity() : WifiSyncBaseActivity() {
     private var serverStatusThread: Thread? = null
@@ -105,9 +91,7 @@ class MainActivity() : WifiSyncBaseActivity() {
             startActivity(intent)
         } else {
             setContent {
-                //AppTheme {
-                    CustomView()
-                //}
+                CustomView()
             }
 
             checkServerStatus()
@@ -152,9 +136,9 @@ class MainActivity() : WifiSyncBaseActivity() {
                 CenterAlignedTopAppBar(
                         modifier = Modifier.height(75.dp),
                         colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary
-                    ),
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                        ),
                     title = {
                         Box( // Wrap the Text in a Box
                             modifier = Modifier.fillMaxHeight(), // Fill the available height in the title slot
@@ -168,86 +152,84 @@ class MainActivity() : WifiSyncBaseActivity() {
                         }
                     },
                     actions = {
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
+                        IconButton(onClick = { expanded = !expanded }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
                         ) {
-                            IconButton(onClick = { expanded = !expanded }) {
-                                Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
-                            }
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            DropdownMenuItem(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Column(horizontalAlignment = Alignment.Start) {
                                             Text(getString(R.string.menuWifiFullSync))
+                                        }
+                                        Column(horizontalAlignment = Alignment.End) {
                                             Checkbox(
-                                                checked = isFullSyncChecked,
+                                                checked = true,
+                                                colors = CheckboxDefaults.colors(
+                                                    checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                                    checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                                                ),
                                                 onCheckedChange = { isChecked ->
-                                                    isFullSyncChecked = isChecked
                                                 }
                                             )
                                         }
-                                    },
-                                    onClick = {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            SettingsActivity::class.java
-                                        )
-                                        expanded = false
-                                        startActivity(intent)
                                     }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(getString(R.string.menuWifiPlaylistSync)) },
-                                    onClick = {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            SettingsActivity::class.java
-                                        )
-                                        expanded = false
-                                        startActivity(intent)
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(getString(R.string.menuSyncSettings)) },
-                                    onClick = {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            SettingsActivity::class.java
-                                        )
-                                        expanded = false
-                                        startActivity(intent)
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(getString(R.string.menuFullScanFiles)) },
-                                    onClick = {
-                                        expanded = false
-                                        onFullScanMenuItemClick()
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(getString(R.string.menuAllPlaylistsDelete)) },
-                                    onClick = {
-                                        expanded = false
-                                        onDeleteAllPlaylistsClick()
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(getString(R.string.menuWifiSyncLog)) },
-                                    onClick = {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            ViewErrorLogActivity::class.java
-                                        )
-                                        expanded = false
-                                        startActivity(intent)
-                                    }
-                                )
-                            }
+                               },
+                                onClick = {
+                                    expanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(getString(R.string.menuWifiPlaylistSync)) },
+                                onClick = {
+                                    val intent = Intent(
+                                        applicationContext,
+                                        PlaylistSyncActivity::class.java
+                                    )
+                                    expanded = false
+                                    startActivity(intent)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(getString(R.string.menuSyncSettings)) },
+                                onClick = {
+                                    val intent = Intent(
+                                        applicationContext,
+                                        SettingsActivity::class.java
+                                    )
+                                    expanded = false
+                                    startActivity(intent)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(getString(R.string.menuFullScanFiles)) },
+                                onClick = {
+                                    expanded = false
+                                    onFullScanMenuItemClick()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(getString(R.string.menuAllPlaylistsDelete)) },
+                                onClick = {
+                                    expanded = false
+                                    onDeleteAllPlaylistsClick()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(getString(R.string.menuWifiSyncLog)) },
+                                onClick = {
+                                    val intent = Intent(
+                                        applicationContext,
+                                        ViewErrorLogActivity::class.java
+                                    )
+                                    expanded = false
+                                    startActivity(intent)
+                                }
+                            )
                         }
                     },
                     scrollBehavior = scrollBehavior,
@@ -260,7 +242,16 @@ class MainActivity() : WifiSyncBaseActivity() {
                     Button(
                         modifier = Modifier
                             .weight(0.5f)
-                            .height(80.dp),
+                            .height(80.dp)
+                            .border(
+                                width = 2.dp, // 枠線の幅
+                                color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                            ),
+                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                        ),
                         onClick = {
                             try {
                                 //syncStartButton!!.isEnabled = false
@@ -299,7 +290,16 @@ class MainActivity() : WifiSyncBaseActivity() {
                     Button(
                         modifier = Modifier
                             .weight(0.5f)
-                            .height(80.dp),
+                            .height(80.dp)
+                            .border(
+                                width = 2.dp, // 枠線の幅
+                                color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                            ),
+                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                        ),
                         onClick = {
                             try {
                                 WifiSyncServiceSettings.syncCustomFiles = false
@@ -351,29 +351,31 @@ class MainActivity() : WifiSyncBaseActivity() {
                     )
                 }
                 Row() {
-                    MaterialTheme {
-                        Row(
-                            modifier = Modifier
-                                .toggleable(
-                                    value = isSyncFromMusicBeeChecked,
-                                    enabled = true,
-                                    role = Role.Checkbox,
-                                    onValueChange = { isSyncFromMusicBeeChecked = !isSyncFromMusicBeeChecked }
-                                )
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start,
-                        ) {
-                            Checkbox(
-                                checked = isSyncFromMusicBeeChecked,
+                    Row(
+                        modifier = Modifier
+                            .toggleable(
+                                value = isSyncFromMusicBeeChecked,
                                 enabled = true,
-                                onCheckedChange = {
-                                    isSyncFromMusicBeeChecked = it
-                                }
+                                role = Role.Checkbox,
+                                onValueChange = { isSyncFromMusicBeeChecked = !isSyncFromMusicBeeChecked }
                             )
-                            Text(getString(R.string.syncFromDefault), fontSize = 20.sp)
-                        }
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        Checkbox(
+                            checked = isSyncFromMusicBeeChecked,
+                            enabled = true,
+                            colors = CheckboxDefaults.colors(
+                                checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                            ),
+                            onCheckedChange = {
+                                isSyncFromMusicBeeChecked = it
+                            }
+                        )
+                        Text(getString(R.string.syncFromDefault), fontSize = 20.sp)
                     }
                 }
                 Row(modifier = Modifier.padding(top = 15.dp)) {
@@ -386,81 +388,87 @@ class MainActivity() : WifiSyncBaseActivity() {
                     )
                 }
                 Row() {
-                    MaterialTheme {
-                        Row(
-                            modifier = Modifier
-                                .toggleable(
-                                    value = isSyncToPlaycountsChecked,
-                                    enabled = isSyncToPlaycountsEnabled,
-                                    role = Role.Checkbox,
-                                    onValueChange = { isSyncToPlaycountsChecked = !isSyncToPlaycountsChecked }
-                                )
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start,
-                        ) {
-                            Checkbox(
-                                checked = isSyncToPlaycountsChecked,
+                    Row(
+                        modifier = Modifier
+                            .toggleable(
+                                value = isSyncToPlaycountsChecked,
                                 enabled = isSyncToPlaycountsEnabled,
-                                onCheckedChange = {
-                                    isSyncToPlaycountsChecked = it
-                                }
+                                role = Role.Checkbox,
+                                onValueChange = { isSyncToPlaycountsChecked = !isSyncToPlaycountsChecked }
                             )
-                            Text(getString(R.string.syncToPlaycounts), fontSize = 20.sp)
-                        }
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        Checkbox(
+                            checked = isSyncToPlaycountsChecked,
+                            enabled = isSyncToPlaycountsEnabled,
+                            colors = CheckboxDefaults.colors(
+                                checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                            ),
+                            onCheckedChange = {
+                                isSyncToPlaycountsChecked = it
+                            }
+                        )
+                        Text(getString(R.string.syncToPlaycounts), fontSize = 20.sp)
                     }
                 }
                 Row() {
-                    MaterialTheme {
-                        Row(
-                            modifier = Modifier
-                                .toggleable(
-                                    value = isSyncToRatingChecked,
-                                    enabled = isSyncToRatingEnabled,
-                                    role = Role.Checkbox,
-                                    onValueChange = { isSyncToRatingChecked = !isSyncToRatingChecked }
-                                )
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start,
-                        ) {
-                            Checkbox(
-                                checked = isSyncToRatingChecked,
+                    Row(
+                        modifier = Modifier
+                            .toggleable(
+                                value = isSyncToRatingChecked,
                                 enabled = isSyncToRatingEnabled,
-                                onCheckedChange = {
-                                    isSyncToRatingChecked = it
-                                }
+                                role = Role.Checkbox,
+                                onValueChange = { isSyncToRatingChecked = !isSyncToRatingChecked }
                             )
-                            Text(getString(R.string.syncToRatings), fontSize = 20.sp)
-                        }
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        Checkbox(
+                            checked = isSyncToRatingChecked,
+                            enabled = isSyncToRatingEnabled,
+                            colors = CheckboxDefaults.colors(
+                                checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                            ),
+                            onCheckedChange = {
+                                isSyncToRatingChecked = it
+                            }
+                        )
+                        Text(getString(R.string.syncToRatings), fontSize = 20.sp)
                     }
                 }
                 Row() {
-                    MaterialTheme {
-                        Row(
-                            modifier = Modifier
-                                .toggleable(
-                                    value = isSyncToPlaylistsChecked,
-                                    enabled = isSyncToPlaylistsEnabled,
-                                    role = Role.Checkbox,
-                                    onValueChange = { isSyncToPlaylistsChecked = !isSyncToPlaylistsChecked }
-                                )
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start,
-                        ) {
-                            Checkbox(
-                                checked = isSyncToPlaylistsChecked,
+                    Row(
+                        modifier = Modifier
+                            .toggleable(
+                                value = isSyncToPlaylistsChecked,
                                 enabled = isSyncToPlaylistsEnabled,
-                                onCheckedChange = {
-                                    isSyncToPlaylistsChecked = it
-                                }
+                                role = Role.Checkbox,
+                                onValueChange = { isSyncToPlaylistsChecked = !isSyncToPlaylistsChecked }
                             )
-                            Text(getString(R.string.syncToPlaylists), fontSize = 20.sp)
-                        }
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        Checkbox(
+                            checked = isSyncToPlaylistsChecked,
+                            enabled = isSyncToPlaylistsEnabled,
+                            colors = CheckboxDefaults.colors(
+                                checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                            ),
+                            onCheckedChange = {
+                                isSyncToPlaylistsChecked = it
+                            }
+                        )
+                        Text(getString(R.string.syncToPlaylists), fontSize = 20.sp)
                     }
                 }
                 Row() {
@@ -541,6 +549,10 @@ class MainActivity() : WifiSyncBaseActivity() {
                                 ) {
                                 RadioButton(
                                     selected = (option.index == selectedOption),
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = Color(getColor(R.color.colorButtonTextEnabled)), // 選択時の色
+                                        unselectedColor = Color(getColor(R.color.colorButtonBackground)) // 非選択時の色
+                                    ),
                                     onClick = {
                                         onOptionSelected(option.index)
                                         when (option.index) {

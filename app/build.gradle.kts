@@ -15,8 +15,8 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 130
-        versionName = "2.9.0"
+        versionCode = 131
+        versionName = "3.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         targetSdk = 35
@@ -91,6 +91,7 @@ dependencies {
     implementation(libs.litert.metadata)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.ui.graphics)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.kotlinx.coroutines.core) // Or the latest version
     implementation(libs.kotlinx.coroutines.android)

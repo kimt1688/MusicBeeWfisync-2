@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.*
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,6 +43,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -147,14 +149,11 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             }
                         }
                         setContent {
-                            //MainAppComposable()
-                            AppTheme {
-                                CustomView(
-                                    title = getString(R.string.title_activity_sync_preview),
-                                    resultsToData = previewToData,
-                                    resultsFromData = previewFromData
-                                )
-                            }
+                            CustomView(
+                                title = getString(R.string.title_activity_sync_preview),
+                                resultsToData = previewToData,
+                                resultsFromData = previewFromData
+                            )
                         }
                     }
                 }
@@ -182,8 +181,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             topBar = {
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
+                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                        titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
                     ),
                     title = {
                         Text(
@@ -238,8 +237,17 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 ) {
                     Button(modifier = Modifier
                         .weight(1f)
-                        .height(80.dp),
+                        .height(80.dp)
+                        .border(
+                            width = 2.dp, // 枠線の幅
+                            color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                        ),
                         enabled = isSyncButtonEnabled.value,
+                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                        ),
                         onClick = {
                             try {
                                 WifiSyncServiceSettings.syncCustomFiles = false
@@ -339,8 +347,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 CenterAlignedTopAppBar(
                         modifier = Modifier.height(75.dp),
                         colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
                     ),
                     title = {
                         Box( // Wrap the Text in a Box
@@ -400,7 +408,16 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 ) {
                     Button(modifier = Modifier
                         .weight(1f)
-                        .height(80.dp),
+                        .height(80.dp)
+                        .border(
+                            width = 2.dp, // 枠線の幅
+                            color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                        ),
+                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                        ),
                         enabled = isSyncButtonEnabled.value,
                         onClick = {
                             try {
@@ -517,10 +534,11 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 }
                 item {
                     Text(
+                        modifier = Modifier.padding(start = 20.dp),
                         text = if (info.estimatedSize.isNullOrEmpty()) info.message!! else "${info.action!!} - ${info.estimatedSize}",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 24.sp
+                        fontSize = 24.sp,
                     )
                 }
                 item {

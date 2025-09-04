@@ -17,9 +17,7 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.ScrollView
@@ -28,9 +26,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,18 +37,17 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -64,8 +60,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -76,71 +72,23 @@ import java.io.File
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import com.example.compose.AppTheme
-import kim.tkland.musicbeewifisync.MainActivity.RadioOption
 
 class SettingsActivity : WifiSyncBaseActivity() {
     private var initialSetup = false
-    private var locateServerButton: Button? = null
-    private var settingsLocateServerNoConfig: TextView? = null
-    private var settingsStorageOptions: RadioGroup? = null
-    private var settingsStorageSdCard1: RadioButton? = null
-    private var settingsDebugMode: CheckBox? = null
-    private var settingsDeviceNamePrompt: TextView? = null
-    private var settingsDeviceName: EditText? = null
+
     private val PERMISSION_READ_EXTERNAL_STORAGE = 1000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         initialSetup = WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()
-        //setContentView(R.layout.activity_settings)
-        /*
-        locateServerButton = findViewById(R.id.locateServerButton)
-        settingsLocateServerNoConfig = findViewById(R.id.settingsLocateServerNoConfig)
-        val settingsStoragePrompt = findViewById<TextView>(R.id.settingsStoragePrompt)
-        settingsStorageOptions = findViewById(R.id.settingsStorageOptions)
-        settingsStorageOptions?.let { it.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { _, _ -> showGrantAccessButton() }) }
-        val settingsStorageInternal = findViewById<RadioButton>(R.id.settingsStorageInternal)
-        settingsStorageSdCard1 = findViewById(R.id.settingsStorageSdCard1)
-        settingsDebugMode = findViewById(R.id.settingsDebugMode)
-         */
-        //settingsDebugMode?.setChecked(WifiSyncServiceSettings.debugMode)
-        //settingsDebugMode?.let {
-        //    it.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, _ ->
-        //        WifiSyncServiceSettings.debugMode = settingsDebugMode?.isChecked!!
-        //    })
-        //}
-        //settingsDeviceNamePrompt = findViewById(R.id.settingsDeviceNamePrompt)
-        //settingsDeviceName = findViewById(R.id.settingsDeviceName)
-        // val externalSdCardCount = 2
-        // val sdCard1: RadioButton? = settingsStorageSdCard1
-        //if (externalSdCardCount == 0) {
-        //settingsStorageInternal.isChecked = true
-        //sdCard1?.setChecked(false)
-        //} else {
-        //if (externalSdCardCount == 1) {
-        //if (WifiSyncServiceSettings.deviceStorageIndex == 2) {
-        //sdCard1?.setChecked(true)
-        //} else {
-        //settingsStorageInternal.isChecked = true
-        //}
-        //} else {
-        //settingsStorageInternal.isChecked = false
-        //WifiSyncServiceSettings.deviceStorageIndex = 1
-        //sdCard1?.setText(R.string.settingsStorageSdCard1)
-        //}
-        //}
-        //val debugMode: CheckBox? = settingsDebugMode
-        //val serverButton: Button? = locateServerButton
+
         WifiSyncServiceSettings.deviceStorageIndex == 2
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = true
             setContent {
-                AppTheme {
-                    FirstSettingView()
-                }
+                FirstSettingView()
             }
-            //debugMode?.let { it.visibility = View.GONE }
 
             // ここでパミッションチェックか？2024/7/20 8:20
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -184,29 +132,8 @@ class SettingsActivity : WifiSyncBaseActivity() {
             }
         } else {
             setContent {
-                AppTheme {
-                    OptionSettingView()
-                }
+                OptionSettingView()
             }
-            //val actionBar = supportActionBar
-            //if (actionBar != null) {
-            //    actionBar.setDisplayHomeAsUpEnabled(true)
-            //    actionBar.setTitle(R.string.title_activity_settings2)
-            //}
-            /*
-            findViewById<View>(R.id.settingsInfo0).visibility = View.GONE
-            findViewById<View>(R.id.settingsInfo1).visibility = View.GONE
-            findViewById<View>(R.id.settingsInfo2).visibility = View.GONE
-            serverButton?.let { it.visibility = View.GONE }
-            debugMode?.let { it.visibility = View.VISIBLE }
-            settingsStoragePrompt.setText(R.string.settingsStorageSettingsPrompt)
-            if (!Build.MODEL.equals(WifiSyncServiceSettings.deviceName, ignoreCase = true)) {
-                showNoConfigMatchedSettings()
-            }
-        }
-        setActivityRoot(this)
-             */
-            //setSupportActionBar(findViewById(R.id.my_toolbar))
         }
     }
 
@@ -215,12 +142,6 @@ class SettingsActivity : WifiSyncBaseActivity() {
     fun FirstSettingView() {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
-        var expanded by remember { mutableStateOf(false) }
-
-        var isSyncFromMusicBeeChecked by remember { mutableStateOf(WifiSyncServiceSettings.syncFromMusicBee) }
-        var isSyncToPlaycountsChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayCounts) }
-        var isSyncToRatingChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncRatings) }
-        var isSyncToPlaylistsChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlaylists) }
 
         var initialStorage by remember { mutableIntStateOf(value = 1) }
 
@@ -230,8 +151,8 @@ class SettingsActivity : WifiSyncBaseActivity() {
             topBar = {
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
+                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                        titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
                     ),
                     title = {
                         Text(
@@ -248,14 +169,22 @@ class SettingsActivity : WifiSyncBaseActivity() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Button(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f)
+                            .border(
+                                width = 2.dp, // 枠線の幅
+                                color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                            ),
+                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                        ),
                         onClick = {
                             WifiSyncServiceSettings.defaultIpAddressValue =
                                 WifiSyncService.getMusicBeeServerAddress(applicationContext, null)
                                     .toString()
                             WifiSyncServiceSettings.deviceStorageIndex = initialStorage
                             WifiSyncServiceSettings.saveSettings(applicationContext)
-                            // WifiSyncServiceSettings.saveSettings(mainWindow)
                             val intent = Intent(mainWindow, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -317,12 +246,6 @@ class SettingsActivity : WifiSyncBaseActivity() {
     fun OptionSettingView() {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
-        var expanded by remember { mutableStateOf(false) }
-
-        var isSyncFromMusicBeeChecked by remember { mutableStateOf(WifiSyncServiceSettings.syncFromMusicBee) }
-        var isSyncToPlaycountsChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayCounts) }
-        var isSyncToRatingChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncRatings) }
-        var isSyncToPlaylistsChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlaylists) }
 
         var initialStorage by remember { mutableIntStateOf(value = WifiSyncServiceSettings.deviceStorageIndex) }
 
@@ -332,8 +255,8 @@ class SettingsActivity : WifiSyncBaseActivity() {
             topBar = {
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
+                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                        titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
                     ),
                     title = {
                         Text(
@@ -408,6 +331,10 @@ class SettingsActivity : WifiSyncBaseActivity() {
             ) {
                 Checkbox(
                     checked = checked,
+                    colors = CheckboxDefaults.colors(
+                        checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                        checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                    ),
                     onCheckedChange = onCheckedChange
                 )
                 Text(text, fontSize = 20.sp)
@@ -453,6 +380,10 @@ class SettingsActivity : WifiSyncBaseActivity() {
                     ) {
                     RadioButton(
                         selected = (option.index == selectedOption),
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = Color(getColor(R.color.colorButtonTextEnabled)), // 選択時の色
+                            unselectedColor = Color(getColor(R.color.colorButtonBackground)) // 非選択時の色
+                        ),
                         onClick = {
                             onOptionSelected(option.index)
                             WifiSyncServiceSettings.deviceStorageIndex = option.index
@@ -538,10 +469,10 @@ class SettingsActivity : WifiSyncBaseActivity() {
     }
 
     override fun onDestroy() {
-        /*
+
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = false
-        } else {
+        } /*else {
             WifiSyncServiceSettings.deviceStorageIndex =
                 if (settingsStorageSdCard1!!.isChecked) 2 else 1
             WifiSyncServiceSettings.saveSettings(applicationContext)
@@ -551,50 +482,27 @@ class SettingsActivity : WifiSyncBaseActivity() {
         super.onDestroy()
     }
 
-    //override fun onSupportNavigateUp(): Boolean {
-    //    finish()
-    //    return true
-    //}
-
-    @Suppress("REDUNDANT_MODIFIER_IN_GETTER")
-    private val checkedStorageTypeButton: Int
-        private get() {
-            when (settingsStorageOptions!!.checkedRadioButtonId) {
-                R.id.settingsStorageSdCard1 -> return 2
-            }
-            return 1
-        }
-
-    private fun showGrantAccessButton() {
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 
     fun onLocateServerButton_Click() {
-        //settingsLocateServerNoConfig!!.visibility = View.GONE
-        //WifiSyncServiceSettings.deviceStorageIndex =
-        //    if (settingsStorageSdCard1!!.isChecked) 2 else 1
         WifiSyncServiceSettings.saveSettings(applicationContext)
-        // WifiSyncServiceSettings.saveSettings(mainWindow)
-        // settingsWaitIndicator!!.visibility = View.VISIBLE
         val locateServerThread = Thread(Runnable {
             val serverIPAddress = WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
             runOnUiThread {
                 if (mainWindow != null) {
-                    // settingsWaitIndicator!!.visibility = View.INVISIBLE
-                    //locateServerButton!!.isEnabled = true
-                    //locateServerButton!!.setTextColor(buttonTextEnabledColor)
                     if (serverIPAddress == null) {
                         val errorDialog = AlertDialog.Builder(mainWindow!!)
                         errorDialog.setMessage(getText(R.string.errorServerNotFound))
                         errorDialog.setPositiveButton(android.R.string.ok, null)
                         errorDialog.show()
                     } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
-                        //settingsLocateServerNoConfig!!.visibility = View.VISIBLE
                         showNoConfigMatchedSettings()
-                        //settingsDeviceNamePrompt!!.visibility = View.GONE
                     } else {
                         WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
                         WifiSyncServiceSettings.saveSettings(applicationContext)
-                        // WifiSyncServiceSettings.saveSettings(mainWindow)
                         val intent = Intent(mainWindow, MainActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -607,47 +515,9 @@ class SettingsActivity : WifiSyncBaseActivity() {
     }
 
     private fun showNoConfigMatchedSettings() {
-        settingsDeviceNamePrompt!!.visibility = View.VISIBLE
-        settingsDeviceName!!.setText(WifiSyncServiceSettings.deviceName)
-        settingsDeviceName!!.visibility = View.VISIBLE
-        settingsDeviceName!!.setOnEditorActionListener { _, _, _ ->
-            WifiSyncServiceSettings.deviceName = settingsDeviceName!!.text.toString()
+            //WifiSyncServiceSettings.deviceName = settingsDeviceName!!.text.toString()
             WifiSyncServiceSettings.saveSettings(applicationContext)
-            // WifiSyncServiceSettings.saveSettings(mainWindow)
             false
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_settings, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        return true
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val intent: Intent
-        when (item.itemId) {
-            R.id.wifiSyncLogMenuItem -> {
-                intent = Intent(this, ViewErrorLogActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    fun setActivityRoot(c: Activity) {
-        var v: View = (c.findViewById<ViewGroup>(android.R.id.content)!!).getChildAt(0)
-
-        var sv = ScrollView(c)
-        var lp = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-        sv.setLayoutParams(lp)
-
-        (v.parent as ViewGroup).removeAllViews()
-
-        sv.addView(v)
-        c.addContentView(sv, lp)
-    }
-}
