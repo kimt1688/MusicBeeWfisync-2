@@ -251,7 +251,6 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         onClick = {
                             try {
                                 WifiSyncServiceSettings.syncCustomFiles = false
-                                //syncPreview = false
                                 WifiSyncService.startSynchronisation(applicationContext, 0, false, false)
                             }catch (ex:Exception){
                                 Log.d("onSyncStartButtonClick", ex.message!!)
@@ -287,7 +286,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         if (errorMessageId != R.string.errorServerNotFound) {
             confirmButtonComposable = {
                 Button(onClick = {
-                    // はいボタンがクリックされたときの処理
+                                                                                                                                                                                                                                                                                                                                    // はいボタンがクリックされたときの処理
                     showDialogState.value = false
                 }) {
                     Text(getString(android.R.string.ok))
@@ -320,8 +319,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             icon = { // Use the dedicated 'icon' parameter
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_dialog_alert),
-                    contentDescription = "Error Icon" // Provide a content description
-                )
+                    contentDescription = "Error Icon")  /* Provide a content description)*/
             },
             title = { getString(R.string.syncErrorHeader) },
             text = { getString(errorMessageId) },

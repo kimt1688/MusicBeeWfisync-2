@@ -73,7 +73,7 @@ import androidx.core.content.edit
 import androidx.core.net.toUri
 import com.example.compose.AppTheme
 
-class SettingsActivity : WifiSyncBaseActivity() {
+class SettingsActivity : WifiSyncBaseActivity("") {
     private var initialSetup = false
     private val PERMISSION_READ_EXTERNAL_STORAGE = 1000
 

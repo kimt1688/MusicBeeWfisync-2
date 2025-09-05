@@ -23,7 +23,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import java.io.File
 
-abstract class WifiSyncBaseActivity : AppCompatActivity() {
+abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppCompatActivity() {
     protected var mainWindow: WifiSyncBaseActivity? = this
     protected var buttonTextEnabledColor = 0
     protected var buttonTextDisabledColor = 0

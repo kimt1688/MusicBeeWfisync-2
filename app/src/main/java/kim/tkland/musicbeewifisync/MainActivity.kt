@@ -59,7 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.RadioButtonDefaults
 
-class MainActivity() : WifiSyncBaseActivity() {
+class MainActivity() : WifiSyncBaseActivity("") {
     private var serverStatusThread: Thread? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,6 +187,7 @@ class MainActivity() : WifiSyncBaseActivity() {
                                         applicationContext,
                                         PlaylistSyncActivity::class.java
                                     )
+                                    intent.putExtra("playlistSync", true)
                                     expanded = false
                                     startActivity(intent)
                                 }
