@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.*
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -417,7 +416,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         enabled = isSyncButtonEnabled.value,
                         onClick = {
                             try {
-                                // WifiSyncServiceSettings.syncCustomFiles = false
+                                WifiSyncServiceSettings.syncCustomFiles = true
                                 //syncPreview = false
                                 WifiSyncService.startSynchronisation(applicationContext, 1, false, false)
                             }catch (ex:Exception){

@@ -269,8 +269,8 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 modifier = Modifier
                     .padding(top = 120.dp, start = 15.dp, end = 15.dp)
                     .fillMaxWidth(),
-                    color = Color(getColor(R.color.colorButtonBackground)),
-                    trackColor = Color(getColor(R.color.colorButtonTextEnabled))
+                    color = Color(getColor(R.color.colorButtonTextEnabled)),
+                    trackColor = Color(getColor(R.color.colorButtonBackground))
             )
             Text(
                 modifier = Modifier
@@ -319,8 +319,8 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                     modifier = Modifier
                         .padding(top = 120.dp, start = 15.dp, end = 15.dp)
                         .fillMaxWidth(),
-                    color = Color(getColor(R.color.colorButtonBackground)),
-                    trackColor = Color(getColor(R.color.colorButtonTextEnabled))
+                    color = Color(getColor(R.color.colorButtonTextEnabled)),
+                    trackColor = Color(getColor(R.color.colorButtonBackground))
                 )
                 Text(
                     modifier = Modifier

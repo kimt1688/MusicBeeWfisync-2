@@ -1,9 +1,7 @@
 package kim.tkland.musicbeewifisync
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.border
@@ -21,6 +19,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -37,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -45,12 +45,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.net.SocketTimeoutException
-import kotlin.Boolean
 
 class PlaylistSyncActivity : WifiSyncBaseActivity {
     constructor() : super("") {
@@ -76,6 +77,29 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
         }
     }
 
+    @Composable
+    fun ShowErrorDialog(showDialog: Boolean, onDismiss: () -> Unit) {
+        if (showDialog) {
+           AlertDialog(
+                onDismissRequest = {false }, // ダイアログの外側をクリックしたときの処理
+                icon = { // Use the dedicated 'icon' parameter
+                    Icon(
+                        painter = painterResource(id = android.R.drawable.ic_dialog_alert),
+                        contentDescription = "Error Icon"
+                    )  /* Provide a content description)*/
+                },
+                title = { getString(R.string.syncErrorHeader) },
+                text = { getString(R.string.errorNoPlaylistsSelected) },
+                confirmButton = {
+                    Button(onClick = onDismiss) { /* Handle confirm action */
+                        Text(getString(android.R.string.ok)) // Or use a string resource
+                    }
+                },
+               dismissButton = null
+            )
+        }
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CustomView() {
@@ -85,8 +109,11 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
 
         var isSyncPlaylistsDeleteFiles by remember { mutableStateOf(WifiSyncServiceSettings.syncDeleteUnselectedFiles) }
         var checkCount by remember { mutableStateOf(getString(R.string.syncPlaylists0)) }
-        var isListChecked = remember { mutableStateListOf<Boolean>(false) }
-        var listFilename = remember { mutableStateListOf<String>("") }
+        val isListChecked = remember { mutableStateListOf<Boolean>(false) }
+        val listFilename = remember { mutableStateListOf<String>("") }
+        val isOpenDialog = remember { mutableStateOf(false) }
+
+        val context = LocalContext.current
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -220,26 +247,38 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
                         ),
                         onClick = {
-                            try {
-                                WifiSyncServiceSettings.syncCustomFiles = true
-
-                                if (setSyncParameters(isListChecked, isSyncPlaylistsDeleteFiles)) {
-                                    WifiSyncService.startSynchronisation(
-                                        applicationContext,
-                                        0,
-                                        true,
-                                        false
-                                    )
-                                }
-                            } catch (ex: Exception) {
-                                Log.d("onPreviewButtonClick", ex.message!!)
-                            } finally {
-                                // syncStartButton!!.isEnabled = true
+                            isOpenDialog.value = !setSyncParameters(isListChecked, isSyncPlaylistsDeleteFiles)
+                            if (!isOpenDialog.value) {
+                                WifiSyncService.startSynchronisation(
+                                    context,
+                                    0,
+                                    true,
+                                    false
+                                )
                             }
-                        }) {
+                        }
+                    ) {
                         Modifier.weight(1f)
-
                         Text(getString(R.string.syncPreview), fontSize = 24.sp)
+                    }
+                    if (isOpenDialog.value) {
+                        AlertDialog(
+                            onDismissRequest = { isOpenDialog.value = false }, // ダイアログの外側をクリックしたときの処理
+                            icon = { // Use the dedicated 'icon' parameter
+                                Icon(
+                                    painter = painterResource(id = android.R.drawable.ic_dialog_alert),
+                                    contentDescription = "Error Icon"
+                                )  /* Provide a content description)*/
+                            },
+                            title = { Text(getString(R.string.syncErrorHeader)) },
+                            text = { Text(getString(R.string.errorNoPlaylistsSelected)) },
+                            confirmButton = {
+                                Button(onClick = {isOpenDialog.value = false}) { /* Handle confirm action */
+                                    Text(getString(android.R.string.ok)) // Or use a string resource
+                                }
+                            },
+                            dismissButton = null
+                        )
                     }
                     Button(
                         modifier = Modifier
@@ -255,22 +294,19 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
                         ),
                         onClick = {
-                            try {
+                            isOpenDialog.value = !setSyncParameters(isListChecked, isSyncPlaylistsDeleteFiles)
+                            if (!isOpenDialog.value) {
                                 WifiSyncServiceSettings.syncCustomFiles = true
 
-                                if (setSyncParameters(isListChecked, isSyncPlaylistsDeleteFiles)) {
-                                    WifiSyncService.startSynchronisation(
-                                        applicationContext,
+                                WifiSyncService.startSynchronisation(
+                                        context,
                                         0,
                                         false,
                                         false
                                     )
-                                }
-                            } catch (ex: Exception) {
-                                Log.d("onSyncStartButtonClick", ex.message!!)
-                            } finally {
                             }
-                        }) {
+                        }
+                    ) {
                         Modifier.weight(1f)
 
                         Icon(
@@ -278,6 +314,25 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                             contentDescription = "Sync",
                         )
                         Text(getString(R.string.syncNow), fontSize = 24.sp)
+                    }
+                    if (isOpenDialog.value) {
+                        AlertDialog(
+                            onDismissRequest = { isOpenDialog.value = false }, // ダイアログの外側をクリックしたときの処理
+                            icon = { // Use the dedicated 'icon' parameter
+                                Icon(
+                                    painter = painterResource(id = android.R.drawable.ic_dialog_alert),
+                                    contentDescription = "Error Icon"
+                                )  /* Provide a content description)*/
+                            },
+                            title = { Text(getString(R.string.syncErrorHeader)) },
+                            text = { Text(getString(R.string.errorNoPlaylistsSelected)) },
+                            confirmButton = {
+                                Button(onClick = {isOpenDialog.value = false}) { /* Handle confirm action */
+                                    Text(getString(android.R.string.ok)) // Or use a string resource
+                                }
+                            },
+                            dismissButton = null
+                        )
                     }
                 }
             }
@@ -424,17 +479,11 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                 }
             }
         }
-        return if (WifiSyncServiceSettings.syncCustomPlaylistNames.size > 0) {
+        if (WifiSyncServiceSettings.syncCustomPlaylistNames.isNotEmpty()) {
             WifiSyncServiceSettings.saveSettings(applicationContext)
-            true
+            return true
         } else {
-            val builder = AlertDialog.Builder(applicationContext)
-            builder.setTitle(getString(R.string.syncErrorHeader))
-            builder.setMessage(getString(R.string.errorNoPlaylistsSelected))
-            builder.setIcon(android.R.drawable.ic_dialog_alert)
-            builder.setPositiveButton(android.R.string.ok, null)
-            builder.show()
-            false
+            return false
         }
     }
 
