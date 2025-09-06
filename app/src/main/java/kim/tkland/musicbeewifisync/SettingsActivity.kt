@@ -1,7 +1,6 @@
 package kim.tkland.musicbeewifisync
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,18 +9,6 @@ import android.os.Bundle
 import android.provider.DocumentsContract
 import android.provider.Settings.ACTION_REQUEST_MANAGE_MEDIA
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.RadioButton
-import android.widget.RadioGroup
-import android.widget.ScrollView
-import android.widget.TextView
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -67,11 +54,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
-import androidx.core.view.MenuCompat
 import java.io.File
 import androidx.core.content.edit
 import androidx.core.net.toUri
-import com.example.compose.AppTheme
 
 class SettingsActivity : WifiSyncBaseActivity("") {
     private var initialSetup = false
@@ -182,7 +167,8 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             WifiSyncServiceSettings.deviceStorageIndex = initialStorage
                             WifiSyncServiceSettings.saveSettings(applicationContext)
                             val locateServerThread = Thread(Runnable {
-                                val serverIPAddress = WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
+                                val serverIPAddress =
+                                    WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
                                 runOnUiThread {
                                     if (mainWindow != null) {
                                         if (serverIPAddress == null) {
@@ -193,9 +179,11 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                                         } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
                                             showNoConfigMatchedSettings()
                                         } else {
-                                            WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
+                                            WifiSyncServiceSettings.defaultIpAddressValue =
+                                                serverIPAddress
                                             WifiSyncServiceSettings.saveSettings(mainWindow)
-                                            val intent = Intent(mainWindow, MainActivity::class.java)
+                                            val intent =
+                                                Intent(mainWindow, MainActivity::class.java)
                                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                                             startActivity(intent)
@@ -203,7 +191,8 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                                     }
                                 }
                             })
-                            locateServerThread.start()                        }) {
+                            locateServerThread.start()
+                        }) {
                         Text(getString(R.string.settingsLocate), fontSize = 24.sp)
                     }
                 }
@@ -327,7 +316,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     }
 
     @Composable
-    private fun CheckableRow(text: String, checked: Boolean, onCheckedChange: (Boolean)->Unit) {
+    private fun CheckableRow(text: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
         MaterialTheme {
             var checked by remember { mutableStateOf(checked) }
             Row(
@@ -407,6 +396,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             }
         }
     }
+
     // アクティビティの結果に対するコールバックの登録
     private val launcher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -440,7 +430,8 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             for (uriPermission in contentResolver.persistedUriPermissions) {
                 applicationContext.contentResolver.releasePersistableUriPermission(
                     /* uri = */       uriPermission.uri,
-                    /* modeFlags = */ Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    /* modeFlags = */
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
             }
         } catch (e: Throwable) {
@@ -485,13 +476,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
         if (initialSetup) {
             WifiSyncServiceSettings.debugMode = false
-        } /*else {
-            WifiSyncServiceSettings.deviceStorageIndex =
-                if (settingsStorageSdCard1!!.isChecked) 2 else 1
-            WifiSyncServiceSettings.saveSettings(applicationContext)
-            // WifiSyncServiceSettings.saveSettings(this)
         }
-         */
         super.onDestroy()
     }
 
@@ -500,6 +485,13 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         return true
     }
 
+    private fun showNoConfigMatchedSettings() {
+        //WifiSyncServiceSettings.deviceName = settingsDeviceName!!.text.toString()
+        WifiSyncServiceSettings.saveSettings(applicationContext)
+        false
+    }
+}
+    /*
     fun onLocateServerButton_Click() {
         WifiSyncServiceSettings.saveSettings(applicationContext)
         val locateServerThread = Thread(Runnable {
@@ -526,11 +518,4 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         })
         locateServerThread.start()
     }
-
-    private fun showNoConfigMatchedSettings() {
-            //WifiSyncServiceSettings.deviceName = settingsDeviceName!!.text.toString()
-            WifiSyncServiceSettings.saveSettings(applicationContext)
-            false
-        }
-    }
-
+*/

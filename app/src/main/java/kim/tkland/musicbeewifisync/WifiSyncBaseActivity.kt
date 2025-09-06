@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.DialogInterface
-import android.content.Intent
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -12,14 +11,11 @@ import android.os.Bundle
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.util.Log
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import java.io.File
 
@@ -30,17 +26,6 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
     protected var progressDialog: WifiSyncAlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //enableEdgeToEdge()
-
-        //val resources = resources
-        //val transparent = ResourcesCompat.getColor(resources, android.R.color.transparent, theme)
-        //val isDarkMode = isDarkMode(resources)
-        //window.statusBarColor = transparent
-        //window.navigationBarColor = transparent
-        //val controller = WindowInsetsControllerCompat(window, window.decorView)
-        //controller.isAppearanceLightStatusBars = !isDarkMode
-        //controller.isAppearanceLightNavigationBars = !isDarkMode
-
         super.onCreate(savedInstanceState)
         buttonTextEnabledColor = resources.getColor(R.color.colorButtonTextEnabled, null)
         buttonTextDisabledColor = resources.getColor(R.color.colorButtonTextDisabled, null)
@@ -52,13 +37,6 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-
-            //v.updateLayoutParams() {
-            //    v.top = (insets.top).toInt()
-            //v.left = (insets.left).toInt()
-            //    v.bottom = (insets.bottom).toInt()
-            //v.right = (insets.right).toInt()
-            //}
 
             v.updatePadding(
                 //    left = bars.left,
@@ -76,7 +54,6 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
     }
 
     fun onFullScanMenuItemClick() {
-    //fun onFullScanMenuItemClick(item: MenuItem) {
         AlertDialog.Builder(this)
             .setTitle(R.string.progressDialogTitle)
             .setMessage(R.string.alertDialogMessage)

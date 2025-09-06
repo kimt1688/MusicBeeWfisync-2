@@ -68,7 +68,6 @@ class MainActivity() : WifiSyncBaseActivity("") {
         ComposeView(applicationContext).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
-        //setContentView(R.layout.activity_settings)
         ErrorHandler.initialise(this)
         // needed so android "Recent Views" actually shows the icon - only seems to be an issue with P
         @Suppress("DEPRECATION") setTaskDescription(
@@ -124,7 +123,6 @@ class MainActivity() : WifiSyncBaseActivity("") {
             WifiSyncServiceSettings.PLAYER_GONEMAD -> initialReverseSyncPlayer = 1
             0 -> initialReverseSyncPlayer = 2
         }
-        // var reverseSyncPrayerSelected by remember { mutableIntStateOf(value = initialReverseSyncPlayer) }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -278,11 +276,6 @@ class MainActivity() : WifiSyncBaseActivity("") {
                         }) {
                         Modifier.weight(1f)
 
-                        //Icon(
-                        //imageVector = Icons.Filled.Sync,
-                        //contentDescription = "Sync",
-                        //)
-                        //Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                         Text(getString(R.string.syncPreview), fontSize = 24.sp)
                     }
                     Button(
@@ -389,93 +382,87 @@ class MainActivity() : WifiSyncBaseActivity("") {
                         text = applicationContext.getString(R.string.syncToPrompt), fontSize = 16.sp
                     )
                 }
-                Row() {
-                    Row(
-                        modifier = Modifier
-                            .toggleable(
-                                value = isSyncToPlaycountsChecked,
-                                enabled = isSyncToPlaycountsEnabled,
-                                role = Role.Checkbox,
-                                onValueChange = {
-                                    isSyncToPlaycountsChecked = !isSyncToPlaycountsChecked
-                                }
-                            )
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
-                    ) {
-                        Checkbox(
-                            checked = isSyncToPlaycountsChecked,
+                Row(
+                    modifier = Modifier
+                        .toggleable(
+                            value = isSyncToPlaycountsChecked,
                             enabled = isSyncToPlaycountsEnabled,
-                            colors = CheckboxDefaults.colors(
-                                checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
-                                checkedColor = Color(getColor(R.color.colorButtonBackground)),
-                            ),
-                            onCheckedChange = {
-                                isSyncToPlaycountsChecked = it
+                            role = Role.Checkbox,
+                            onValueChange = {
+                                isSyncToPlaycountsChecked = !isSyncToPlaycountsChecked
                             }
                         )
-                        Text(getString(R.string.syncToPlaycounts), fontSize = 20.sp)
-                    }
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                ) {
+                    Checkbox(
+                        checked = isSyncToPlaycountsChecked,
+                        enabled = isSyncToPlaycountsEnabled,
+                        colors = CheckboxDefaults.colors(
+                            checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                        ),
+                        onCheckedChange = {
+                            isSyncToPlaycountsChecked = it
+                        }
+                    )
+                    Text(getString(R.string.syncToPlaycounts), fontSize = 20.sp)
                 }
-                Row() {
-                    Row(
-                        modifier = Modifier
-                            .toggleable(
-                                value = isSyncToRatingChecked,
-                                enabled = isSyncToRatingEnabled,
-                                role = Role.Checkbox,
-                                onValueChange = { isSyncToRatingChecked = !isSyncToRatingChecked }
-                            )
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
-                    ) {
-                        Checkbox(
-                            checked = isSyncToRatingChecked,
+                Row(
+                    modifier = Modifier
+                        .toggleable(
+                            value = isSyncToRatingChecked,
                             enabled = isSyncToRatingEnabled,
-                            colors = CheckboxDefaults.colors(
-                                checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
-                                checkedColor = Color(getColor(R.color.colorButtonBackground)),
-                            ),
-                            onCheckedChange = {
-                                isSyncToRatingChecked = it
-                            }
+                            role = Role.Checkbox,
+                            onValueChange = { isSyncToRatingChecked = !isSyncToRatingChecked }
                         )
-                        Text(getString(R.string.syncToRatings), fontSize = 20.sp)
-                    }
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                ) {
+                    Checkbox(
+                        checked = isSyncToRatingChecked,
+                        enabled = isSyncToRatingEnabled,
+                        colors = CheckboxDefaults.colors(
+                            checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                        ),
+                        onCheckedChange = {
+                            isSyncToRatingChecked = it
+                        }
+                    )
+                    Text(getString(R.string.syncToRatings), fontSize = 20.sp)
                 }
-                Row() {
-                    Row(
-                        modifier = Modifier
-                            .toggleable(
-                                value = isSyncToPlaylistsChecked,
-                                enabled = isSyncToPlaylistsEnabled,
-                                role = Role.Checkbox,
-                                onValueChange = {
-                                    isSyncToPlaylistsChecked = !isSyncToPlaylistsChecked
-                                }
-                            )
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
-                    ) {
-                        Checkbox(
-                            checked = isSyncToPlaylistsChecked,
+                Row(
+                    modifier = Modifier
+                        .toggleable(
+                            value = isSyncToPlaylistsChecked,
                             enabled = isSyncToPlaylistsEnabled,
-                            colors = CheckboxDefaults.colors(
-                                checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
-                                checkedColor = Color(getColor(R.color.colorButtonBackground)),
-                            ),
-                            onCheckedChange = {
-                                isSyncToPlaylistsChecked = it
+                            role = Role.Checkbox,
+                            onValueChange = {
+                                isSyncToPlaylistsChecked = !isSyncToPlaylistsChecked
                             }
                         )
-                        Text(getString(R.string.syncToPlaylists), fontSize = 20.sp)
-                    }
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                ) {
+                    Checkbox(
+                        checked = isSyncToPlaylistsChecked,
+                        enabled = isSyncToPlaylistsEnabled,
+                        colors = CheckboxDefaults.colors(
+                            checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                        ),
+                        onCheckedChange = {
+                            isSyncToPlaylistsChecked = it
+                        }
+                    )
+                    Text(getString(R.string.syncToPlaylists), fontSize = 20.sp)
                 }
                 Row() {
                     Text(

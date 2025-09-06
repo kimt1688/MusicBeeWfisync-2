@@ -38,7 +38,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -62,7 +61,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import androidx.compose.material3.ToggleFloatingActionButtonDefaults.containerColor
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -368,16 +366,6 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
         }
          */
     }
-
-    /*
-    private fun stopProgressTimer() {
-        syncProgressBar!!.visibility = View.INVISIBLE
-        syncWaitIndicator!!.visibility = View.INVISIBLE
-        syncProgressMessage!!.visibility = View.GONE
-        timerHandler.removeCallbacks(timerRunnable!!)
-        stopSyncButton!!.text = getString(R.string.syncMore)
-    }
-         */
 
     @Composable
     private fun ShowEndOfSyncInformation(innerPadding: PaddingValues, completeMessage: String, onCompleteTextChange: (String) -> Unit) {
