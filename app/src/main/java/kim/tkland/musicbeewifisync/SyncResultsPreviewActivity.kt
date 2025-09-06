@@ -419,9 +419,9 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         enabled = isSyncButtonEnabled.value,
                         onClick = {
                             try {
-                                WifiSyncServiceSettings.syncCustomFiles = false
+                                // WifiSyncServiceSettings.syncCustomFiles = false
                                 //syncPreview = false
-                                WifiSyncService.startSynchronisation(applicationContext, 0, false, false)
+                                WifiSyncService.startSynchronisation(applicationContext, 1, false, false)
                             }catch (ex:Exception){
                                 Log.d("onSyncStartButtonClick", ex.message!!)
                             } finally {
@@ -523,7 +523,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             contentDescription = "Sync Direction Icon", // Provide a content description
                         )
                         Text(
-                            text = if (info.targetName.isNullOrEmpty()) "" else info.targetName,
+                            text = if (info.targetName == null) "" else info.targetName,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             fontSize = 24.sp
@@ -533,7 +533,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 item {
                     Text(
                         modifier = Modifier.padding(start = 20.dp),
-                        text = if (info.estimatedSize.isNullOrEmpty()) info.message!! else "${info.action!!} - ${info.estimatedSize}",
+                        text = if (info.estimatedSize == null) info.message!! else "${info.action!!} - ${info.estimatedSize}",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 24.sp,

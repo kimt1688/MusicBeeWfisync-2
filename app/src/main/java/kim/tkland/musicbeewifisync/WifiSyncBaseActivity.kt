@@ -75,47 +75,6 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
         super.onDestroy()
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val intent: Intent
-        when (item.itemId) {
-            R.id.fullSyncMenuItem -> {
-                if (!item.isChecked) {
-                    intent = Intent(this, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                }
-                return true
-            }
-
-            R.id.playlistSyncMenuItem -> {
-                if (!item.isChecked) {
-                    intent = Intent(this, PlaylistSyncActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                }
-                return true
-            }
-
-            R.id.wifiSyncSettingsMenuItem -> {
-                intent = Intent(this, SettingsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-                return true
-            }
-
-            R.id.wifiSyncLogMenuItem -> {
-                intent = Intent(this, ViewErrorLogActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     fun onFullScanMenuItemClick() {
     //fun onFullScanMenuItemClick(item: MenuItem) {
         AlertDialog.Builder(this)

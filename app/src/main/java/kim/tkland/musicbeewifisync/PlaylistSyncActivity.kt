@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.net.SocketTimeoutException
+import kotlin.Boolean
 
 class PlaylistSyncActivity : WifiSyncBaseActivity {
     constructor() : super("") {
@@ -94,12 +95,16 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
         var isSyncPlaylistsDeleteFiles by remember { mutableStateOf(WifiSyncServiceSettings.syncDeleteUnselectedFiles) }
         var checkCount by remember { mutableStateOf(getString(R.string.syncPlaylists0)) }
         var isListChecked = remember { mutableStateListOf<Boolean>(false) }
+        var listFilename = remember { mutableStateListOf<String>("") }
 
         if (selectedPlaylists == null) {
-            isListChecked = remember { mutableStateListOf(false) }
+            isListChecked.clear()
+            listFilename.clear()
             loadPlaylists(
                 isListChecked,
                 onIsListCheckChange = { isChecked: Boolean -> isListChecked.add(isChecked) },
+                listFilename,
+                onListFilenameChange = { newFilename: String ->listFilename.add(newFilename)},
                 "", // Pass the current value of checkCount
                 onCheckCountChange = { newCheckCountValue -> // This lambda receives the new String
                     checkCount = newCheckCountValue // Update the checkCount state
@@ -107,7 +112,10 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
             )
             //loadPlaylists(isListChecked, onIsListCheckChange = {isChecked -> isListChecked.add(isChecked)}, checkCount, onCheckCountChange = {checkCount})
         } else {
-            showPlaylists("", onCheckCountChange = { newCheckCountValue ->
+            isListChecked.clear()
+            listFilename.clear()
+            showPlaylists(isListChecked, onIsListCheckChange = {isChecked -> isListChecked.add(isChecked)}, listFilename = listFilename, onListFilenameChange = {filename: String -> listFilename.add(filename)},
+                checkCount = "", onCheckCountChange = { newCheckCountValue ->
                 checkCount = newCheckCountValue // Also update here if showPlaylists modifies it
             })
         }
@@ -245,18 +253,16 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                         ),
                         onClick = {
                             try {
-                                //syncStartButton!!.isEnabled = false
-                                WifiSyncServiceSettings.syncCustomFiles = false
-                                // 画面情報を保存する
-                                //WifiSyncServiceSettings.reverseSyncPlayer = reverseSyncPrayerSelected
+                                WifiSyncServiceSettings.syncCustomFiles = true
 
-                                //syncPreview = false
-                                WifiSyncService.startSynchronisation(
-                                    applicationContext,
-                                    0,
-                                    true,
-                                    false
-                                )
+                                if (setSyncParameters(isListChecked, isSyncPlaylistsDeleteFiles)) {
+                                    WifiSyncService.startSynchronisation(
+                                        applicationContext,
+                                        0,
+                                        true,
+                                        false
+                                    )
+                                }
                             } catch (ex: Exception) {
                                 Log.d("onPreviewButtonClick", ex.message!!)
                             } finally {
@@ -287,14 +293,16 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                         ),
                         onClick = {
                             try {
-                                WifiSyncServiceSettings.syncCustomFiles = false
+                                WifiSyncServiceSettings.syncCustomFiles = true
 
-                                WifiSyncService.startSynchronisation(
-                                    applicationContext,
-                                    0,
-                                    false,
-                                    false
-                                )
+                                if (setSyncParameters(isListChecked, isSyncPlaylistsDeleteFiles)) {
+                                    WifiSyncService.startSynchronisation(
+                                        applicationContext,
+                                        0,
+                                        false,
+                                        false
+                                    )
+                                }
                             } catch (ex: Exception) {
                                 Log.d("onSyncStartButtonClick", ex.message!!)
                             } finally {
@@ -326,7 +334,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                             enabled = true,
                             role = Role.Checkbox,
                             onValueChange = {
-                                isSyncPlaylistsDeleteFiles = !isSyncPlaylistsDeleteFiles
+                                isSyncPlaylistsDeleteFiles = it
                                 WifiSyncServiceSettings.syncDeleteUnselectedFiles = it
                             }
                         )
@@ -354,17 +362,28 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                     .fillMaxWidth()) {Text( text = checkCount, color = Color.Red, fontSize = 16.sp)}
                 // Playlistのロード
                 if (selectedPlaylists == null) {
-                    isListChecked = remember { mutableStateListOf(false) }
+                    isListChecked.clear()
+                    listFilename.clear()
                     loadPlaylists(isListChecked,
                                 onIsListCheckChange = {isChecked -> isListChecked.add(isChecked)},
+                        listFilename,
+                        onListFilenameChange = { newFilename: String ->listFilename.add(newFilename)},
                                 "",
                                 onCheckCountChange = { newCheckCountValue: String ->
                                     checkCount = newCheckCountValue // Also update here if showPlaylists modifies it
                                 })
                 } else {
-                    showPlaylists("", onCheckCountChange = { newCheckCountValue: String ->
+                    isListChecked.clear()
+                    listFilename.clear()
+                    showPlaylists(isListChecked, onIsListCheckChange = {isChecked -> isListChecked.add(isChecked)}, listFilename, onListFilenameChange = { newFilename: String ->listFilename.add(newFilename)},"", onCheckCountChange = { newCheckCountValue: String ->
                         checkCount = newCheckCountValue // Also update here if showPlaylists modifies it
                     })
+                    showPlaylistsSelectedCount(
+                        checkCount = "",
+                        onCheckCountChange = { newCheckCountValue: String ->
+                            checkCount = newCheckCountValue
+                        }
+                    )
                 }
                 LazyColumn(
                     modifier = Modifier
@@ -385,7 +404,9 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                                                 it1[i].checked = it
                                                 showPlaylistsSelectedCount(
                                                     checkCount = "",
-                                                    onCheckCountChange = {newCheckCountValue: String -> checkCount = newCheckCountValue}
+                                                    onCheckCountChange = { newCheckCountValue: String ->
+                                                        checkCount = newCheckCountValue
+                                                    }
                                                 )
                                             }
                                         )
@@ -403,12 +424,15 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                                         onCheckedChange = {
                                             isListChecked[i] = it
                                             it1[i].checked = it
-                                            showPlaylistsSelectedCount("", { newCheckCountValue: String ->
-                                                checkCount = newCheckCountValue // Also update here if showPlaylists modifies it
-                                            })
+                                            showPlaylistsSelectedCount(
+                                                "",
+                                                { newCheckCountValue: String ->
+                                                    checkCount =
+                                                        newCheckCountValue // Also update here if showPlaylists modifies it
+                                                })
                                         }
                                     )
-                                    Text(it1[i].filename, fontSize = 16.sp)
+                                    Text(listFilename[i], fontSize = 16.sp)
                                 }
                             }
                             item {
@@ -464,10 +488,10 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
             }
         }
         return if (WifiSyncServiceSettings.syncCustomPlaylistNames.size > 0) {
-            WifiSyncServiceSettings.saveSettings(this)
+            WifiSyncServiceSettings.saveSettings(applicationContext)
             true
         } else {
-            val builder = AlertDialog.Builder(mainWindow)
+            val builder = AlertDialog.Builder(applicationContext)
             builder.setTitle(getString(R.string.syncErrorHeader))
             builder.setMessage(getString(R.string.errorNoPlaylistsSelected))
             builder.setIcon(android.R.drawable.ic_dialog_alert)
@@ -477,7 +501,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
         }
     }
 
-    private fun loadPlaylists(isListChecked: MutableList<Boolean>, onIsListCheckChange: (Boolean) -> Unit, checkCount: String, onCheckCountChange: (String) -> Unit) {
+    private fun loadPlaylists(isListChecked: MutableList<Boolean>, onIsListCheckChange: (Boolean) -> Unit, listFilename: MutableList<String>, onListFilenameChange: (String) -> Unit, checkCount: String, onCheckCountChange: (String) -> Unit) {
         playlistLoaderThread = Thread(Runnable {
             try {
                 while (true) {
@@ -496,6 +520,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                                 )
                             )
                             onIsListCheckChange(lookup.containsKey(playlistName))
+                            onListFilenameChange(playlistName)
                         }
                         selectedPlaylists = values
                         runOnUiThread {
@@ -521,11 +546,17 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
         playlistLoaderThread!!.start()
     }
 
-    private fun showPlaylists(checkCount: String, onCheckCountChange: (String) -> Unit) {
+    private fun showPlaylists(isListChecked: MutableList<Boolean>, onIsListCheckChange: (Boolean) -> Unit, listFilename: MutableList<String>, onListFilenameChange: (String) -> Unit, checkCount: String, onCheckCountChange: (String) -> Unit) {
 
         if (mainWindow != null) {
             try {
                 //syncNoPlaylistsMessage!!.visibility = View.GONE
+                if (selectedPlaylists != null) {
+                    for (i in 0 until selectedPlaylists!!.size) {
+                        onIsListCheckChange(selectedPlaylists!![i].checked)
+                        onListFilenameChange(selectedPlaylists!![i].filename)
+                    }
+                }
                 showPlaylistsSelectedCount(
                     checkCount = checkCount,
                     { newCheckCountValue: String ->

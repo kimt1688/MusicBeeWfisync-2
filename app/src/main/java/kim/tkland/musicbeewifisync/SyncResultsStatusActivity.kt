@@ -38,6 +38,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -61,6 +62,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults.containerColor
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -244,12 +246,12 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 rawTargetSyncProgress = WifiSyncService.syncPercentCompleted.get() / 100f
                 onCurrentSyncMessageChange(WifiSyncService.syncProgressMessage.get())
                 showEndOfSyncInfo = false
-                onButtonTextChange("STOP")
+                onButtonTextChange(getString(R.string.syncStop))
             } else {
                 rawTargetSyncProgress = 1f // Or whatever the final state should be
                 onCurrentSyncMessageChange("Sync finished") // Or a message from WifiSyncService
                 showEndOfSyncInfo = true
-                onButtonTextChange("Sync More")
+                onButtonTextChange(getString(R.string.syncMore))
                 loading = false
                 break
             }
@@ -268,7 +270,9 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 { animatedSyncProgress },
                 modifier = Modifier
                     .padding(top = 120.dp, start = 15.dp, end = 15.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                    color = Color(getColor(R.color.colorButtonBackground)),
+                    trackColor = Color(getColor(R.color.colorButtonTextEnabled))
             )
             Text(
                 modifier = Modifier
@@ -282,6 +286,8 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
             )
             CircularProgressIndicator(
                 modifier = Modifier.width(64.dp),
+                color = Color(getColor(R.color.colorButtonBackground)),
+                trackColor = Color(getColor(R.color.colorButtonTextEnabled))
             )
             Column (
                 modifier = Modifier.fillMaxSize(),
@@ -314,7 +320,9 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                     { animatedSyncProgress },
                     modifier = Modifier
                         .padding(top = 120.dp, start = 15.dp, end = 15.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    color = Color(getColor(R.color.colorButtonBackground)),
+                    trackColor = Color(getColor(R.color.colorButtonTextEnabled))
                 )
                 Text(
                     modifier = Modifier
