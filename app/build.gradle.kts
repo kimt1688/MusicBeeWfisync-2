@@ -79,6 +79,7 @@ composeCompiler {
 }
 
 dependencies {
+    implementation(libs.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
 
@@ -98,7 +99,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core) // Or the latest version
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.compose.material3)
-    //implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.compose.material3) // Or the latest version
 
     implementation (libs.androidx.constraintlayout)
@@ -114,9 +115,9 @@ dependencies {
     implementation (libs.androidx.leanback)
     implementation(project(":app:poweramp_api_lib"))
     implementation(libs.androidx.activity)
-    //implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.ui.graphics)
-    //implementation(libs.androidx.databinding.runtime)
+    implementation(libs.androidx.databinding.runtime)
     implementation(libs.androidx.foundation.layout)
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.navigation3.runtime)
@@ -125,18 +126,18 @@ dependencies {
     //testImplementation (libs.junit)
     //androidTestImplementation (libs.androidx.junit)
     //testImplementation (libs.androidx.espresso.core)
-    //implementation (libs.androidx.lifecycle.livedata.ktx)
-    //implementation (libs.androidx.lifecycle.viewmodel.ktx)
-    //implementation (libs.kotlin.stdlib.jdk7)
-    //implementation (libs.androidx.activity.ktx)
+    implementation (libs.androidx.lifecycle.livedata.ktx)
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    implementation (libs.kotlin.stdlib.jdk7)
+    implementation (libs.androidx.activity.ktx)
     implementation (libs.androidx.fragment.ktx)
     implementation (libs.androidx.runtime)
-    //implementation (libs.kotlinx.coroutines.core.jvm)
-    //implementation (libs.androidx.activity.compose)
-    //implementation (libs.androidx.preference.ktx)
+    implementation (libs.kotlinx.coroutines.core.jvm)
+    implementation (libs.androidx.activity.compose)
+    implementation (libs.androidx.preference.ktx)
     implementation (libs.androidx.documentfile)
-    //implementation (libs.kotlinx.coroutines.android)
-    //implementation (platform(libs.compose.bom))
+    implementation (libs.kotlinx.coroutines.android)
+    implementation (platform(libs.compose.bom))
     //androidTestImplementation (platform(libs.compose.bom))
     //androidTestImplementation(libs.androidx.ui.test.junit4)
     //debugImplementation(libs.androidx.ui.tooling)

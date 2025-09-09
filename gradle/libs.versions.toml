@@ -8,6 +8,7 @@ checkerQual = "3.49.5"
 composeBom = "2025.01.01"
 composeBomVersion = "2025.06.00"
 constraintlayout = "2.2.1"
+core = "1.50.0"
 coreKtx = "1.16.0"
 cronetEmbedded = "119.6045.31"
 documentfile = "1.1.0"
@@ -83,6 +84,7 @@ androidx-ui-tooling-preview-v142 = { module = "androidx.compose.ui:ui-tooling-pr
 androidx-ui-tooling-v142 = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 checker-qual = { module = "org.checkerframework:checker-qual", version.ref = "checkerQual" }
 compose-bom = { module = "androidx.compose:compose-bom", version = "2025.08.01" }
+core = { module = "com.google.ar:core", version.ref = "core" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version = "2.2.10" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version = "2.2.10" }

@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-66:/values-b+es+419/values-b+es+419.xml",
+            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-69:/values-b+es+419/values-b+es+419.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\ad1e75054a6466c5b8b3ad8debf15feb\\transformed\\material-1.13.0\\res\\values-b+es+419\\values-b+es+419.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\723a5c5bf56e60c6caef0bf41dc536e2\\transformed\\material-1.13.0\\res\\values-b+es+419\\values-b+es+419.xml",
                     "from": {
                         "startLines": "2,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -23,13 +23,13 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\9cdb77465ef02e801d030e3856ddbb66\\transformed\\core-1.15.0\\res\\values-b+es+419\\values.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\93ba6e3394bc748d4fdca64ebf61745c\\transformed\\core-1.50.0\\res\\values-b+es+419\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8",
                         "startColumns": "0,0,0,0,0",
-                        "startOffsets": "196,245,297,421,553",
+                        "startOffsets": "221,270,322,446,578",
                         "endColumns": "48,51,123,131,88",
-                        "endOffsets": "244,296,420,552,641"
+                        "endOffsets": "269,321,445,577,666"
                     },
                     "to": {
                         "startLines": "6,7,8,9,10",

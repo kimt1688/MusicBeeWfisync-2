@@ -28,6 +28,12 @@
 
     <queries>
         <package android:name="com.maxmpz.audioplayer" />
+        <package android:name="com.google.ar.core" />
+        <package android:name="com.android.vending" />
+
+        <intent>
+            <action android:name="com.google.android.play.core.install.BIND_INSTALL_SERVICE" />
+        </intent>
     </queries>
 
     <permission
@@ -83,9 +89,14 @@
         <activity
             android:name="kim.tkland.musicbeewifisync.ViewErrorLogActivity"
             android:label="@string/title_activity_view_error_log" />
+        <!-- This activity is critical for installing ARCore when it is not already present. -->
         <activity
-            android:name="androidx.compose.ui.tooling.PreviewActivity"
-            android:exported="true" />
+            android:name="com.google.ar.core.InstallActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.Material.Light.Dialog.Alert" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"
@@ -109,6 +120,10 @@
             android:name="androidx.window.sidecar"
             android:required="false" />
 
+        <activity
+            android:name="androidx.compose.ui.tooling.PreviewActivity"
+            android:exported="true" />
+
         <receiver
             android:name="androidx.profileinstaller.ProfileInstallReceiver"
             android:directBootAware="false"
@@ -127,14 +142,7 @@
             <intent-filter>
                 <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
             </intent-filter>
-        </receiver> <!-- This activity is critical for installing ARCore when it is not already present. -->
-        <activity
-            android:name="com.google.ar.core.InstallActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Material.Light.Dialog.Alert" />
+        </receiver>
     </application>
 
 </manifest>
