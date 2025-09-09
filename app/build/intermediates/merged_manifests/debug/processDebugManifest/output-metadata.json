@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 134,
-      "versionName": "3.0.4",
+      "versionCode": 138,
+      "versionName": "3.0.8",
       "outputFile": "AndroidManifest.xml"
     }
   ],

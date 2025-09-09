@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.*
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.border
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,8 +35,12 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -52,7 +54,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
 
 class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
-    private var syncExcludeErrors: CheckBox? = null
     private var waitResultsThread: Thread? = null
 
     private var showDialogState = mutableStateOf(false)
@@ -173,14 +174,13 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
         var expanded by remember { mutableStateOf(false) }
 
+        val statusBarPadding = WindowInsets.systemBars.asPaddingValues()
+        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
+
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(getColor(R.color.colorButtonBackground)),
-                        titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
-                    ),
+                MusicBeeWifiSyncTopBar(
                     title = {
                         Text(
                             title,
@@ -231,6 +231,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             bottomBar = {
                 Row( // Or a Compose Row
                     modifier = Modifier.fillMaxWidth()
+                        .padding(navigationBarPadding)
                 ) {
                     Button(modifier = Modifier
                         .weight(1f)
@@ -268,7 +269,9 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             }
         ) { innerPadding ->
             Text(message,
-                modifier = Modifier.padding(top = 100.dp, start = 20.dp, end = 20.dp),
+                modifier = Modifier.padding(top = 100.dp, start = 20.dp, end = 20.dp)
+                    .padding(innerPadding)
+                    .padding(statusBarPadding),
                 color = Color(color),
                 fontSize = 20.sp,
             )
@@ -336,19 +339,15 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
         var expanded by remember { mutableStateOf(false) }
 
+        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
+
         Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            // modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                CenterAlignedTopAppBar(
-                        modifier = Modifier.height(75.dp),
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color(getColor(R.color.colorButtonBackground)),
-                            titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
-                    ),
+                MusicBeeWifiSyncTopBar(
                     title = {
                         Box( // Wrap the Text in a Box
-                            modifier = Modifier.fillMaxHeight(), // Fill the available height in the title slot
-                            contentAlignment = Alignment.BottomCenter // Align content to the bottom start
                         ) {
                             Text(
                                 text = title,
@@ -400,6 +399,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             bottomBar = {
                 Row( // Or a Compose Row
                     modifier = Modifier.fillMaxWidth()
+                        .padding(navigationBarPadding)
                 ) {
                     Button(modifier = Modifier
                         .weight(1f)
@@ -416,8 +416,6 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         enabled = isSyncButtonEnabled.value,
                         onClick = {
                             try {
-                                WifiSyncServiceSettings.syncCustomFiles = true
-                                //syncPreview = false
                                 WifiSyncService.startSynchronisation(applicationContext, 1, false, false)
                             }catch (ex:Exception){
                                 Log.d("onSyncStartButtonClick", ex.message!!)
@@ -437,7 +435,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 }
             }
         ) { innerPadding ->
-            ShowResultsComposable(innerPadding, resultsToData, resultsFromData)
+            ShowResultsComposable(innerPadding, statusBarPadding, resultsToData, resultsFromData)
         }
     }
 
@@ -445,6 +443,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     @Composable
     fun ShowResultsComposable(
         innerPadding: PaddingValues,
+        statusBarPadding: PaddingValues,
         resultsToData: ArrayList<SyncResultsInfo>?,
         resultsFromData: ArrayList<SyncResultsInfo>?
     ) {
@@ -507,7 +506,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         }
         LazyColumn (
             modifier =
-                Modifier.padding(innerPadding),
+                Modifier.padding(innerPadding)
+                    .padding(statusBarPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {

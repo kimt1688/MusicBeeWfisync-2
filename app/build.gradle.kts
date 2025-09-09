@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.Packaging
 import com.android.sdklib.AndroidVersion.VersionCodes.*
 
 plugins {
@@ -8,15 +9,15 @@ plugins {
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 36
     namespace = "kim.tkland.musicbeewifisync"
-    ndkVersion = "29.0.13113456"
+    ndkVersion = "29.0.14033849"
 
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 135
-        versionName = "3.0.5"
+        versionCode = 138
+        versionName = "3.0.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         targetSdk = 35
@@ -24,25 +25,24 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled =  true
+            isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             isJniDebuggable = false
             signingConfig = signingConfigs.getByName("debug")
-            ndk {
-                debugSymbolLevel = "FULL"
-            }
         }
         getByName("debug") {
             isDebuggable = true
-            isMinifyEnabled =  false
+            isMinifyEnabled = false
             isShrinkResources = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            isJniDebuggable = true
-            // matchingFallbacks += listOf("")
-            ndk {
-                debugSymbolLevel = "FULL"
-            }
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            isJniDebuggable = false
         }
     }
     compileOptions {
@@ -57,7 +57,7 @@ android {
         jvmTarget = "19"
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.1"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
 }
 
@@ -79,6 +79,7 @@ composeCompiler {
 }
 
 dependencies {
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
 
     implementation (libs.androidx.compose.material3.material32)
@@ -92,10 +93,13 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.ui.graphics)
-    debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.rendering)
+    //debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.kotlinx.coroutines.core) // Or the latest version
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.compose.material3)
+    //implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.androidx.compose.material3) // Or the latest version
 
     implementation (libs.androidx.constraintlayout)
     implementation (libs.androidx.appcompat.resources)
@@ -110,33 +114,33 @@ dependencies {
     implementation (libs.androidx.leanback)
     implementation(project(":app:poweramp_api_lib"))
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    //implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.databinding.runtime)
+    //implementation(libs.androidx.databinding.runtime)
     implementation(libs.androidx.foundation.layout)
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.litert.metadata)
 
-    testImplementation (libs.junit)
-    androidTestImplementation (libs.androidx.junit)
-    testImplementation (libs.androidx.espresso.core)
-    implementation (libs.androidx.lifecycle.livedata.ktx)
-    implementation (libs.androidx.lifecycle.viewmodel.ktx)
-    implementation (libs.kotlin.stdlib.jdk7)
-    implementation (libs.androidx.activity.ktx)
+    //testImplementation (libs.junit)
+    //androidTestImplementation (libs.androidx.junit)
+    //testImplementation (libs.androidx.espresso.core)
+    //implementation (libs.androidx.lifecycle.livedata.ktx)
+    //implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    //implementation (libs.kotlin.stdlib.jdk7)
+    //implementation (libs.androidx.activity.ktx)
     implementation (libs.androidx.fragment.ktx)
     implementation (libs.androidx.runtime)
-    implementation (libs.kotlinx.coroutines.core.jvm)
-    implementation (libs.androidx.activity.compose)
-    implementation (libs.androidx.preference.ktx)
+    //implementation (libs.kotlinx.coroutines.core.jvm)
+    //implementation (libs.androidx.activity.compose)
+    //implementation (libs.androidx.preference.ktx)
     implementation (libs.androidx.documentfile)
-    implementation (libs.kotlinx.coroutines.android)
-    implementation (platform(libs.compose.bom))
-    androidTestImplementation (platform(libs.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    //implementation (libs.kotlinx.coroutines.android)
+    //implementation (platform(libs.compose.bom))
+    //androidTestImplementation (platform(libs.compose.bom))
+    //androidTestImplementation(libs.androidx.ui.test.junit4)
+    //debugImplementation(libs.androidx.ui.tooling)
+    //debugImplementation(libs.androidx.ui.test.manifest)
 }
 repositories {
     mavenCentral()

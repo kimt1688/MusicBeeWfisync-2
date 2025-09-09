@@ -17,18 +17,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -105,19 +108,15 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         var expanded by remember { mutableStateOf(false) }
         val context = LocalContext.current // Get the context here
 
+        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
+
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                CenterAlignedTopAppBar(
-                        modifier = Modifier.height(75.dp),
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color(getColor(R.color.colorButtonBackground)),
-                            titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
-                    ),
+                MusicBeeWifiSyncTopBar(
                     title = {
                         Box( // Wrap the Text in a Box
-                            modifier = Modifier.fillMaxHeight(), // Fill the available height in the title slot
-                            contentAlignment = Alignment.BottomCenter // Align content to the bottom start
                         ) {
                             Text(
                                 text = getString(R.string.title_activity_sync_status),
@@ -168,7 +167,8 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             },
             bottomBar = {
                 Column (
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(navigationBarPadding),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
                     Button(
@@ -215,6 +215,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             }
         ){ innerPadding ->
             ShowSyncStatusComposable(innerPadding,
+                statusBarPadding,
                 currentSyncMessage, onCurrentSyncMessageChange,
                 buttonText, onButtonTextChange,
             scrollBehavior)
@@ -224,8 +225,11 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ShowSyncStatusComposable(innerPadding: PaddingValues,
-                             currentSyncMessage: String, onCurrentSyncMessageChange: (String) -> Unit,
-                             buttonText: String, onButtonTextChange: (String) -> Unit,
+                             statusBarPadding: PaddingValues,
+                             currentSyncMessage: String,
+                             onCurrentSyncMessageChange: (String) -> Unit,
+                             buttonText: String,
+                             onButtonTextChange: (String) -> Unit,
                              scrollBehavior: TopAppBarScrollBehavior) {
     var rawTargetSyncProgress by remember { mutableFloatStateOf(0f) }
     var loading by remember { mutableStateOf(true) }
@@ -262,6 +266,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)
+            .padding(statusBarPadding)
     ) {
         if (loading) {
             LinearProgressIndicator(
@@ -313,6 +318,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(innerPadding)
+                    .padding(statusBarPadding)
             ) {
                 LinearProgressIndicator(
                     { animatedSyncProgress },
@@ -335,7 +341,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
             }
         } else {
             isErrorEnd = true
-            ShowEndOfSyncInformation(innerPadding, completeMessage, { completeMessage = it })
+            ShowEndOfSyncInformation(innerPadding, statusBarPadding, completeMessage, { completeMessage = it })
         }
     }
 }
@@ -368,7 +374,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
     }
 
     @Composable
-    private fun ShowEndOfSyncInformation(innerPadding: PaddingValues, completeMessage: String, onCompleteTextChange: (String) -> Unit) {
+    private fun ShowEndOfSyncInformation(innerPadding: PaddingValues, statusBarPadding: PaddingValues, completeMessage: String, onCompleteTextChange: (String) -> Unit) {
         val errorMessageId = WifiSyncService.syncErrorMessageId.getAndSet(0)
         WifiSyncServiceSettings.saveSettings(this)
         var errorMessage = ""
@@ -394,13 +400,13 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                             )
                         )
                     }
-                    ShowResultsComposable(innerPadding, errorMessage, WifiSyncService.syncToResults,failedFrom)
+                    ShowResultsComposable(innerPadding, statusBarPadding, errorMessage, WifiSyncService.syncToResults,failedFrom)
                 }
             }
         } else if (errorMessageId == R.string.syncCancelled) {
             errorMessage = getString(errorMessageId)
             onCompleteTextChange(errorMessage)
-            ShowResultsComposable(innerPadding, errorMessage, WifiSyncService.syncToResults,null)
+            ShowResultsComposable(innerPadding, statusBarPadding, errorMessage, WifiSyncService.syncToResults,null)
         } else {
             val builder = AlertDialog.Builder(this)
             builder.setTitle(getString(R.string.syncErrorHeader))
@@ -426,7 +432,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                     )
                 }
             }
-            ShowResultsComposable(innerPadding, errorMessage, WifiSyncService.syncToResults,null)
+            ShowResultsComposable(innerPadding, statusBarPadding, errorMessage, WifiSyncService.syncToResults,null)
             builder.show()
         }
     }
@@ -434,6 +440,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
     @Composable
     fun ShowResultsComposable(
         innerPadding: PaddingValues,
+        statusBarPadding: PaddingValues,
         errorMessage: String,
         resultsToData: ArrayList<SyncResultsInfo>?,
         resultsFromData: ArrayList<SyncResultsInfo>?
@@ -498,7 +505,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
         LazyColumn (
             modifier =
                 Modifier.padding(innerPadding)
-                    .fillMaxSize(),
+                    .padding(statusBarPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {

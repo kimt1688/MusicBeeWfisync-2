@@ -17,16 +17,19 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -69,7 +72,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
         WifiSyncServiceSettings.deviceStorageIndex == 2
         if (initialSetup) {
-            WifiSyncServiceSettings.debugMode = true
+            // WifiSyncServiceSettings.debugMode = true
             setContent {
                 FirstSettingView()
             }
@@ -128,16 +131,14 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
 
         var initialStorage by remember { mutableIntStateOf(value = 1) }
+        var debugMode by remember { mutableStateOf(value = WifiSyncServiceSettings.debugMode) }
+
+        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
 
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
-
             topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(getColor(R.color.colorButtonBackground)),
-                        titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
-                    ),
+                MusicBeeWifiSyncTopBar(
                     title = {
                         Text(
                             getString(R.string.title_activity_settings),
@@ -151,9 +152,11 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             bottomBar = {
                 Row( // Or a Compose Row
                     modifier = Modifier.fillMaxWidth()
-                ) {
+                        .padding(navigationBarPadding),
+                    ) {
                     Button(
                         modifier = Modifier.weight(1f)
+                            .height(80.dp)
                             .border(
                                 width = 2.dp, // 枠線の幅
                                 color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
@@ -165,6 +168,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                         ),
                         onClick = {
                             WifiSyncServiceSettings.deviceStorageIndex = initialStorage
+                            WifiSyncServiceSettings.debugMode = debugMode
                             WifiSyncServiceSettings.saveSettings(applicationContext)
                             val locateServerThread = Thread(Runnable {
                                 val serverIPAddress =
@@ -201,7 +205,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
-                    .fillMaxSize(),
+                    .padding(statusBarPadding),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start,
             ) {
@@ -239,6 +243,17 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 Row() {
                     StorageRadioGroup(initialStorage, 20)
                 }
+                /* 2025/09/08 Pending OptionSettingと連動しない
+                Row(modifier = Modifier.padding(top = 30.dp)){
+                    CheckableRow(text = applicationContext.getString(R.string.settingsDebugMode),
+                        checked = debugMode,
+                        onCheckedChange = {
+                            debugMode = it
+                            WifiSyncServiceSettings.debugMode = it
+                            // WifiSyncServiceSettings.saveSettings(applicationContext)
+                        }
+                    )
+                }*/
             }
         }
     }
@@ -250,16 +265,14 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
 
         var initialStorage by remember { mutableIntStateOf(value = WifiSyncServiceSettings.deviceStorageIndex) }
+        var debugMode by remember { mutableStateOf(value = WifiSyncServiceSettings.debugMode) }
+
+        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
 
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
-
             topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(getColor(R.color.colorButtonBackground)),
-                        titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
-                    ),
+                MusicBeeWifiSyncTopBar(
                     title = {
                         Text(
                             getString(R.string.title_activity_settings),
@@ -282,7 +295,8 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
-                    .fillMaxSize(),
+                    .padding(statusBarPadding)
+                    .padding(navigationBarPadding),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start,
             ) {
@@ -304,10 +318,11 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 ) {
                     CheckableRow(
                         text = applicationContext.getString(R.string.settingsDebugMode),
-                        checked = WifiSyncServiceSettings.debugMode,
+                        checked = debugMode,
                         onCheckedChange = {
+                            debugMode = it
                             WifiSyncServiceSettings.debugMode = it
-                            WifiSyncServiceSettings.saveSettings(applicationContext)
+                            // WifiSyncServiceSettings.saveSettings(applicationContext)
                         }
                     )
                 }
@@ -324,7 +339,8 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     .toggleable(
                         value = checked,
                         role = Role.Checkbox,
-                        onValueChange = { checked = !checked }
+                        onValueChange = {checked = !checked
+                                        onCheckedChange(checked)},
                     )
                     .padding(8.dp)
                     .fillMaxWidth(),
@@ -491,31 +507,3 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         false
     }
 }
-    /*
-    fun onLocateServerButton_Click() {
-        WifiSyncServiceSettings.saveSettings(applicationContext)
-        val locateServerThread = Thread(Runnable {
-            val serverIPAddress = WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
-            runOnUiThread {
-                if (mainWindow != null) {
-                    if (serverIPAddress == null) {
-                        val errorDialog = AlertDialog.Builder(mainWindow!!)
-                        errorDialog.setMessage(getText(R.string.errorServerNotFound))
-                        errorDialog.setPositiveButton(android.R.string.ok, null)
-                        errorDialog.show()
-                    } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
-                        showNoConfigMatchedSettings()
-                    } else {
-                        WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
-                        WifiSyncServiceSettings.saveSettings(applicationContext)
-                        val intent = Intent(mainWindow, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        startActivity(intent)
-                    }
-                }
-            }
-        })
-        locateServerThread.start()
-    }
-*/

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.DialogInterface
+import android.content.res.Resources
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -12,11 +13,6 @@ import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import java.io.File
 
 abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppCompatActivity() {
@@ -27,25 +23,10 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         buttonTextEnabledColor = resources.getColor(R.color.colorButtonTextEnabled, null)
         buttonTextDisabledColor = resources.getColor(R.color.colorButtonTextDisabled, null)
 
-        val windowInsetsController =
-            WindowCompat.getInsetsController(window, window.decorView)
-        windowInsetsController.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-
-            v.updatePadding(
-                //    left = bars.left,
-                //    top = bars.top,
-                //    right = bars.right,
-                bottom = bars.bottom,
-            )
-            WindowInsetsCompat.CONSUMED
-        }
     }
 
     override fun onDestroy() {

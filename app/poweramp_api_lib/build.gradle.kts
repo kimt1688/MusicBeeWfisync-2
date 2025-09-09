@@ -1,3 +1,6 @@
+import com.android.build.api.dsl.Packaging
+
+
 plugins{
     id("com.android.library")
     alias(libs.plugins.compose.compiler)
@@ -6,6 +9,7 @@ plugins{
 android {
     namespace = "com.maxmpz.poweramp"
     compileSdk = 35
+    ndkVersion = "29.0.13113456"
 
     defaultConfig {
         minSdk = 31
@@ -17,6 +21,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

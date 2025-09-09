@@ -2759,7 +2759,7 @@ internal object WifiSyncServiceSettings {
     var reverseSyncPlaylistsPath = ""
     var reverseSyncRatings = false
     var reverseSyncPlayCounts = true
-    var debugMode = true
+    var debugMode = false
     var permissionsUpgraded = false
     fun loadSettings(context: Context) {
         defaultIpAddressValue = ""

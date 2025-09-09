@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
@@ -36,7 +39,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.net.toUri
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
@@ -58,6 +60,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.ui.graphics.RectangleShape
 
 class MainActivity() : WifiSyncBaseActivity("") {
     private var serverStatusThread: Thread? = null
@@ -65,6 +68,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
         ComposeView(applicationContext).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
@@ -103,7 +107,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+        @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CustomView() {
         val topAppBarState = rememberTopAppBarState()
@@ -117,27 +121,22 @@ class MainActivity() : WifiSyncBaseActivity("") {
         var isSyncToPlaycountsEnabled by remember { mutableStateOf(false) }
         var isSyncToRatingEnabled by remember { mutableStateOf(false) }
         var isSyncToPlaylistsEnabled by remember { mutableStateOf(false) }
-        var initialReverseSyncPlayer: Int = 2
-        when (WifiSyncServiceSettings.reverseSyncPlayer) {
-            WifiSyncServiceSettings.PLAYER_POWERAMP -> initialReverseSyncPlayer = 0
-            WifiSyncServiceSettings.PLAYER_GONEMAD -> initialReverseSyncPlayer = 1
+        var reverseSyncPlayer by remember {mutableIntStateOf(WifiSyncServiceSettings.reverseSyncPlayer)}
+        var initialReverseSyncPlayer by remember {mutableIntStateOf(2)}
+        when (reverseSyncPlayer) {
             0 -> initialReverseSyncPlayer = 2
+            WifiSyncServiceSettings.PLAYER_GONEMAD -> initialReverseSyncPlayer = 1
+            WifiSyncServiceSettings.PLAYER_POWERAMP -> initialReverseSyncPlayer = 0
         }
 
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
+        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
 
+        Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(
-                    modifier = Modifier.height(75.dp),
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(getColor(R.color.colorButtonBackground)),
-                        titleContentColor = Color(getColor(R.color.colorButtonTextEnabled))
-                    ),
+                MusicBeeWifiSyncTopBar(
                     title = {
-                        Box( // Wrap the Text in a Box
-                            modifier = Modifier.fillMaxHeight(), // Fill the available height in the title slot
-                            contentAlignment = Alignment.BottomCenter // Align content to the bottom start
+                        Box(
                         ) {
                             Text(
                                 text = getString(R.string.app_name),
@@ -229,11 +228,12 @@ class MainActivity() : WifiSyncBaseActivity("") {
                         }
                     },
                     scrollBehavior = scrollBehavior,
-                )
+                    )
             },
             bottomBar = {
                 Row( // Or a Compose Row
                     modifier = Modifier.fillMaxWidth()
+                                .padding(navigationBarPadding),
                 ) {
                     Button(
                         modifier = Modifier
@@ -243,7 +243,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
                                 width = 2.dp, // 枠線の幅
                                 color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
                             ),
-                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        shape = RectangleShape,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(getColor(R.color.colorButtonBackground)),
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
@@ -259,6 +259,9 @@ class MainActivity() : WifiSyncBaseActivity("") {
                                 isSyncToRatingChecked
                             WifiSyncServiceSettings.reverseSyncPlaylists =
                                 isSyncToPlaylistsChecked
+                            WifiSyncServiceSettings.reverseSyncPlayer =
+                                reverseSyncPlayer
+                            WifiSyncServiceSettings.saveSettings(applicationContext)
                             if (isConfigOK()) {
                                 try {
                                     WifiSyncService.startSynchronisation(
@@ -286,7 +289,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
                                 width = 2.dp, // 枠線の幅
                                 color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
                             ),
-                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        shape = RectangleShape,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(getColor(R.color.colorButtonBackground)),
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
@@ -301,6 +304,9 @@ class MainActivity() : WifiSyncBaseActivity("") {
                                 isSyncToRatingChecked
                             WifiSyncServiceSettings.reverseSyncPlaylists =
                                 isSyncToPlaylistsChecked
+                            WifiSyncServiceSettings.reverseSyncPlayer =
+                                reverseSyncPlayer
+                            WifiSyncServiceSettings.saveSettings(applicationContext)
                             if (isConfigOK()) {
                                 try {
                                     WifiSyncService.startSynchronisation(
@@ -329,7 +335,8 @@ class MainActivity() : WifiSyncBaseActivity("") {
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
-                    .fillMaxSize(),
+                    .padding(statusBarPadding),
+                    //.fillMaxSize()
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start,
             ) {
@@ -343,35 +350,33 @@ class MainActivity() : WifiSyncBaseActivity("") {
                         fontSize = 16.sp
                     )
                 }
-                Row() {
-                    Row(
-                        modifier = Modifier
-                            .toggleable(
-                                value = isSyncFromMusicBeeChecked,
-                                enabled = true,
-                                role = Role.Checkbox,
-                                onValueChange = {
-                                    isSyncFromMusicBeeChecked = !isSyncFromMusicBeeChecked
-                                }
-                            )
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
-                    ) {
-                        Checkbox(
-                            checked = isSyncFromMusicBeeChecked,
+                Row(
+                    modifier = Modifier
+                        .toggleable(
+                            value = isSyncFromMusicBeeChecked,
                             enabled = true,
-                            colors = CheckboxDefaults.colors(
-                                checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
-                                checkedColor = Color(getColor(R.color.colorButtonBackground)),
-                            ),
-                            onCheckedChange = {
-                                isSyncFromMusicBeeChecked = it
+                            role = Role.Checkbox,
+                            onValueChange = {
+                                isSyncFromMusicBeeChecked = !isSyncFromMusicBeeChecked
                             }
                         )
-                        Text(getString(R.string.syncFromDefault), fontSize = 20.sp)
-                    }
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                ) {
+                    Checkbox(
+                        checked = isSyncFromMusicBeeChecked,
+                        enabled = true,
+                        colors = CheckboxDefaults.colors(
+                            checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                        ),
+                        onCheckedChange = {
+                            isSyncFromMusicBeeChecked = it
+                        }
+                    )
+                    Text(getString(R.string.syncFromDefault), fontSize = 20.sp)
                 }
                 Row(modifier = Modifier.padding(top = 15.dp)) {
                     Image(
@@ -486,7 +491,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
                     )
 
                     val (selectedOption, onOptionSelected) = remember {
-                        mutableIntStateOf(
+                       mutableIntStateOf(
                             initialReverseSyncPlayer
                         )
                     }
@@ -497,13 +502,15 @@ class MainActivity() : WifiSyncBaseActivity("") {
                                 modifier = Modifier
                                     //.padding(8.dp)
                                     .selectable(
-                                        selected = (option.index == selectedOption),
+                                        selected = (option.index == initialReverseSyncPlayer),
                                         onClick = {
                                             onOptionSelected(option.index)
                                             when (option.index) {
                                                 0 -> {
                                                     WifiSyncServiceSettings.reverseSyncPlayer =
                                                         WifiSyncServiceSettings.PLAYER_POWERAMP
+                                                    reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
+                                                    initialReverseSyncPlayer = 0
                                                     isSyncToPlaycountsEnabled = true
                                                     isSyncToRatingEnabled = true
                                                     isSyncToPlaylistsEnabled = false
@@ -518,6 +525,8 @@ class MainActivity() : WifiSyncBaseActivity("") {
                                                 1 -> {
                                                     WifiSyncServiceSettings.reverseSyncPlayer =
                                                         WifiSyncServiceSettings.PLAYER_GONEMAD
+                                                    reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+                                                    initialReverseSyncPlayer = 1
                                                     isSyncToPlaycountsEnabled = true
                                                     isSyncToRatingEnabled = true
                                                     isSyncToPlaylistsEnabled = true
@@ -531,6 +540,8 @@ class MainActivity() : WifiSyncBaseActivity("") {
 
                                                 2 -> {
                                                     WifiSyncServiceSettings.reverseSyncPlayer = 0
+                                                    reverseSyncPlayer = 0
+                                                    initialReverseSyncPlayer = 2
                                                     isSyncToPlaycountsEnabled = false
                                                     isSyncToRatingEnabled = false
                                                     isSyncToPlaylistsEnabled = false
@@ -550,7 +561,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
 
                                 ) {
                                 RadioButton(
-                                    selected = (option.index == selectedOption),
+                                    selected = (option.index == initialReverseSyncPlayer),
                                     colors = RadioButtonDefaults.colors(
                                         selectedColor = Color(getColor(R.color.colorButtonTextEnabled)), // 選択時の色
                                         unselectedColor = Color(getColor(R.color.colorButtonBackground)) // 非選択時の色
@@ -561,6 +572,8 @@ class MainActivity() : WifiSyncBaseActivity("") {
                                             0 -> {
                                                 WifiSyncServiceSettings.reverseSyncPlayer =
                                                     WifiSyncServiceSettings.PLAYER_POWERAMP
+                                                reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_POWERAMP
+                                                initialReverseSyncPlayer = 0
                                                 isSyncToPlaycountsEnabled = true
                                                 isSyncToRatingEnabled = true
                                                 isSyncToPlaylistsEnabled = false
@@ -572,6 +585,8 @@ class MainActivity() : WifiSyncBaseActivity("") {
                                             1 -> {
                                                 WifiSyncServiceSettings.reverseSyncPlayer =
                                                     WifiSyncServiceSettings.PLAYER_GONEMAD
+                                                reverseSyncPlayer = WifiSyncServiceSettings.PLAYER_GONEMAD
+                                                initialReverseSyncPlayer = 1
                                                 isSyncToPlaycountsEnabled = true
                                                 isSyncToRatingEnabled = true
                                                 isSyncToPlaylistsEnabled = true
@@ -582,6 +597,8 @@ class MainActivity() : WifiSyncBaseActivity("") {
 
                                             2 -> {
                                                 WifiSyncServiceSettings.reverseSyncPlayer = 0
+                                                reverseSyncPlayer = 0
+                                                initialReverseSyncPlayer = 2
                                                 isSyncToPlaycountsEnabled = false
                                                 isSyncToRatingEnabled = false
                                                 isSyncToPlaylistsEnabled = false
@@ -600,7 +617,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
                 }
 
                 Row(modifier = Modifier.padding(top = 15.dp)) {
-                    var status = checkServerStatus()
+                    val status = checkServerStatus()
                     Text(text = status, color = Color.Red, fontSize = 20.sp)
                 }
             }

@@ -10,11 +10,6 @@ plugins {
 }
 
 buildscript {
-    //ext {
-    //    agp_version = '8.9.1'
-    //}
-    //ext.agp_version = '8.9,1'
-    //ext.kotlin_version = '2.1.10'
     extra.apply {
         set("agpversion", "8.13.0")
         set("kotlinversion", "2.1.10")
@@ -42,6 +37,9 @@ allprojects {
         google()
         mavenCentral()
     }
+    //tasks.withType(JavaCompile::class.java).configureEach {
+    //    options.compilerArgs.addAll(listOf("-Xlint:deprecation"))
+    //}
 }
 
 tasks.register<Delete>("clean") {

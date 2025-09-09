@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-68:/values-night-v8/values-night-v8.xml",
+            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-66:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\abf07979eca608ab7d073daaf484a524\\transformed\\appcompat-1.7.1\\res\\values-night-v8\\values-night-v8.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\e95fb2372ae3d988d9b0af986bc99d45\\transformed\\appcompat-1.7.1\\res\\values-night-v8\\values-night-v8.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\23f5bfd40b7a0e79d4a11924a7b59aad\\transformed\\material-1.13.0\\res\\values-night-v8\\values-night-v8.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\ad1e75054a6466c5b8b3ad8debf15feb\\transformed\\material-1.13.0\\res\\values-night-v8\\values-night-v8.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

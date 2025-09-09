@@ -1,5 +1,6 @@
 [versions]
 accompanistSystemuicontroller = "0.36.0"
+accompanistSystemuicontrollerVersion = "0.20.3"
 activityCompose = "1.10.1"
 androidxMaterial3Version = "1.3.2"
 appcompatResources = "1.7.1"
@@ -24,6 +25,7 @@ lifecycleLivedataKtx = "2.9.1"
 material = "1.13.0"
 material3 = "1.3.2"
 material3AdaptiveNavigationSuite = "1.5.0-alpha02"
+material3Version = "1.2.1"
 materialIconsCore = "1.7.8"
 navigationCompose = "2.9.3"
 navigationFragmentKtx = "2.9.0"
@@ -44,16 +46,19 @@ roomCompiler = "2.7.2"
 litertMetadata = "1.4.0"
 uiToolingPreviewVersion = "1.4.2"
 uiGraphics = "1.9.0"
+rendering = "1.17.1"
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
+accompanist-systemuicontroller-v0203 = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontrollerVersion" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityCompose" }
 androidx-appcompat-resources = { module = "androidx.appcompat:appcompat-resources", version.ref = "appcompatResources" }
 androidx-compose-bom-v20250101 = { module = "androidx.compose:compose-bom", version = "2025.08.01" }
 androidx-compose-material3-material32 = { module = "androidx.compose.material3:material3", version.ref = "androidxMaterial3Version" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-compose-material3-v121 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
-androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.17.0" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.16.0" }
 androidx-documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentfile" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.7.0" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.8" }
@@ -100,6 +105,7 @@ androidx-foundation = { group = "androidx.compose.foundation", name = "foundatio
 androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3Runtime" }
 litert-metadata = { group = "com.google.ai.edge.litert", name = "litert-metadata", version.ref = "litertMetadata" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+rendering = { group = "com.google.ar.sceneform", name = "rendering", version.ref = "rendering" }
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
