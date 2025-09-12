@@ -28,12 +28,6 @@
 
     <queries>
         <package android:name="com.maxmpz.audioplayer" />
-        <package android:name="com.google.ar.core" />
-        <package android:name="com.android.vending" />
-
-        <intent>
-            <action android:name="com.google.android.play.core.install.BIND_INSTALL_SERVICE" />
-        </intent>
     </queries>
 
     <permission
@@ -51,14 +45,16 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:testOnly="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+
+        <!--
         <meta-data
             android:name="com.google.ar.core.min_apk_version"
-            android:value="31" />
-        <meta-data
-            android:name="com.google.ar.core"
-            android:value="optional" />
-
+            android:value="31"
+            tools:replace="android:value" />
+        <meta-data android:name="com.google.ar.core" android:value="optional" />
+        -->
         <service
             android:name="kim.tkland.musicbeewifisync.WifiSyncService"
             android:exported="false"
@@ -89,14 +85,6 @@
         <activity
             android:name="kim.tkland.musicbeewifisync.ViewErrorLogActivity"
             android:label="@string/title_activity_view_error_log" />
-        <!-- This activity is critical for installing ARCore when it is not already present. -->
-        <activity
-            android:name="com.google.ar.core.InstallActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Material.Light.Dialog.Alert" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

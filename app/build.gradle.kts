@@ -79,7 +79,7 @@ composeCompiler {
 }
 
 dependencies {
-    implementation(libs.core)
+    /* implementation(libs.core) */
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
 
@@ -94,8 +94,10 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.ui.graphics)
+    /*
     implementation(libs.rendering)
-    //debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.tooling)
+    */
     implementation(libs.kotlinx.coroutines.core) // Or the latest version
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.compose.material3)

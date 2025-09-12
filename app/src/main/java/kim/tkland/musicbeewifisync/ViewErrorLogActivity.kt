@@ -2,6 +2,7 @@ package kim.tkland.musicbeewifisync
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,8 +18,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
@@ -45,6 +51,9 @@ class ViewErrorLogActivity : ComponentActivity() {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
 
         val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+        var expanded by remember { mutableStateOf(false) }
+        var logdata by remember { mutableStateOf(ErrorHandler.log) }
+
         //val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
         Scaffold(
             topBar = {
@@ -68,37 +77,41 @@ class ViewErrorLogActivity : ComponentActivity() {
                         }
                     },
                     actions = {
-                        Button(
-                            modifier = Modifier.border(
-                                width = 2.dp, // 枠線の幅
-                                color = Color(getColor(R.color.colorButtonTextEnabled)),
-                                shape = androidx.compose.ui.graphics.RectangleShape
-                            ),
-                            shape = androidx.compose.ui.graphics.RectangleShape,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(getColor(R.color.colorButtonBackground)),
-                                contentColor = Color(getColor(R.color.colorButtonTextEnabled))
-                            ),
-                            onClick = {
-                                val clipboard =
-                                    getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                                val logData = ErrorHandler.log
-                                if (!logData.isNullOrEmpty()) {
-                                    val clipData =
-                                        ClipData.newPlainText("plain text", logData)
-                                    clipboard.setPrimaryClip(clipData)
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                        ) {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
                             }
-                        }) {
-                            Icon(
-                                modifier = Modifier.border(
-                                                        width = 2.dp, // 枠線の幅
-                                                        color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
-                                                    )
-                                                    .background(Color(getColor(R.color.colorButtonBackground))),
-                                imageVector = Icons.Filled.ContentCopy,
-                                contentDescription = "Copy to Clipboard",
-                                tint = Color(getColor(R.color.colorButtonTextEnabled)),
-                            )
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ){
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.logCopyClipboard))},
+                                    onClick = {
+                                        val clipboard =
+                                            getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                                        val logData = ErrorHandler.log
+                                        if (!logData.isNullOrEmpty()) {
+                                            val clipData =
+                                                ClipData.newPlainText("plain text", logData)
+                                            clipboard.setPrimaryClip(clipData)
+                                        }
+                                        expanded = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.logClear)) },
+                                    onClick = {
+                                        ErrorHandler.initialise(applicationContext)
+                                        ErrorHandler.clearLog()
+                                        logdata = ""
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
                     },
                     scrollBehavior = scrollBehavior
@@ -110,10 +123,10 @@ class ViewErrorLogActivity : ComponentActivity() {
                     .padding(statusBarPadding)
 
                 ) {
-                val errorLog = ErrorHandler.log
-                if (!errorLog.isNullOrEmpty()) {
+                // val errorLog = ErrorHandler.log
+                if (logdata != null) {
                     item {
-                        Text(errorLog)
+                        Text(logdata!!)
                     }
                 } else {
                     item {

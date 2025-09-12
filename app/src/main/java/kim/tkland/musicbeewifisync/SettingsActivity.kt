@@ -51,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -136,6 +137,8 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
         val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
 
+        val context = LocalContext.current
+
         Scaffold(
             topBar = {
                 MusicBeeWifiSyncTopBar(
@@ -172,27 +175,31 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             WifiSyncServiceSettings.saveSettings(applicationContext)
                             val locateServerThread = Thread(Runnable {
                                 val serverIPAddress =
-                                    WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
+                                    WifiSyncService.getMusicBeeServerAddress(context, null)
                                 runOnUiThread {
-                                    if (mainWindow != null) {
+                                    //if (context != null) {
                                         if (serverIPAddress == null) {
-                                            val errorDialog = AlertDialog.Builder(mainWindow!!)
+                                            val errorDialog = AlertDialog.Builder(context)
                                             errorDialog.setMessage(getText(R.string.errorServerNotFound))
                                             errorDialog.setPositiveButton(android.R.string.ok, null)
                                             errorDialog.show()
                                         } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
                                             showNoConfigMatchedSettings()
+                                            val errorDialog = AlertDialog.Builder(context)
+                                            errorDialog.setMessage(getText(R.string.errorLocateServerNoConfig))
+                                            errorDialog.setPositiveButton(android.R.string.ok, null)
+                                            errorDialog.show()
                                         } else {
                                             WifiSyncServiceSettings.defaultIpAddressValue =
                                                 serverIPAddress
-                                            WifiSyncServiceSettings.saveSettings(mainWindow)
+                                            WifiSyncServiceSettings.saveSettings(context)
                                             val intent =
-                                                Intent(mainWindow, MainActivity::class.java)
+                                                Intent(context, MainActivity::class.java)
                                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                                             startActivity(intent)
                                         }
-                                    }
+                                    //}
                                 }
                             })
                             locateServerThread.start()

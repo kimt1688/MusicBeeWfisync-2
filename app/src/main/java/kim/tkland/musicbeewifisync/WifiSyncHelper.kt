@@ -77,7 +77,16 @@ internal object ErrorHandler {
         }
     }
 
-    val log: String?
+    fun clearLog() {
+        val file = File(folderPath, "MusicBeeWifiSyncErrorLog.txt")
+        try {
+            FileOutputStream(file).channel.truncate(0).close()
+        } catch (e: IOException) { /* log and ignore */
+            Log.d("ErrorHandler", e.message!!)
+        }
+    }
+
+    var log: String? = null
         get() {
             try {
                 val errorLog = File(folderPath, "MusicBeeWifiSyncErrorLog.txt")
@@ -87,8 +96,12 @@ internal object ErrorHandler {
                     return String(buffer, StandardCharsets.UTF_8)
                 }
             } catch (ex: Exception) {
+                logError("ErrorHandler.log.get", ex)
                 return null
             }
+        }
+        set(value){
+            field = value
         }
 
     fun logError(tag: String, message: String?) {

@@ -64,6 +64,7 @@
     <string name="reverseSyncFilesWarning1">1 ファイル</string>
     <string name="reverseSyncFilesWarningN">%d ファイル</string>
     <string name="logCopyClipboard">クリップボードにコピー</string>
+    <string name="logClear">エラーログのクリア</string>
     <string name="errorNone">正常終了.</string>
     <string name="errorServerNotFound">MusicBeeが動いているPCが見つかりませんでした. MusicBeeが起動していること、ファイアフォールを解除していることを確認してください.</string>
     <string name="errorConfigNotMatched">MusicBee can\'t match the device name to an existing configuration.</string>

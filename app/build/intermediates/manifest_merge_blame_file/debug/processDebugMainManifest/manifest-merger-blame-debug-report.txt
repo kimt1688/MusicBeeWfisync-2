@@ -53,223 +53,191 @@
 30        <package android:name="com.maxmpz.audioplayer" />
 30-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:27:9-58
 30-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:27:18-55
-31        <package android:name="com.google.ar.core" />
-31-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:21:9-54
-31-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:21:18-51
-32        <package android:name="com.android.vending" />
-32-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:22:9-55
-32-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:22:18-52
-33
-34        <intent>
-34-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:24:9-26:18
-35            <action android:name="com.google.android.play.core.install.BIND_INSTALL_SERVICE" />
-35-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:25:13-96
-35-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:25:21-93
-36        </intent>
-37    </queries>
+31    </queries>
+32
+33    <permission
+33-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:22:5-24:47
+34        android:name="kim.tkland.musicbeewifisync.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+34-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:23:9-81
+35        android:protectionLevel="signature" />
+35-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:24:9-44
+36
+37    <uses-permission android:name="kim.tkland.musicbeewifisync.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+37-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:26:5-97
+37-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:26:22-94
 38
-39    <permission
-39-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:22:5-24:47
-40        android:name="kim.tkland.musicbeewifisync.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-40-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:23:9-81
-41        android:protectionLevel="signature" />
-41-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:24:9-44
-42
-43    <uses-permission android:name="kim.tkland.musicbeewifisync.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-43-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:26:5-97
-43-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:26:22-94
-44
-45    <application
-45-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:5-72:19
-46        android:name="kim.tkland.musicbeewifisync.WifiSyncApp"
-46-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:31:9-36
-47        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-47-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:28:18-86
-48        android:debuggable="true"
-49        android:extractNativeLibs="false"
-50        android:icon="@mipmap/ic_launcher"
-50-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:32:9-43
-51        android:label="@string/app_name"
-51-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:33:9-41
-52        android:roundIcon="@mipmap/ic_launcher_round"
-52-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:34:9-54
-53        android:supportsRtl="true"
-53-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:35:9-35
-54        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
-54-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:36:9-65
-55        <meta-data
-55-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:37:9-40:45
-56            android:name="com.google.ar.core.min_apk_version"
-56-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:38:13-62
-57            android:value="31" />
-57-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:39:13-31
-58        <meta-data
-58-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:9-81
-59            android:name="com.google.ar.core"
-59-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:20-53
-60            android:value="optional" />
-60-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:54-78
-61
-62        <service
-62-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:42:9-45:56
-63            android:name="kim.tkland.musicbeewifisync.WifiSyncService"
-63-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:43:13-44
-64            android:exported="false"
-64-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:44:13-37
-65            android:foregroundServiceType="dataSync" />
-65-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:45:13-53
-66
-67        <activity
-67-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:9-56:20
-68            android:name="kim.tkland.musicbeewifisync.MainActivity"
-68-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:48:13-41
-69            android:exported="true" >
-69-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:13-36
-70            <intent-filter>
-70-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:50:13-55:29
-71                <action android:name="android.intent.action.MAIN" />
-71-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:51:17-69
-71-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:51:25-66
-72                <action android:name="android.intent.action.VIEW" />
-72-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:52:17-69
-72-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:52:25-66
-73
-74                <category android:name="android.intent.category.LAUNCHER" />
-74-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:54:17-77
-74-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:54:27-74
-75            </intent-filter>
-76        </activity>
-77        <activity
-77-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:57:9-59:63
-78            android:name="kim.tkland.musicbeewifisync.SettingsActivity"
-78-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:58:13-45
-79            android:label="@string/title_activity_settings" />
-79-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:59:13-60
-80        <activity
-80-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:60:9-62:66
-81            android:name="kim.tkland.musicbeewifisync.SyncResultsStatusActivity"
-81-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:61:13-54
-82            android:label="@string/title_activity_sync_status" />
-82-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:62:13-63
-83        <activity
-83-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:63:9-65:67
-84            android:name="kim.tkland.musicbeewifisync.SyncResultsPreviewActivity"
-84-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:64:13-55
-85            android:label="@string/title_activity_sync_preview" />
-85-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:65:13-64
-86        <activity
-86-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:66:9-68:69
-87            android:name="kim.tkland.musicbeewifisync.PlaylistSyncActivity"
-87-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:67:13-49
-88            android:label="@string/title_activity_sync_playlists" />
-88-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:68:13-66
-89        <activity
-89-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:69:9-71:69
-90            android:name="kim.tkland.musicbeewifisync.ViewErrorLogActivity"
-90-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:70:13-49
-91            android:label="@string/title_activity_view_error_log" />
-91-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:71:13-66
-92        <!-- This activity is critical for installing ARCore when it is not already present. -->
-93        <activity
-93-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:36:9-42:80
-94            android:name="com.google.ar.core.InstallActivity"
-94-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:37:13-62
-95            android:configChanges="keyboardHidden|orientation|screenSize"
-95-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:38:13-74
-96            android:excludeFromRecents="true"
-96-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:39:13-46
-97            android:exported="false"
-97-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:40:13-37
-98            android:launchMode="singleTop"
-98-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:41:13-43
-99            android:theme="@android:style/Theme.Material.Light.Dialog.Alert" />
-99-->[com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:42:13-77
-100
-101        <provider
-101-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
-102            android:name="androidx.startup.InitializationProvider"
-102-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:25:13-67
-103            android:authorities="kim.tkland.musicbeewifisync.androidx-startup"
-103-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:26:13-68
-104            android:exported="false" >
-104-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:27:13-37
-105            <meta-data
-105-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:29:13-31:52
-106                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-106-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:30:17-75
-107                android:value="androidx.startup" />
-107-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:31:17-49
-108            <meta-data
-108-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\d300b8489205f68ff03e4ef44937cd76\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:29:13-31:52
-109                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-109-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\d300b8489205f68ff03e4ef44937cd76\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:30:17-78
-110                android:value="androidx.startup" />
-110-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\d300b8489205f68ff03e4ef44937cd76\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:31:17-49
-111            <meta-data
-111-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
-112                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-112-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
-113                android:value="androidx.startup" />
-113-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
-114        </provider>
-115
-116        <uses-library
-116-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:23:9-25:40
-117            android:name="androidx.window.extensions"
-117-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:24:13-54
-118            android:required="false" />
-118-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:25:13-37
-119        <uses-library
-119-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:26:9-28:40
-120            android:name="androidx.window.sidecar"
-120-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:27:13-51
-121            android:required="false" />
-121-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:28:13-37
-122
-123        <activity
-123-->[androidx.compose.ui:ui-tooling-android:1.9.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\5e8981386112504b7f8d60bd9bd9c7a3\transformed\ui-tooling\AndroidManifest.xml:23:9-25:39
-124            android:name="androidx.compose.ui.tooling.PreviewActivity"
-124-->[androidx.compose.ui:ui-tooling-android:1.9.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\5e8981386112504b7f8d60bd9bd9c7a3\transformed\ui-tooling\AndroidManifest.xml:24:13-71
-125            android:exported="true" />
-125-->[androidx.compose.ui:ui-tooling-android:1.9.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\5e8981386112504b7f8d60bd9bd9c7a3\transformed\ui-tooling\AndroidManifest.xml:25:13-36
-126
-127        <receiver
-127-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
-128            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-128-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
-129            android:directBootAware="false"
-129-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
-130            android:enabled="true"
-130-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
-131            android:exported="true"
-131-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
-132            android:permission="android.permission.DUMP" >
-132-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
-133            <intent-filter>
-133-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
-134                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-134-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
-134-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
-135            </intent-filter>
-136            <intent-filter>
-136-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
-137                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-137-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
-137-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
-138            </intent-filter>
-139            <intent-filter>
-139-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
-140                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-140-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
-140-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
-141            </intent-filter>
-142            <intent-filter>
-142-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
-143                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-143-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
-143-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
-144            </intent-filter>
-145        </receiver>
-146    </application>
-147
-148</manifest>
+39    <application
+39-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:5-72:19
+40        android:name="kim.tkland.musicbeewifisync.WifiSyncApp"
+40-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:31:9-36
+41        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+41-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8b44ebdbd5090f319224773405e7682c\transformed\core-1.16.0\AndroidManifest.xml:28:18-86
+42        android:debuggable="true"
+43        android:extractNativeLibs="false"
+44        android:icon="@mipmap/ic_launcher"
+44-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:32:9-43
+45        android:label="@string/app_name"
+45-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:33:9-41
+46        android:roundIcon="@mipmap/ic_launcher_round"
+46-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:34:9-54
+47        android:supportsRtl="true"
+47-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:35:9-35
+48        android:testOnly="true"
+49        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+49-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:36:9-65
+50
+51        <!--
+52        <meta-data
+53            android:name="com.google.ar.core.min_apk_version"
+54            android:value="31"
+55            tools:replace="android:value" />
+56        <meta-data android:name="com.google.ar.core" android:value="optional" />
+57        -->
+58        <service
+58-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:42:9-45:56
+59            android:name="kim.tkland.musicbeewifisync.WifiSyncService"
+59-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:43:13-44
+60            android:exported="false"
+60-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:44:13-37
+61            android:foregroundServiceType="dataSync" />
+61-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:45:13-53
+62
+63        <activity
+63-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:9-56:20
+64            android:name="kim.tkland.musicbeewifisync.MainActivity"
+64-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:48:13-41
+65            android:exported="true" >
+65-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:13-36
+66            <intent-filter>
+66-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:50:13-55:29
+67                <action android:name="android.intent.action.MAIN" />
+67-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:51:17-69
+67-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:51:25-66
+68                <action android:name="android.intent.action.VIEW" />
+68-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:52:17-69
+68-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:52:25-66
+69
+70                <category android:name="android.intent.category.LAUNCHER" />
+70-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:54:17-77
+70-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:54:27-74
+71            </intent-filter>
+72        </activity>
+73        <activity
+73-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:57:9-59:63
+74            android:name="kim.tkland.musicbeewifisync.SettingsActivity"
+74-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:58:13-45
+75            android:label="@string/title_activity_settings" />
+75-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:59:13-60
+76        <activity
+76-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:60:9-62:66
+77            android:name="kim.tkland.musicbeewifisync.SyncResultsStatusActivity"
+77-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:61:13-54
+78            android:label="@string/title_activity_sync_status" />
+78-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:62:13-63
+79        <activity
+79-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:63:9-65:67
+80            android:name="kim.tkland.musicbeewifisync.SyncResultsPreviewActivity"
+80-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:64:13-55
+81            android:label="@string/title_activity_sync_preview" />
+81-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:65:13-64
+82        <activity
+82-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:66:9-68:69
+83            android:name="kim.tkland.musicbeewifisync.PlaylistSyncActivity"
+83-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:67:13-49
+84            android:label="@string/title_activity_sync_playlists" />
+84-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:68:13-66
+85        <activity
+85-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:69:9-71:69
+86            android:name="kim.tkland.musicbeewifisync.ViewErrorLogActivity"
+86-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:70:13-49
+87            android:label="@string/title_activity_view_error_log" />
+87-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:71:13-66
+88
+89        <provider
+89-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
+90            android:name="androidx.startup.InitializationProvider"
+90-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:25:13-67
+91            android:authorities="kim.tkland.musicbeewifisync.androidx-startup"
+91-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:26:13-68
+92            android:exported="false" >
+92-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:27:13-37
+93            <meta-data
+93-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:29:13-31:52
+94                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+94-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:30:17-75
+95                android:value="androidx.startup" />
+95-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:31:17-49
+96            <meta-data
+96-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\d300b8489205f68ff03e4ef44937cd76\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:29:13-31:52
+97                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+97-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\d300b8489205f68ff03e4ef44937cd76\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:30:17-78
+98                android:value="androidx.startup" />
+98-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\d300b8489205f68ff03e4ef44937cd76\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:31:17-49
+99            <meta-data
+99-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+100                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+100-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+101                android:value="androidx.startup" />
+101-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+102        </provider>
+103
+104        <uses-library
+104-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:23:9-25:40
+105            android:name="androidx.window.extensions"
+105-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:24:13-54
+106            android:required="false" />
+106-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:25:13-37
+107        <uses-library
+107-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:26:9-28:40
+108            android:name="androidx.window.sidecar"
+108-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:27:13-51
+109            android:required="false" />
+109-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a8a86fcd31a2b9b8620916090250ea1b\transformed\window-1.4.0\AndroidManifest.xml:28:13-37
+110
+111        <activity
+111-->[androidx.compose.ui:ui-tooling-android:1.9.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\5e8981386112504b7f8d60bd9bd9c7a3\transformed\ui-tooling\AndroidManifest.xml:23:9-25:39
+112            android:name="androidx.compose.ui.tooling.PreviewActivity"
+112-->[androidx.compose.ui:ui-tooling-android:1.9.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\5e8981386112504b7f8d60bd9bd9c7a3\transformed\ui-tooling\AndroidManifest.xml:24:13-71
+113            android:exported="true" />
+113-->[androidx.compose.ui:ui-tooling-android:1.9.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\5e8981386112504b7f8d60bd9bd9c7a3\transformed\ui-tooling\AndroidManifest.xml:25:13-36
+114
+115        <receiver
+115-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+116            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+116-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+117            android:directBootAware="false"
+117-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+118            android:enabled="true"
+118-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+119            android:exported="true"
+119-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+120            android:permission="android.permission.DUMP" >
+120-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+121            <intent-filter>
+121-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+122                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+122-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+122-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+123            </intent-filter>
+124            <intent-filter>
+124-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+125                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+125-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+125-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+126            </intent-filter>
+127            <intent-filter>
+127-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+128                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+128-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+128-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+129            </intent-filter>
+130            <intent-filter>
+130-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+131                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+131-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+131-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f3f07d0ffba0cb96758902ba9697424f\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+132            </intent-filter>
+133        </receiver>
+134    </application>
+135
+136</manifest>

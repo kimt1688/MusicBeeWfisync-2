@@ -4,8 +4,6 @@ ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:
 INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-74:12
 INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-74:12
 INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-74:12
-MERGED from [com.google.ar.sceneform:rendering:1.17.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b831830ec5cbcbe394ebb398101a00d0\transformed\rendering-1.17.1\AndroidManifest.xml:2:1-7:12
-MERGED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:8:1-45:12
 MERGED from [:app:poweramp_api_lib] D:\mws-poweramp\MusicBeeWfisync-2\app\poweramp_api_lib\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.3] C:\Users\toshi\.gradle\caches\8.14.3\transforms\dd1aa2d4d118854292a82bac55355d54\transformed\navigation-runtime-release\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-common-android:2.9.3] C:\Users\toshi\.gradle\caches\8.14.3\transforms\ae8663d33a12e3e8133496162ec32d01\transformed\navigation-common-release\AndroidManifest.xml:17:1-22:12
@@ -167,8 +165,6 @@ ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:24
 		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:24:22-76
 queries
 ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:5-28:15
-MERGED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:20:5-27:15
-MERGED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:20:5-27:15
 package#com.maxmpz.audioplayer
 ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:27:9-58
 	android:name
@@ -176,8 +172,6 @@ ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:27
 application
 ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:5-72:19
 INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:5-72:19
-MERGED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:29:5-43:19
-MERGED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:29:5-43:19
 MERGED from [com.google.android.material:material:1.13.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\723a5c5bf56e60c6caef0bf41dc536e2\transformed\material-1.13.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.13.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\723a5c5bf56e60c6caef0bf41dc536e2\transformed\material-1.13.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.2.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\54a32b8c6c2a238a001dc158ae792eef\transformed\constraintlayout-2.2.1\AndroidManifest.xml:7:5-20
@@ -214,23 +208,6 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\toshi\.gradle\cach
 		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:36:9-65
 	android:name
 		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:31:9-36
-meta-data#com.google.ar.core.min_apk_version
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:37:9-40:45
-MERGED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:32:9-34:41
-MERGED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:32:9-34:41
-	tools:replace
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:40:13-42
-	android:value
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:39:13-31
-		REJECTED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:34:13-38
-	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:38:13-62
-meta-data#com.google.ar.core
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:9-81
-	android:value
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:54-78
-	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:20-53
 service#kim.tkland.musicbeewifisync.WifiSyncService
 ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:42:9-45:56
 	android:exported
@@ -293,10 +270,6 @@ uses-sdk
 INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
 INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
-MERGED from [com.google.ar.sceneform:rendering:1.17.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b831830ec5cbcbe394ebb398101a00d0\transformed\rendering-1.17.1\AndroidManifest.xml:5:5-44
-MERGED from [com.google.ar.sceneform:rendering:1.17.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b831830ec5cbcbe394ebb398101a00d0\transformed\rendering-1.17.1\AndroidManifest.xml:5:5-44
-MERGED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:16:5-18:41
-MERGED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:16:5-18:41
 MERGED from [:app:poweramp_api_lib] D:\mws-poweramp\MusicBeeWfisync-2\app\poweramp_api_lib\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [:app:poweramp_api_lib] D:\mws-poweramp\MusicBeeWfisync-2\app\poweramp_api_lib\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.3] C:\Users\toshi\.gradle\caches\8.14.3\transforms\dd1aa2d4d118854292a82bac55355d54\transformed\navigation-runtime-release\AndroidManifest.xml:20:5-44
@@ -501,34 +474,6 @@ MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\toshi\.gradle\cache
 		INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
 	android:minSdkVersion
 		INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
-package#com.google.ar.core
-ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:21:9-54
-	android:name
-		ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:21:18-51
-package#com.android.vending
-ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:22:9-55
-	android:name
-		ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:22:18-52
-intent#action:name:com.google.android.play.core.install.BIND_INSTALL_SERVICE
-ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:24:9-26:18
-action#com.google.android.play.core.install.BIND_INSTALL_SERVICE
-ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:25:13-96
-	android:name
-		ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:25:21-93
-activity#com.google.ar.core.InstallActivity
-ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:36:9-42:80
-	android:excludeFromRecents
-		ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:39:13-46
-	android:launchMode
-		ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:41:13-43
-	android:exported
-		ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:40:13-37
-	android:configChanges
-		ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:38:13-74
-	android:theme
-		ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:42:13-77
-	android:name
-		ADDED from [com.google.ar:core:1.50.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\93ba6e3394bc748d4fdca64ebf61745c\transformed\core-1.50.0\AndroidManifest.xml:37:13-62
 provider#androidx.startup.InitializationProvider
 ADDED from [androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f738c76e8c267726ec0ccffb8f35ae31\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
 MERGED from [androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\d300b8489205f68ff03e4ef44937cd76\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:24:9-32:20

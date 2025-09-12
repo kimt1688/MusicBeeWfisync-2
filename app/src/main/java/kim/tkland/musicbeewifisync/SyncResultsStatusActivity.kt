@@ -3,13 +3,12 @@ package kim.tkland.musicbeewifisync
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
+import androidx.compose.material3.AlertDialog
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +24,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -43,6 +41,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
@@ -56,7 +55,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -66,6 +64,8 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
+    var showEndOfSyncDialog by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -110,9 +110,10 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
 
         val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
         val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
+        var completeMessage by remember { mutableStateOf("") }
 
         Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 MusicBeeWifiSyncTopBar(
                     title = {
@@ -186,21 +187,16 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                         ),
                         onClick = {
                             if (buttonText == getString(R.string.syncStop)) {
-                                try {
-                                    WifiSyncServiceSettings.syncCustomFiles = false
-                                    runOnUiThread {
-                                        WifiSyncService.waitSyncResults.waitOne()
-                                        WifiSyncService.startSynchronisation(
-                                            applicationContext,
-                                            0,
-                                            false,
-                                            false
-                                        )
-                                        onButtonTextChange("Sync More")
-                                    }
-                                } catch (ex: Exception) {
-                                    Log.d("onSyncStartButtonClick", ex.message!!)
-                                }
+                                val intent = Intent()
+                                intent.setClass(context, WifiSyncService::class.java)
+                                intent.action = getString(R.string.actionSyncAbort)
+                                startService(intent)
+                                WifiSyncService.syncPercentCompleted.set(-1)
+                                WifiSyncServiceSettings.saveSettings(context)
+                                WifiSyncService.syncErrorMessageId.set(R.string.syncCancelled)
+                                completeMessage = getString(R.string.syncCancelled)
+                                showEndOfSyncDialog = true
+                                onButtonTextChange(getString(R.string.syncMore))
                             } else if (buttonText == getString(R.string.syncMore)){
                                 val intent =
                                     Intent(context, MainActivity::class.java) // Use the context
@@ -219,8 +215,37 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                 currentSyncMessage, onCurrentSyncMessageChange,
                 buttonText, onButtonTextChange,
             scrollBehavior)
+
+            if (showEndOfSyncDialog) {
+                ShowEndOfSyncInformation(
+                    paddingValue = innerPadding,
+                    statusBarPadding = statusBarPadding,
+                    message = completeMessage,
+                    onDismiss = { showEndOfSyncDialog = false})
+            }
         }
     }
+
+    @Composable
+    fun ShowEndOfSyncInformation(
+        paddingValue: PaddingValues,
+        statusBarPadding: PaddingValues,
+        message: String,
+        onDismiss: () -> Unit
+    ) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            modifier = Modifier.padding(paddingValue).padding(statusBarPadding),
+            title = { Text(text = getString(R.string.syncCancelled)) },
+            text = { Text(text = message) },
+            confirmButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(text = getString(android.R.string.ok))
+                }
+            },
+        )
+    }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -235,7 +260,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
     var loading by remember { mutableStateOf(true) }
     var showEndOfSyncInfo by remember { mutableStateOf(false) }
     var isErrorEnd by remember { mutableStateOf(false) }
-    var completeMessage by remember { mutableStateOf("") }
+    var compMessage by remember { mutableStateOf("") }
 
     val animatedSyncProgress by animateFloatAsState(
         targetValue = rawTargetSyncProgress,
@@ -283,7 +308,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                     .padding(top = 20.dp, start = 15.dp, end = 15.dp)
                     .height(90.dp),
                 //.padding(start = 15.dp, top = 200.dp),
-                text = completeMessage,
+                text = compMessage,
                 maxLines = 3,
                 fontSize = 18.sp
             )
@@ -298,7 +323,8 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(170.dp),
+                        .height(170.dp)
+                        .padding(start = 15.dp, end = 15.dp),
                     text = currentSyncMessage,
                     maxLines = 7,
                     fontSize = 16.sp,
@@ -309,7 +335,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
     }
     if (showEndOfSyncInfo) {
         onCurrentSyncMessageChange("")
-        completeMessage = getString(R.string.syncCompleted)
+        compMessage = getString(R.string.syncCompleted)
         if (WifiSyncService.syncErrorMessageId.get() == 0 && !isErrorEnd) {
             // 正常系のメッセージ表示、データのクリアを行う
             Column(
@@ -334,14 +360,15 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                         .padding(top = 20.dp, start = 15.dp, end = 15.dp)
                         .height(90.dp),
                     //.padding(start = 15.dp, top = 200.dp),
-                    text = completeMessage,
+                    text = compMessage,
                     maxLines = 3,
                     fontSize = 18.sp
                 )
             }
         } else {
             isErrorEnd = true
-            ShowEndOfSyncInformation(innerPadding, statusBarPadding, completeMessage, { completeMessage = it })
+            //ShowEndOfSyncInformation(innerPadding, statusBarPadding, compMessage, onDismiss = { showEndOfSyncDialog = false})
+            ShowEndOfSyncInformation(innerPadding, statusBarPadding, compMessage, onCompleteTextChange = {compMessage = it})
         }
     }
 }
@@ -374,7 +401,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
     }
 
     @Composable
-    private fun ShowEndOfSyncInformation(innerPadding: PaddingValues, statusBarPadding: PaddingValues, completeMessage: String, onCompleteTextChange: (String) -> Unit) {
+    private fun ShowEndOfSyncInformation(innerPadding: PaddingValues, statusBarPadding: PaddingValues, compMessage: String, onCompleteTextChange: (String) -> Unit) {
         val errorMessageId = WifiSyncService.syncErrorMessageId.getAndSet(0)
         WifiSyncServiceSettings.saveSettings(this)
         var errorMessage = ""
@@ -408,7 +435,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
             onCompleteTextChange(errorMessage)
             ShowResultsComposable(innerPadding, statusBarPadding, errorMessage, WifiSyncService.syncToResults,null)
         } else {
-            val builder = AlertDialog.Builder(this)
+            val builder = androidx.appcompat.app.AlertDialog.Builder(this)
             builder.setTitle(getString(R.string.syncErrorHeader))
             builder.setMessage(getString(errorMessageId))
             builder.setIcon(android.R.drawable.ic_dialog_alert)

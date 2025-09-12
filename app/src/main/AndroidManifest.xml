@@ -34,11 +34,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <meta-data
+        <!--<meta-data
             android:name="com.google.ar.core.min_apk_version"
             android:value="31"
             tools:replace="android:value" />
-        <meta-data android:name="com.google.ar.core" android:value="optional" />
+        <meta-data android:name="com.google.ar.core" android:value="optional" />-->
         <service
             android:name=".WifiSyncService"
             android:exported="false"

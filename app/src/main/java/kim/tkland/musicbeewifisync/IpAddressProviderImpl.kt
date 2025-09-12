@@ -39,9 +39,10 @@ class IpAddressProviderImpl(context: Context, overrideSearchIP: InetAddress?) : 
         }
         var ipSplit = deviceIP.hostAddress!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
             .toTypedArray()
-        ipSplit = Arrays.copyOf(ipSplit, 3)
+        @Suppress("UNCHECKED_CAST")
+        ipSplit = ipSplit.copyOf(3) as Array<String>
         var ipPrefix = ""
-        for (ipPart in Arrays.asList<String>(*ipSplit)) {
+        for (ipPart in listOf<String>(*ipSplit)) {
             ipPrefix += "$ipPart."
         }
         return ipPrefix

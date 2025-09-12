@@ -64,6 +64,7 @@
     <string name="reverseSyncFilesWarning1">1 file</string>
     <string name="reverseSyncFilesWarningN">%d files</string>
     <string name="logCopyClipboard">Copy to Clipboard</string>
+    <string name="logClear">Clear error log</string>
     <string name="errorNone">No errors.</string>
     <string name="errorServerNotFound">Server not found. Ensure MusicBee is running and Windows firewall is not blocking MusicBee.</string>
     <string name="errorConfigNotMatched">MusicBee can\'t match the device name to an existing configuration.</string>

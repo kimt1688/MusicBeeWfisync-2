@@ -64,6 +64,7 @@
     <string name="reverseSyncFilesWarning1">1 arquivo</string>
     <string name="reverseSyncFilesWarningN">%d arquivos</string>
     <string name="logCopyClipboard">Copiar para a área de transferência</string>
+    <string name="logClear">Clear error log</string>
     <string name="errorNone">Sem erros.</string>
     <string name="errorServerNotFound">Servidor não encontrado. Verifique se o Musicbee está rodando e o firewall não está bloqueando o Musicbee.</string>
     <string name="errorConfigNotMatched">O Musicbee não pôde conferir o nome do dispositivo com a configuração atual.</string>
