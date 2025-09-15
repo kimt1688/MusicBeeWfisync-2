@@ -1,162 +1,170 @@
 [
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/drawable_ic_launcher_background.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/drawable/ic_launcher_background.xml"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxxhdpi_ic_sync_round.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxxhdpi\\ic_sync_round.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/drawable_rounded_background.xml.flat",
+        "source": "kim.tkland.musicbeewifisync.app-main-72:/drawable/rounded_background.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\drawable_rounded_background.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\drawable\\rounded_background.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xhdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xhdpi/ic_launcher_foreground.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxhdpi_ic_sync_foreground.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxhdpi\\ic_sync_foreground.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-hdpi/ic_launcher.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxxhdpi\\ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxxhdpi_ic_sync_round.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxxhdpi/ic_sync_round.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-anydpi-v26\\ic_launcher.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxhdpi_ic_sync_foreground.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxhdpi/ic_sync_foreground.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\drawable_ic_sync_background.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\drawable\\ic_sync_background.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxxhdpi_ic_sync_foreground.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxxhdpi/ic_sync_foreground.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\drawable\\ic_launcher_background.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxhdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxhdpi/ic_launcher_foreground.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xhdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/layout_dialog_sync_progress.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/layout/dialog_sync_progress.xml"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-hdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxxhdpi_ic_sync.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxxhdpi/ic_sync.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-mdpi_ic_sync_round.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-mdpi\\ic_sync_round.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxhdpi_ic_sync_round.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxhdpi/ic_sync_round.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\drawable_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\drawable\\ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xhdpi_ic_sync_round.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xhdpi\\ic_sync_round.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-mdpi/ic_launcher.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\layout_dialog_sync_progress.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\layout\\dialog_sync_progress.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-mdpi_ic_sync.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-mdpi/ic_sync.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-mdpi_ic_launcher_foreground.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-mdpi\\ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xhdpi_ic_sync_foreground.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xhdpi/ic_sync_foreground.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxxhdpi\\ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxhdpi/ic_launcher.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xhdpi\\ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-hdpi_ic_sync.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-hdpi/ic_sync.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxxhdpi_ic_sync.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxxhdpi\\ic_sync.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-hdpi_ic_sync_round.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-hdpi/ic_sync_round.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-mdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-mdpi\\ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-anydpi-v26_ic_sync.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-anydpi-v26\\ic_sync.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xhdpi_ic_sync.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xhdpi\\ic_sync.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxhdpi_ic_sync.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxhdpi/ic_sync.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\drawable_ic_arrow_back.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\drawable\\ic_arrow_back.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\drawable_ic_arrow_forward.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\drawable\\ic_arrow_forward.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxxhdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-hdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-hdpi/ic_launcher_foreground.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxhdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/drawable_ic_launcher_round.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/drawable/ic_launcher_round.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-hdpi_ic_sync_foreground.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-hdpi\\ic_sync_foreground.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xhdpi_ic_sync.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xhdpi/ic_sync.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-mdpi_ic_sync_foreground.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-mdpi\\ic_sync_foreground.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-anydpi-v26_ic_sync_round.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-anydpi-v26/ic_sync_round.xml"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xhdpi_ic_sync_foreground.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xhdpi\\ic_sync_foreground.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/drawable_ic_arrow_forward.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/drawable/ic_arrow_forward.xml"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xhdpi\\ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-mdpi_ic_sync_foreground.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-mdpi/ic_sync_foreground.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-mdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xhdpi_ic_sync_round.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xhdpi/ic_sync_round.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-mdpi_ic_sync.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-mdpi\\ic_sync.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/drawable_ic_sync_background.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/drawable/ic_sync_background.xml"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxhdpi\\ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/drawable_ic_arrow_back.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/drawable/ic_arrow_back.xml"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxxhdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxxhdpi/ic_launcher_foreground.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-hdpi_ic_launcher_foreground.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-hdpi\\ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-mdpi_ic_sync_round.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-mdpi/ic_sync_round.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-hdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-hdpi\\ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-hdpi_ic_sync_round.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-hdpi\\ic_sync_round.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxhdpi_ic_sync.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxhdpi\\ic_sync.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-mdpi_ic_launcher_foreground.png.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-mdpi/ic_launcher_foreground.png"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxxhdpi_ic_sync_foreground.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxxhdpi\\ic_sync_foreground.webp"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-anydpi-v26_ic_sync.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-anydpi-v26/ic_sync.xml"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxhdpi\\ic_launcher.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-hdpi_ic_sync_foreground.webp.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-hdpi/ic_sync_foreground.webp"
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-hdpi_ic_sync.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-hdpi\\ic_sync.webp"
+    },
+    {
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-anydpi-v26_ic_sync_round.xml.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-anydpi-v26\\ic_sync_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-debug-69:\\mipmap-xxhdpi_ic_sync_round.webp.flat",
+        "source": "C:\\Users\\toshi\\.gradle\\daemon\\8.14.3\\kim.tkland.musicbeewifisync.app-main-72:\\mipmap-xxhdpi\\ic_sync_round.webp"
     }
 ]

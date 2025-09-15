@@ -1,4 +1,4 @@
-#Fri Sep 12 04:27:46 JST 2025
+#Tue Sep 16 06:59:11 JST 2025
 base.0=D\:\\mws-poweramp\\MusicBeeWfisync-2\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
 base.1=D\:\\mws-poweramp\\MusicBeeWfisync-2\\app\\build\\intermediates\\dex\\debug\\mergeLibDexDebug\\12\\classes.dex
 base.10=D\:\\mws-poweramp\\MusicBeeWfisync-2\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes3.dex

@@ -1,6 +1,7 @@
 package kim.tkland.musicbeewifisync
 
 import android.Manifest
+import android.R.color.white
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,6 +14,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -162,7 +164,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             .height(80.dp)
                             .border(
                                 width = 2.dp, // 枠線の幅
-                                color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                                color = Color(getColor(white)), // 枠線の色
                             ),
                         shape = androidx.compose.ui.graphics.RectangleShape,
                         colors = ButtonDefaults.buttonColors(
@@ -211,8 +213,9 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         ) { innerPadding ->
             Column(
                 modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(statusBarPadding),
+                    .background(Color(getColor(white)))
+                    .padding(innerPadding),
+                    //.padding(statusBarPadding),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start,
             ) {
@@ -301,6 +304,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         ) { innerPadding ->
             Column(
                 modifier = Modifier
+                    .background(Color(getColor(white)))
                     .padding(innerPadding)
                     .padding(statusBarPadding)
                     .padding(navigationBarPadding),
@@ -309,7 +313,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        //.fillMaxWidth()
                         .padding(start = 15.dp, end = 15.dp, top = 50.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
@@ -318,7 +322,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 }
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        //.fillMaxWidth()
                         .padding(start = 15.dp, end = 15.dp, top = 100.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,

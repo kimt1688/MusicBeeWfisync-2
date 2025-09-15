@@ -1,11 +1,13 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.color.white
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
@@ -238,7 +240,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         .height(80.dp)
                         .border(
                             width = 2.dp, // 枠線の幅
-                            color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                            color = Color(getColor(white)), // 枠線の色
                         ),
                         enabled = isSyncButtonEnabled.value,
                         shape = androidx.compose.ui.graphics.RectangleShape,
@@ -365,6 +367,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                                 Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
                             }
                             DropdownMenu(
+                                modifier = Modifier.background(Color(getColor(white))),
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false }
                             ) {
@@ -406,7 +409,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                         .height(80.dp)
                         .border(
                             width = 2.dp, // 枠線の幅
-                            color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                            color = Color(getColor(white)), // 枠線の色
                         ),
                         shape = androidx.compose.ui.graphics.RectangleShape,
                         colors = ButtonDefaults.buttonColors(
@@ -506,8 +509,9 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         }
         LazyColumn (
             modifier =
-                Modifier.padding(innerPadding)
-                    .padding(statusBarPadding),
+                Modifier.background(Color(getColor(white)))
+                        .padding(innerPadding),
+                        //.padding(statusBarPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {

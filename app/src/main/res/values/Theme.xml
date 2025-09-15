@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AlertDialog.PositiveBtn" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:background">@drawable/rounded_background</item>
+        <item name="android:textColor">@color/colorButtonTextEnabled</item>
+        <item name="android:layout_marginStart">20dp</item>
+    </style>
+    <style name="AlertDialog.NegativeBtn" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:background">@drawable/rounded_background</item>
+        <item name="android:textColor">@color/colorButtonTextEnabled</item>
+    </style>
+    <style name="AlertDialog.NeutralBtn" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:background">@drawable/rounded_background</item>
+        <item name="android:textColor">@color/colorButtonTextEnabled</item>
+    </style>
+</resources>

@@ -1,10 +1,10 @@
 package kim.tkland.musicbeewifisync
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 
 class WifiSyncAlertDialog : DialogFragment() {

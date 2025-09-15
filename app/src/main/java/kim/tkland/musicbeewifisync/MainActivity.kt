@@ -1,5 +1,6 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.color.white
 import android.app.ActivityManager.TaskDescription
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -150,6 +152,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
                             Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
                         }
                         DropdownMenu(
+                            modifier = Modifier.background(Color(getColor(white))),
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
                         ) {
@@ -241,7 +244,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
                             .height(80.dp)
                             .border(
                                 width = 2.dp, // 枠線の幅
-                                color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                                color = Color(getColor(white)), // 枠線の色
                             ),
                         shape = RectangleShape,
                         colors = ButtonDefaults.buttonColors(
@@ -287,7 +290,7 @@ class MainActivity() : WifiSyncBaseActivity("") {
                             .height(80.dp)
                             .border(
                                 width = 2.dp, // 枠線の幅
-                                color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                                color = Color(getColor(white)), // 枠線の色
                             ),
                         shape = RectangleShape,
                         colors = ButtonDefaults.buttonColors(
@@ -334,13 +337,13 @@ class MainActivity() : WifiSyncBaseActivity("") {
         ) { innerPadding ->
             Column(
                 modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(statusBarPadding),
-                    //.fillMaxSize()
+                    .background(Color(getColor(white)))
+                    .padding(innerPadding),
+                    //.padding(statusBarPadding),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start,
             ) {
-                Row(modifier = Modifier.padding(top = 15.dp)) {
+                Row(/*modifier = Modifier.padding(top = 15.dp)*/) {
                     Image(
                         painter = painterResource(R.drawable.ic_arrow_forward),
                         contentDescription = "Header"

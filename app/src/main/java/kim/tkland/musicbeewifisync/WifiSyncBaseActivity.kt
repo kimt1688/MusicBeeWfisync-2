@@ -1,10 +1,8 @@
 package kim.tkland.musicbeewifisync
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.DialogInterface
-import android.content.res.Resources
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -12,6 +10,7 @@ import android.os.Bundle
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import java.io.File
 
@@ -35,7 +34,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
     }
 
     fun onFullScanMenuItemClick() {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder((application as WifiSyncApp).currentActivity!!)
             .setTitle(R.string.progressDialogTitle)
             .setMessage(R.string.alertDialogMessage)
             .setPositiveButton("OK") { dialog: DialogInterface, _ ->
@@ -47,7 +46,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                 // クリックしたときの処理
                 dialog.dismiss()
             }
-//            .create()
+            .create()
             .show()
     }
 
@@ -139,7 +138,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
             .setPositiveButton("OK") { dialog: DialogInterface, _ ->
                 // OKボタン押下時に実行したい処理を記述
                 dialog.dismiss()
-                var thread = Thread(DeleteAllPlaylists())
+                val thread = Thread(DeleteAllPlaylists())
                 showWifiSyncAlertDialog(getString(R.string.playlistDeletingMessage), thread, null)
             }
             .setNegativeButton("Cancel") { dialog: DialogInterface, _ ->

@@ -30,13 +30,11 @@ object Dialog {
                     synchronized(dialogWait) { dialogWait.notifyAll() }
                 })
             errorDialog.setPositiveButton(
-                android.R.string.ok,
-                object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface, which: Int) {
-                        result.set(android.R.string.ok)
-                        synchronized(dialogWait) { dialogWait.notifyAll() }
-                    }
-                })
+                android.R.string.ok
+            ) { dialog, which ->
+                result.set(android.R.string.ok)
+                synchronized(dialogWait) { dialogWait.notifyAll() }
+            }
             errorDialog.setCancelable(false)
             errorDialog.show()
         }

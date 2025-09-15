@@ -1,5 +1,6 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.color.white
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.AlertDialog
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -135,6 +137,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                                 Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
                             }
                             DropdownMenu(
+                                modifier = Modifier.background(Color(getColor(white))),
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false }
                             ) {
@@ -168,7 +171,8 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             },
             bottomBar = {
                 Column (
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(navigationBarPadding),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
@@ -178,7 +182,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                             .height(80.dp)
                             .border(
                                 width = 2.dp, // 枠線の幅
-                                color = Color(getColor(R.color.colorButtonTextEnabled)), // 枠線の色
+                                color = Color(getColor(white)), // 枠線の色
                             ),
                         shape = androidx.compose.ui.graphics.RectangleShape,
                         colors = ButtonDefaults.buttonColors(
@@ -235,11 +239,19 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     ) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            modifier = Modifier.padding(paddingValue).padding(statusBarPadding),
-            title = { Text(text = getString(R.string.syncCancelled)) },
+            modifier = Modifier
+                .padding(paddingValue),
+                //.padding(statusBarPadding),
+            //title = { Text(text = getString(R.string.syncCancelled)) },
             text = { Text(text = message) },
             confirmButton = {
-                TextButton(onClick = onDismiss) {
+                TextButton(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                        contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                    )
+            ){
                     Text(text = getString(android.R.string.ok))
                 }
             },
@@ -286,12 +298,13 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
         }
     }
     Column(
+        modifier = Modifier
+            //.fillMaxWidth()
+            .background(Color(color = getColor(white)))
+            .padding(innerPadding),
+                //.padding(statusBarPadding)
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(innerPadding)
-            .padding(statusBarPadding)
     ) {
         if (loading) {
             LinearProgressIndicator(
@@ -299,7 +312,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 modifier = Modifier
                     .padding(top = 120.dp, start = 15.dp, end = 15.dp)
                     .fillMaxWidth(),
-                    color = Color(getColor(R.color.colorButtonTextEnabled)),
+                    color = Color(getColor(R.color.colorSuccess)),
                     trackColor = Color(getColor(R.color.colorButtonBackground))
             )
             Text(
@@ -314,7 +327,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
             )
             CircularProgressIndicator(
                 modifier = Modifier.width(64.dp),
-                color = Color(getColor(R.color.colorButtonBackground)),
+                color = Color(getColor(R.color.colorError)),
                 trackColor = Color(getColor(R.color.colorButtonTextEnabled))
             )
             Column (
@@ -531,8 +544,10 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
         }
         LazyColumn (
             modifier =
-                Modifier.padding(innerPadding)
-                    .padding(statusBarPadding),
+                Modifier
+                    .background(Color(color = getColor(white)))
+                    .padding(innerPadding),
+                    //.padding(statusBarPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {

@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
@@ -13,4 +13,9 @@
         <item name="android:layout_height">match_parent</item>
     </style>
 
+    <style name="CustomAlertDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/AlertDialog.PositiveBtn</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AlertDialog.NegativeBtn</item>
+        <item name="buttonBarNeutralButtonStyle">@style/AlertDialog.NegativeBtn</item>
+    </style>
 </resources>

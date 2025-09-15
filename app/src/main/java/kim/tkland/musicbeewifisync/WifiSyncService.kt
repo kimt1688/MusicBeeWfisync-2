@@ -24,7 +24,7 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
-import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.Composable
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import androidx.core.os.BundleCompat
@@ -42,9 +42,6 @@ import kim.tkland.musicbeewifisync.ErrorHandler.logError
 import kim.tkland.musicbeewifisync.ErrorHandler.logInfo
 import kim.tkland.musicbeewifisync.WifiSyncService.Companion.syncProgressMessage
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.DataInputStream
@@ -820,32 +817,13 @@ class WifiSyncService : Service() {
                 var isplaylist = false
                 if (ext.isNotEmpty())
                     isplaylist = ext.equals("m3u", ignoreCase = true) || ext.equals("m3u8", ignoreCase = true) || ext.equals("wpl", ignoreCase = true) || ext.equals("pla", ignoreCase = true)
-                // val mimetype: String?
+
                 if (isplaylist) {
                     receivePlaylist(filePath, fileLength, fileDateModified)
                     return
-                } /*else {*/
+                }
                 val mimetype = MimeTypeMap.getSingleton()
                         .getMimeTypeFromExtension(ext.lowercase(Locale.getDefault()))
-                /*
-                    if (!mimetype!!.startsWith("audio", true)) {
-                        writeString(syncStatusCANCEL)
-                        flushWriter()
-                        // エラーダイアログ表示、スキップ
-                        val msg: String = resources.getString(R.string.mimeTypeErrorMessage)
-                        GlobalScope.launch(Dispatchers.Main) {
-                            AlertDialog.Builder((application as WifiSyncApp).currentActivity!!)
-                                .setTitle(R.string.mimeTypeError)
-                                .setMessage("${msg}\n$filePath")
-                                .setPositiveButton("OK") { _, _ ->
-                                }
-                                .create()
-                                .show()
-                        }
-                        // writeString(resources.getString(R.string.mimeTypeError))
-                        return
-                    }
-                }*/
                 val separatorIndex = filePath.lastIndexOf('/') + 1
                 val path = filePath.substring(0, separatorIndex)
                 val name = filePath.substring(separatorIndex)
@@ -1273,13 +1251,13 @@ class WifiSyncService : Service() {
             val deleteCount = readInt()
             syncPercentCompleted.set(readShort().toInt())
             readToEndOfCommand()
+
             if (showOkCancelDialog(
                     String.format(
                         getString(if ((deleteCount == 1)) R.string.syncDeleteConfirm1 else R.string.syncDeleteConfirm9),
                         deleteCount
                     )
-                ) == android.R.string.ok
-            ) {
+                ) == android.R.string.ok) {
                 writeString(syncStatusOK)
             } else {
                 syncErrorMessageId.set(R.string.syncCancelled)
