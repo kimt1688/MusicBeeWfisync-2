@@ -1,5 +1,6 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.color.white
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -22,8 +23,12 @@ fun MusicBeeWifiSyncTopBar(
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = colorResource(R.color.colorButtonBackground),
-        scrolledContainerColor = colorResource(R.color.colorButtonTextEnabled)
+        containerColor = colorResource(R.color.colorPrimary),
+        //colorOnContainer = colorResource(white),
+        titleContentColor = colorResource(white),
+        navigationIconContentColor = colorResource(white),
+        actionIconContentColor = colorResource(white),
+        scrolledContainerColor = colorResource(white)
     ),
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {

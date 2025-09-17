@@ -4,7 +4,7 @@
             "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-67:/values-v28/values-v28.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\723a5c5bf56e60c6caef0bf41dc536e2\\transformed\\material-1.13.0\\res\\values-v28\\values-v28.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\9ac394a060ca3857319c05300999078f\\transformed\\material-1.13.0\\res\\values-v28\\values-v28.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\238610178043d900f0e98cc57f5d6258\\transformed\\appcompat-1.7.1\\res\\values-v28\\values-v28.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\39c6853b6c3ca56fdb9da64a74449f29\\transformed\\appcompat-1.7.1\\res\\values-v28\\values-v28.xml",
                     "from": {
                         "startLines": "2,3,4,8",
                         "startColumns": "4,4,4,4",

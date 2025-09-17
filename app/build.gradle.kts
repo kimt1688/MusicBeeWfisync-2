@@ -140,6 +140,7 @@ dependencies {
     implementation (libs.androidx.documentfile)
     implementation (libs.kotlinx.coroutines.android)
     implementation (platform(libs.compose.bom))
+    implementation(libs.androidx.compose.runtime)
     //androidTestImplementation (platform(libs.compose.bom))
     //androidTestImplementation(libs.androidx.ui.test.junit4)
     //debugImplementation(libs.androidx.ui.tooling)

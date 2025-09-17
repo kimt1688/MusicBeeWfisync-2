@@ -48,6 +48,7 @@ litertMetadata = "1.4.0"
 uiToolingPreviewVersion = "1.4.2"
 uiGraphics = "1.9.0"
 rendering = "1.17.1"
+runtimeVersion = "1.9.1"
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 accompanist-systemuicontroller-v0203 = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontrollerVersion" }
@@ -108,6 +109,7 @@ androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigat
 litert-metadata = { group = "com.google.ai.edge.litert", name = "litert-metadata", version.ref = "litertMetadata" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
 rendering = { group = "com.google.ar.sceneform", name = "rendering", version.ref = "rendering" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtimeVersion" }
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

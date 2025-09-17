@@ -12,6 +12,8 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppCompatActivity() {

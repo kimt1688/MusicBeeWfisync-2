@@ -15,9 +15,7 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission
-        android:name="android.permission.MANAGE_MEDIA"
-        android:minSdkVersion="33" />
+    <uses-permission android:name="android.permission.MANAGE_MEDIA" />
     <uses-permission android:name="android.permission.STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -47,14 +45,6 @@
         android:supportsRtl="true"
         android:testOnly="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
-
-        <!--
-        <meta-data
-            android:name="com.google.ar.core.min_apk_version"
-            android:value="31"
-            tools:replace="android:value" />
-        <meta-data android:name="com.google.ar.core" android:value="optional" />
-        -->
         <service
             android:name="kim.tkland.musicbeewifisync.WifiSyncService"
             android:exported="false"

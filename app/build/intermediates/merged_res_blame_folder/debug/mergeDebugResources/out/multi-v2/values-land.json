@@ -4,7 +4,17 @@
             "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-67:/values-land/values-land.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\723a5c5bf56e60c6caef0bf41dc536e2\\transformed\\material-1.13.0\\res\\values-land\\values-land.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\39c6853b6c3ca56fdb9da64a74449f29\\transformed\\appcompat-1.7.1\\res\\values-land\\values-land.xml",
+                    "from": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,125,196",
+                        "endColumns": "69,70,67",
+                        "endOffsets": "120,191,259"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\9ac394a060ca3857319c05300999078f\\transformed\\material-1.13.0\\res\\values-land\\values-land.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,31,36",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -20,16 +30,6 @@
                         "endLines": "5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,24,33,38,41",
                         "endColumns": "74,73,64,66,69,71,68,68,81,89,75,67,66,77,64,66,10,10,10,10",
                         "endOffsets": "334,408,473,540,610,682,751,820,902,992,1068,1136,1203,1281,1346,1413,1585,2154,2423,2651"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\238610178043d900f0e98cc57f5d6258\\transformed\\appcompat-1.7.1\\res\\values-land\\values-land.xml",
-                    "from": {
-                        "startLines": "2,3,4",
-                        "startColumns": "4,4,4",
-                        "startOffsets": "55,125,196",
-                        "endColumns": "69,70,67",
-                        "endOffsets": "120,191,259"
                     }
                 }
             ]

@@ -312,7 +312,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 modifier = Modifier
                     .padding(top = 120.dp, start = 15.dp, end = 15.dp)
                     .fillMaxWidth(),
-                    color = Color(getColor(R.color.colorSuccess)),
+                    color = Color(getColor(R.color.colorAccent)),
                     trackColor = Color(getColor(R.color.colorButtonBackground))
             )
             Text(
@@ -327,7 +327,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
             )
             CircularProgressIndicator(
                 modifier = Modifier.width(64.dp),
-                color = Color(getColor(R.color.colorError)),
+                color = Color(getColor(R.color.colorAccent)),
                 trackColor = Color(getColor(R.color.colorButtonTextEnabled))
             )
             Column (

@@ -510,8 +510,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         LazyColumn (
             modifier =
                 Modifier.background(Color(getColor(white)))
-                        .padding(innerPadding),
-                        //.padding(statusBarPadding),
+                        .padding(innerPadding)
+                        .padding(top = 3.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {
@@ -524,7 +524,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             contentDescription = "Sync Direction Icon", // Provide a content description
                         )
                         Text(
-                            text = if (info.targetName == null) "" else info.targetName,
+                            text = info.targetName ?: "",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             fontSize = 24.sp

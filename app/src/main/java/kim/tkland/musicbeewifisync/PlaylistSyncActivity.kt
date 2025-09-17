@@ -1,6 +1,5 @@
 package kim.tkland.musicbeewifisync
 
-import android.R.color.white
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -54,11 +53,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import java.net.SocketTimeoutException
 
 class PlaylistSyncActivity : WifiSyncBaseActivity {
     private var checkCount by mutableStateOf("")
-    //private var checkCount by mutableStateOf(getString(R.string.syncPlaylists0))
+
     private val isListChecked = mutableStateListOf<Boolean>(false)
     private val listFilename = mutableStateListOf<String>("")
 
@@ -98,6 +99,8 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                         checkCount =
                             newCheckCountValue // Also update here if showPlaylists modifies it
                     })
+                // ここでスレッドを待ちたい！！！
+                //playlistLoaderThread?.join()
             } else {
                 showPlaylists(
                     isListChecked,
@@ -151,7 +154,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                                 Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
                             }
                             DropdownMenu(
-                                modifier = Modifier.background(Color(getColor(white))),
+                                modifier = Modifier.background(Color(getColor(android.R.color.white))),
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false }
                             ) {
@@ -248,7 +251,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                             .height(80.dp)
                             .border(
                                 width = 2.dp, // 枠線の幅
-                                color = Color(getColor(white)), // 枠線の色
+                                color = Color(getColor(android.R.color.white)), // 枠線の色
                             ),
                         shape = RectangleShape,
                         colors = ButtonDefaults.buttonColors(
@@ -278,17 +281,22 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                             onDismissRequest = {
                                 isOpenDialog.value = false
                             }, // ダイアログの外側をクリックしたときの処理
+                            title = { Text(getString(R.string.syncErrorHeader)) },
                             icon = { // Use the dedicated 'icon' parameter
                                 Icon(
                                     painter = painterResource(id = android.R.drawable.ic_dialog_alert),
                                     contentDescription = "Error Icon"
                                 )  /* Provide a content description)*/
                             },
-                            title = { Text(getString(R.string.syncErrorHeader)) },
                             text = { Text(getString(R.string.errorNoPlaylistsSelected)) },
                             confirmButton = {
-                                Button(onClick = {
-                                    isOpenDialog.value = false
+                                Button(
+                                    colors = ButtonDefaults.buttonColors (
+                                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                        contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                                    ),
+                                    onClick = {
+                                        isOpenDialog.value = false
                                 }) { /* Handle confirm action */
                                     Text(getString(android.R.string.ok)) // Or use a string resource
                                 }
@@ -302,7 +310,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                             .height(80.dp)
                             .border(
                                 width = 2.dp, // 枠線の幅
-                                color = Color(getColor(white)), // 枠線の色
+                                color = Color(getColor(android.R.color.white)), // 枠線の色
                             ),
                         shape = RectangleShape,
                         colors = ButtonDefaults.buttonColors(
@@ -348,7 +356,11 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                             confirmButton = {
                                 Button(onClick = {
                                     isOpenDialog.value = false
-                                }) { /* Handle confirm action */
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                    contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                )) { /* Handle confirm action */
                                     Text(getString(android.R.string.ok)) // Or use a string resource
                                 }
                             },
@@ -360,9 +372,9 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
         ) { innerPadding ->
             Column(
                 modifier = Modifier
-                        .background(Color(getColor(white)))
-                        .padding(innerPadding),
-//                    .padding(statusBarPadding),
+                    .background(Color(getColor(android.R.color.white)))
+                    .padding(innerPadding)
+                    .padding(statusBarPadding),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start,
             ) {
@@ -387,8 +399,9 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                         checked = isSyncPlaylistsDeleteFiles,
                         enabled = true,
                         colors = CheckboxDefaults.colors(
-                            checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
-                            checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                            checkmarkColor = Color(getColor(android.R.color.white)),
+                            uncheckedColor = Color(getColor(android.R.color.black)),
+                            checkedColor = Color(getColor(R.color.colorAccent)),
                         ),
                         onCheckedChange = {
                             isSyncPlaylistsDeleteFiles = it
@@ -446,8 +459,9 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                                         checked = isListChecked[i],
                                         enabled = true,
                                         colors = CheckboxDefaults.colors(
-                                            checkmarkColor = Color(getColor(R.color.colorButtonTextEnabled)),
-                                            checkedColor = Color(getColor(R.color.colorButtonBackground)),
+                                            checkmarkColor = Color(getColor(android.R.color.white)),
+                                            uncheckedColor = Color(getColor(android.R.color.black)),
+                                            checkedColor = Color(getColor(R.color.colorAccent)),
                                         ),
                                         onCheckedChange = {
                                             isListChecked[i] = it
@@ -554,7 +568,12 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
         }
 //}
       })
-        playlistLoaderThread!!.start()
+        runBlocking {
+            val deferredResult = async {
+                playlistLoaderThread!!.start()
+            }
+            deferredResult.await()
+        }
     }
 
 
