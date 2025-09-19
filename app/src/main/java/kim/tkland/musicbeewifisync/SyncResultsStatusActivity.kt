@@ -4,7 +4,6 @@ import android.R.color.white
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -66,7 +65,9 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
-    var showEndOfSyncDialog by mutableStateOf(false)
+    var showEndOfSyncInfoDialog = mutableStateOf(false)
+    var showEndOfSyncDialog = mutableStateOf(false)
+    var showRetryDialog = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -106,6 +107,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     @Composable
     fun CustomView(currentSyncMessage: String, onCurrentSyncMessageChange: (String) -> Unit, buttonText: String, onButtonTextChange: (String) -> Unit) {
         val topAppBarState = rememberTopAppBarState()
+
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
         var expanded by remember { mutableStateOf(false) }
         val context = LocalContext.current // Get the context here
@@ -113,7 +115,6 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
         val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
         val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
         var completeMessage by remember { mutableStateOf("") }
-
         Scaffold(
             //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
@@ -199,7 +200,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                                 WifiSyncServiceSettings.saveSettings(context)
                                 WifiSyncService.syncErrorMessageId.set(R.string.syncCancelled)
                                 completeMessage = getString(R.string.syncCancelled)
-                                showEndOfSyncDialog = true
+                                showEndOfSyncInfoDialog.value = true
                                 onButtonTextChange(getString(R.string.syncMore))
                             } else if (buttonText == getString(R.string.syncMore)){
                                 val intent =
@@ -220,12 +221,12 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                 buttonText, onButtonTextChange,
             scrollBehavior)
 
-            if (showEndOfSyncDialog) {
+            if (showEndOfSyncInfoDialog.value) {
                 ShowEndOfSyncInformation(
                     paddingValue = innerPadding,
                     statusBarPadding = statusBarPadding,
                     message = completeMessage,
-                    onDismiss = { showEndOfSyncDialog = false})
+                    onDismiss = { showEndOfSyncInfoDialog.value = false})
             }
         }
     }
@@ -393,27 +394,6 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
     }
 
     @Composable
-    fun onStopSyncButton_Click(view: View) {
-        /*
-        if (stopSyncButton!!.text == getString(R.string.syncMore)) {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(intent)
-        } else {
-            val intent = Intent()
-            intent.setClass(this, WifiSyncService::class.java)
-            intent.action = getString(R.string.actionSyncAbort)
-            startService(intent)
-            stopProgressTimer()
-            WifiSyncServiceSettings.saveSettings(this)
-            WifiSyncService.syncErrorMessageId.set(R.string.syncCancelled)
-            ShowEndOfSyncInformation()
-        }
-         */
-    }
-
-    @Composable
     private fun ShowEndOfSyncInformation(innerPadding: PaddingValues, statusBarPadding: PaddingValues, compMessage: String, onCompleteTextChange: (String) -> Unit) {
         val errorMessageId = WifiSyncService.syncErrorMessageId.getAndSet(0)
         WifiSyncServiceSettings.saveSettings(this)
@@ -447,33 +427,112 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
             errorMessage = getString(errorMessageId)
             onCompleteTextChange(errorMessage)
             ShowResultsComposable(innerPadding, statusBarPadding, errorMessage, WifiSyncService.syncToResults,null)
+
         } else {
-            val builder = androidx.appcompat.app.AlertDialog.Builder(this)
-            builder.setTitle(getString(R.string.syncErrorHeader))
-            builder.setMessage(getString(errorMessageId))
-            builder.setIcon(android.R.drawable.ic_dialog_alert)
-            builder.setCancelable(false)
-            if (errorMessageId != R.string.errorServerNotFound) {
-                builder.setPositiveButton(android.R.string.ok) { _, _ ->
-                    errorMessage = getString(errorMessageId)
-                    onCompleteTextChange(errorMessage)
+            if (errorMessageId == R.string.errorServerNotFound) {
+                showRetryDialog.value = true
+                setContent {
+                    if (showRetryDialog.value) {
+                        AlertDialog(
+                            onDismissRequest = { showRetryDialog.value = false },
+                            icon = { // Use the dedicated 'icon' parameter
+                                Icon(
+                                    painter = painterResource(id = android.R.drawable.ic_dialog_alert),
+                                    contentDescription = "Error Icon"
+                                )  /* Provide a content description)*/
+                            },
+                            title = { Text(getString(R.string.syncErrorHeader)) },
+                            text = { Text(getString(errorMessageId)) },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        errorMessage = getString(R.string.syncRetry)
+                                        onCompleteTextChange(errorMessage)
+                                        WifiSyncService.startSynchronisation(
+                                            applicationContext,
+                                            WifiSyncService.syncIteration,
+                                            false,
+                                            false
+                                        )
+                                        WifiSyncService.syncErrorMessageId.getAndSet(0)
+                                        showRetryDialog.value = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                        contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                    )
+                                ) {
+                                    Text(getString(R.string.syncRetry))
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(
+                                    onClick = {
+                                        errorMessage = getString(R.string.syncCancel)
+                                        onCompleteTextChange(errorMessage)
+                                        setContent {
+                                            ShowErrorResultsComposable(
+                                                errorMessage,
+                                                WifiSyncService.syncToResults,
+                                                null
+                                            )
+                                        }
+                                        WifiSyncService.syncErrorMessageId.getAndSet(0)
+                                        showRetryDialog.value = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                        contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                    )
+
+                                ) {
+                                    Text(getString(R.string.syncCancel))
+                                }
+                            }
+                        )
+                    }
                 }
             } else {
-                builder.setNegativeButton(R.string.syncCancel) { _, _ ->
-                    errorMessage = getString(errorMessageId)
-                    onCompleteTextChange(errorMessage)
-                }
-                builder.setPositiveButton(R.string.syncRetry) { _, _ ->
-                    WifiSyncService.startSynchronisation(
-                        applicationContext,
-                        WifiSyncService.syncIteration,
-                        false,
-                        false
-                    )
+                showEndOfSyncDialog.value = true
+                setContent {
+                    if (showEndOfSyncDialog.value) {
+                        AlertDialog(
+                            onDismissRequest = { showEndOfSyncDialog.value = false },
+                            icon = { // Use the dedicated 'icon' parameter
+                                Icon(
+                                    painter = painterResource(id = android.R.drawable.ic_dialog_alert),
+                                    contentDescription = "Error Icon"
+                                )  /* Provide a content description)*/
+                            },
+                            title = { Text(getString(R.string.syncErrorHeader)) },
+                            text = { Text(getString(errorMessageId)) },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        errorMessage = getString(errorMessageId)
+                                        onCompleteTextChange(errorMessage)
+                                        setContent {
+                                            ShowErrorResultsComposable(
+                                                errorMessage,
+                                                WifiSyncService.syncToResults,
+                                                null
+                                            )
+                                        }
+                                        WifiSyncService.syncErrorMessageId.getAndSet(0)
+                                        showEndOfSyncDialog.value = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                        contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                    )
+                                ) {
+                                    Text(getString(android.R.string.ok))
+                                }
+                            }
+                        )
+                    }
                 }
             }
-            ShowResultsComposable(innerPadding, statusBarPadding, errorMessage, WifiSyncService.syncToResults,null)
-            builder.show()
         }
     }
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -587,6 +646,215 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 }
                 item {
                     HorizontalDivider(thickness = 2.dp)
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+    @Composable
+    fun ShowErrorResultsComposable(
+        errorMessage: String,
+        resultsToData: ArrayList<SyncResultsInfo>?,
+        resultsFromData: ArrayList<SyncResultsInfo>?
+    ) {
+        val topAppBarState = rememberTopAppBarState()
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+        var expanded by remember { mutableStateOf(false) }
+        val context = LocalContext.current // Get the context here
+        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
+
+        Scaffold(
+            //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                MusicBeeWifiSyncTopBar(
+                    title = {
+                        Box( // Wrap the Text in a Box
+                        ) {
+                            Text(
+                                text = getString(R.string.title_activity_sync_status),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    },
+                    actions = {
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                        ) {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
+                            }
+                            DropdownMenu(
+                                modifier = Modifier.background(Color(getColor(white))),
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.menuSyncSettings)) },
+                                    onClick = {
+                                        val intent = Intent(
+                                            applicationContext,
+                                            SettingsActivity::class.java
+                                        )
+                                        expanded = false
+                                        startActivity(intent)
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(getString(R.string.menuWifiSyncLog)) },
+                                    onClick = {
+                                        val intent = Intent(
+                                            applicationContext,
+                                            ViewErrorLogActivity::class.java
+                                        )
+                                        expanded = false
+                                        startActivity(intent)
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    scrollBehavior = scrollBehavior
+                )
+            },
+            bottomBar = {
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(navigationBarPadding),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp)
+                            .border(
+                                width = 2.dp, // 枠線の幅
+                                color = Color(getColor(white)), // 枠線の色
+                            ),
+                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                        ),
+                        onClick = {
+                            val intent =
+                                Intent(context, MainActivity::class.java) // Use the context
+                            context.startActivity(intent)
+                            finish()
+                        }
+                    ){
+                        Text(getString(R.string.syncMore), fontSize = 20.sp)
+                    }
+                }
+            }
+        ){ innerPadding ->
+            var resultsToData = resultsToData
+            var resultsFromData = resultsFromData
+            val maxResults = 256
+            if (resultsToData == null) {
+                resultsToData = ArrayList()
+            }
+            if (resultsFromData == null) {
+                resultsFromData = ArrayList()
+            }
+            val resultsToDataCount = if (resultsToData.isEmpty()) 0 else resultsToData.size
+            val resultsFromDataCount = if (resultsFromData.isEmpty()) 0 else resultsFromData.size
+            val filteredPreviewData: ArrayList<SyncResultsInfo>
+            if (resultsToDataCount + resultsFromDataCount < maxResults + 16) {
+                filteredPreviewData = ArrayList(resultsToDataCount + resultsFromDataCount)
+                filteredPreviewData.addAll(resultsToData)
+                filteredPreviewData.addAll(resultsFromData)
+            } else {
+                filteredPreviewData = ArrayList(maxResults + 2)
+                var filteredPreviewFromCount = resultsFromDataCount
+                var filteredPreviewToCount = resultsToDataCount
+                if (resultsToDataCount < maxResults / 4) {
+                    filteredPreviewFromCount = maxResults - resultsToDataCount
+                } else if (resultsFromDataCount < maxResults / 4) {
+                    filteredPreviewToCount = maxResults - resultsFromDataCount
+                } else {
+                    val scaling =
+                        maxResults.toDouble() / (resultsToDataCount + resultsFromDataCount).toDouble()
+                    filteredPreviewToCount *= scaling.toInt()
+                    filteredPreviewFromCount *= scaling.toInt()
+                }
+                for (index in 0 until filteredPreviewToCount) {
+                    filteredPreviewData.add(resultsToData[index])
+                }
+                if (filteredPreviewToCount < resultsToDataCount) {
+                    filteredPreviewData.add(
+                        SyncResultsInfo(
+                            String.format(
+                                getString(R.string.syncPreviewMoreResults),
+                                resultsToDataCount - filteredPreviewToCount
+                            )
+                        )
+                    )
+                }
+                for (index in 0 until filteredPreviewFromCount) {
+                    filteredPreviewData.add(resultsFromData[index])
+                }
+                if (filteredPreviewFromCount < resultsFromDataCount) {
+                    filteredPreviewData.add(
+                        SyncResultsInfo(
+                            String.format(
+                                getString(R.string.syncPreviewMoreResults),
+                                resultsFromDataCount - filteredPreviewFromCount
+                            )
+                        )
+                    )
+                }
+            }
+            LazyColumn (
+                modifier =
+                    Modifier
+                        .background(Color(color = getColor(white)))
+                        .padding(innerPadding),
+                //.padding(statusBarPadding),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                item {
+                    Text(text = errorMessage, maxLines = 5, fontSize = 20.sp)
+                }
+                item {
+                    HorizontalDivider(thickness = 2.dp)
+                }
+                for (info: SyncResultsInfo in filteredPreviewData) {
+                    val iconid =
+                        if (info.alert != SyncResultsInfo.ALERT_INFO) android.R.drawable.stat_notify_error else 0
+
+                    item {
+                        Row() {
+                            if (iconid != 0) {
+                                Icon(
+                                    painter = painterResource(id = iconid),
+                                    contentDescription = "Sync Direction Icon", // Provide a content description
+                                )
+                            }
+                            Text(
+                                text = info.targetName!!,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                fontSize = 24.sp
+                            )
+                        }
+                    }
+                    item {
+                        Text(
+                            text = info.message!!,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 24.sp
+                        )
+                    }
+                    item {
+                        HorizontalDivider(thickness = 2.dp)
+                    }
                 }
             }
         }

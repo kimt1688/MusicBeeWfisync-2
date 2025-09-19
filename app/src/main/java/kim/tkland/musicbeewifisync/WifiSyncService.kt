@@ -1976,8 +1976,10 @@ class WifiSyncService : Service() {
         val waitSyncResults = AutoResetEvent(false)
         //private const val socketConnectTimeout = 0
         private const val socketConnectTimeout = 10000000
-        private const val socketReadTimeout = 0
-        //private const val socketReadTimeout = 30000000
+        //private const val socketConnectTimeout = 100
+        //private const val socketReadTimeout = 0
+        private const val socketReadTimeout = 30000000
+        //private const val socketReadTimeout = 300
         private const val socketTextReadBufferLength = 16384
         private const val socketReadBufferLength = 262144
         //private const val socketReadBufferLength = 131072
