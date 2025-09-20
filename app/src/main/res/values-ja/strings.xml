@@ -93,6 +93,7 @@
     <string name="menuAllPlaylistsDelete">端末内のプレイリストの全削除</string>
     <string name="menuAllPlaylistsDeleteConfirm">本当にすべてのプレイリストを削除しますか？</string>
     <string name="playlistDeletingMessage">プレイリストの削除中…</string>
+    <string name="syncConfirmHeader">確認</string>
 
     <!-- Strings used for fragments for navigation -->
 </resources>

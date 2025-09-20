@@ -53,22 +53,22 @@
 29    </queries>
 30
 31    <permission
-31-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\e80d39154524f938b55636e6635a3987\transformed\core-1.16.0\AndroidManifest.xml:22:5-24:47
+31-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6e2773df30cb7cc0dbec09fb8f208520\transformed\core-1.16.0\AndroidManifest.xml:22:5-24:47
 32        android:name="kim.tkland.musicbeewifisync.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-32-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\e80d39154524f938b55636e6635a3987\transformed\core-1.16.0\AndroidManifest.xml:23:9-81
+32-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6e2773df30cb7cc0dbec09fb8f208520\transformed\core-1.16.0\AndroidManifest.xml:23:9-81
 33        android:protectionLevel="signature" />
-33-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\e80d39154524f938b55636e6635a3987\transformed\core-1.16.0\AndroidManifest.xml:24:9-44
+33-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6e2773df30cb7cc0dbec09fb8f208520\transformed\core-1.16.0\AndroidManifest.xml:24:9-44
 34
 35    <uses-permission android:name="kim.tkland.musicbeewifisync.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-35-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\e80d39154524f938b55636e6635a3987\transformed\core-1.16.0\AndroidManifest.xml:26:5-97
-35-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\e80d39154524f938b55636e6635a3987\transformed\core-1.16.0\AndroidManifest.xml:26:22-94
+35-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6e2773df30cb7cc0dbec09fb8f208520\transformed\core-1.16.0\AndroidManifest.xml:26:5-97
+35-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6e2773df30cb7cc0dbec09fb8f208520\transformed\core-1.16.0\AndroidManifest.xml:26:22-94
 36
 37    <application
 37-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:29:5-65:19
 38        android:name="kim.tkland.musicbeewifisync.WifiSyncApp"
 38-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:9-36
 39        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-39-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\e80d39154524f938b55636e6635a3987\transformed\core-1.16.0\AndroidManifest.xml:28:18-86
+39-->[androidx.core:core:1.16.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6e2773df30cb7cc0dbec09fb8f208520\transformed\core-1.16.0\AndroidManifest.xml:28:18-86
 40        android:debuggable="true"
 41        android:extractNativeLibs="false"
 42        android:icon="@mipmap/ic_launcher"
@@ -142,89 +142,89 @@
 77            android:label="@string/title_activity_view_error_log" />
 77-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:64:13-66
 78
-79        <provider
-79-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f9a3040c8de530cf840d6e2e45d24ae\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
-80            android:name="androidx.startup.InitializationProvider"
-80-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f9a3040c8de530cf840d6e2e45d24ae\transformed\emoji2-1.4.0\AndroidManifest.xml:25:13-67
-81            android:authorities="kim.tkland.musicbeewifisync.androidx-startup"
-81-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f9a3040c8de530cf840d6e2e45d24ae\transformed\emoji2-1.4.0\AndroidManifest.xml:26:13-68
-82            android:exported="false" >
-82-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f9a3040c8de530cf840d6e2e45d24ae\transformed\emoji2-1.4.0\AndroidManifest.xml:27:13-37
-83            <meta-data
-83-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f9a3040c8de530cf840d6e2e45d24ae\transformed\emoji2-1.4.0\AndroidManifest.xml:29:13-31:52
-84                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-84-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f9a3040c8de530cf840d6e2e45d24ae\transformed\emoji2-1.4.0\AndroidManifest.xml:30:17-75
-85                android:value="androidx.startup" />
-85-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f9a3040c8de530cf840d6e2e45d24ae\transformed\emoji2-1.4.0\AndroidManifest.xml:31:17-49
-86            <meta-data
-86-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f36df6a84cdd7f43629c6e245b2a8ce2\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:29:13-31:52
-87                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-87-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f36df6a84cdd7f43629c6e245b2a8ce2\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:30:17-78
-88                android:value="androidx.startup" />
-88-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\f36df6a84cdd7f43629c6e245b2a8ce2\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:31:17-49
-89            <meta-data
-89-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
-90                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-90-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
-91                android:value="androidx.startup" />
-91-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
-92        </provider>
-93
-94        <uses-library
-94-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\668e78ee9fcc0a8eee0e575ddf61326f\transformed\window-1.4.0\AndroidManifest.xml:23:9-25:40
-95            android:name="androidx.window.extensions"
-95-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\668e78ee9fcc0a8eee0e575ddf61326f\transformed\window-1.4.0\AndroidManifest.xml:24:13-54
-96            android:required="false" />
-96-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\668e78ee9fcc0a8eee0e575ddf61326f\transformed\window-1.4.0\AndroidManifest.xml:25:13-37
-97        <uses-library
-97-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\668e78ee9fcc0a8eee0e575ddf61326f\transformed\window-1.4.0\AndroidManifest.xml:26:9-28:40
-98            android:name="androidx.window.sidecar"
-98-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\668e78ee9fcc0a8eee0e575ddf61326f\transformed\window-1.4.0\AndroidManifest.xml:27:13-51
-99            android:required="false" />
-99-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\668e78ee9fcc0a8eee0e575ddf61326f\transformed\window-1.4.0\AndroidManifest.xml:28:13-37
+79        <uses-library
+79-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\50902ee8582c80710e9465b320b0033b\transformed\window-1.4.0\AndroidManifest.xml:23:9-25:40
+80            android:name="androidx.window.extensions"
+80-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\50902ee8582c80710e9465b320b0033b\transformed\window-1.4.0\AndroidManifest.xml:24:13-54
+81            android:required="false" />
+81-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\50902ee8582c80710e9465b320b0033b\transformed\window-1.4.0\AndroidManifest.xml:25:13-37
+82        <uses-library
+82-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\50902ee8582c80710e9465b320b0033b\transformed\window-1.4.0\AndroidManifest.xml:26:9-28:40
+83            android:name="androidx.window.sidecar"
+83-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\50902ee8582c80710e9465b320b0033b\transformed\window-1.4.0\AndroidManifest.xml:27:13-51
+84            android:required="false" />
+84-->[androidx.window:window:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\50902ee8582c80710e9465b320b0033b\transformed\window-1.4.0\AndroidManifest.xml:28:13-37
+85
+86        <provider
+86-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\62a924a2f4607553c76f4229d49abd80\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
+87            android:name="androidx.startup.InitializationProvider"
+87-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\62a924a2f4607553c76f4229d49abd80\transformed\emoji2-1.4.0\AndroidManifest.xml:25:13-67
+88            android:authorities="kim.tkland.musicbeewifisync.androidx-startup"
+88-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\62a924a2f4607553c76f4229d49abd80\transformed\emoji2-1.4.0\AndroidManifest.xml:26:13-68
+89            android:exported="false" >
+89-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\62a924a2f4607553c76f4229d49abd80\transformed\emoji2-1.4.0\AndroidManifest.xml:27:13-37
+90            <meta-data
+90-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\62a924a2f4607553c76f4229d49abd80\transformed\emoji2-1.4.0\AndroidManifest.xml:29:13-31:52
+91                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+91-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\62a924a2f4607553c76f4229d49abd80\transformed\emoji2-1.4.0\AndroidManifest.xml:30:17-75
+92                android:value="androidx.startup" />
+92-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\62a924a2f4607553c76f4229d49abd80\transformed\emoji2-1.4.0\AndroidManifest.xml:31:17-49
+93            <meta-data
+93-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\11bc4ef37385b7098a1410f7a85860ef\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:29:13-31:52
+94                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+94-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\11bc4ef37385b7098a1410f7a85860ef\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:30:17-78
+95                android:value="androidx.startup" />
+95-->[androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\11bc4ef37385b7098a1410f7a85860ef\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:31:17-49
+96            <meta-data
+96-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+97                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+97-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+98                android:value="androidx.startup" />
+98-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+99        </provider>
 100
 101        <activity
-101-->[androidx.compose.ui:ui-tooling-android:1.9.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\081fa082c258664416ef359ca1ce8d52\transformed\ui-tooling\AndroidManifest.xml:23:9-25:39
+101-->[androidx.compose.ui:ui-tooling-android:1.9.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f5c18cebcda0452c6929b44ac0cb87b\transformed\ui-tooling\AndroidManifest.xml:23:9-25:39
 102            android:name="androidx.compose.ui.tooling.PreviewActivity"
-102-->[androidx.compose.ui:ui-tooling-android:1.9.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\081fa082c258664416ef359ca1ce8d52\transformed\ui-tooling\AndroidManifest.xml:24:13-71
+102-->[androidx.compose.ui:ui-tooling-android:1.9.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f5c18cebcda0452c6929b44ac0cb87b\transformed\ui-tooling\AndroidManifest.xml:24:13-71
 103            android:exported="true" />
-103-->[androidx.compose.ui:ui-tooling-android:1.9.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\081fa082c258664416ef359ca1ce8d52\transformed\ui-tooling\AndroidManifest.xml:25:13-36
+103-->[androidx.compose.ui:ui-tooling-android:1.9.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\6f5c18cebcda0452c6929b44ac0cb87b\transformed\ui-tooling\AndroidManifest.xml:25:13-36
 104
 105        <receiver
-105-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+105-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
 106            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-106-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+106-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
 107            android:directBootAware="false"
-107-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+107-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
 108            android:enabled="true"
-108-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+108-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
 109            android:exported="true"
-109-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+109-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
 110            android:permission="android.permission.DUMP" >
-110-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+110-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
 111            <intent-filter>
-111-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+111-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
 112                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-112-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
-112-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+112-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+112-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
 113            </intent-filter>
 114            <intent-filter>
-114-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+114-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
 115                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-115-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
-115-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+115-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+115-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
 116            </intent-filter>
 117            <intent-filter>
-117-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+117-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
 118                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-118-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
-118-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+118-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+118-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
 119            </intent-filter>
 120            <intent-filter>
-120-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+120-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
 121                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-121-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
-121-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\2f5b73f0bd009340c6378472ecec695d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+121-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+121-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\7328bab834269994a75ff2975d15789d\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
 122            </intent-filter>
 123        </receiver>
 124    </application>

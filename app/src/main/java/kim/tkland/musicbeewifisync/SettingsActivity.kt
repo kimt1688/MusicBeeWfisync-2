@@ -84,31 +84,31 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
     // Initialize the launcher in onCreate or an earlier lifecycle method
     private val requestPermissionLauncher =
-    registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-        if (isGranted) {
-            // Permission is granted. Continue the action or update the UI.
-            Log.d("Permission", "Permission granted")
-            // You might want to re-compose or update state here
-        } else {
-            // Explain to the user that the feature is unavailable because the
-            // feature requires a permission that the user has denied.
-            Log.d("Permission", "Permission denied")
-            // You might want to show a rationale or guide the user to settings.
-        }
-    }
-
-    private val requestMultiplePermissionsLauncher =//
-    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        permissions.entries.forEach {
-            val permissionName = it.key
-            val isGranted = it.value
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
-                Log.d("Permission", "$permissionName granted")
+                // Permission is granted. Continue the action or update the UI.
+                Log.d("Permission", "Permission granted")
+                // You might want to re-compose or update state here
             } else {
-                Log.d("Permission", "$permissionName denied")
+                // Explain to the user that the feature is unavailable because the
+                // feature requires a permission that the user has denied.
+                Log.d("Permission", "Permission denied")
+                // You might want to show a rationale or guide the user to settings.
             }
         }
-    }
+
+    private val requestMultiplePermissionsLauncher =//
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                val permissionName = it.key
+                val isGranted = it.value
+                if (isGranted) {
+                    Log.d("Permission", "$permissionName granted")
+                } else {
+                    Log.d("Permission", "$permissionName denied")
+                }
+            }
+        }
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,7 +119,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
         setContent {
             if (initialSetup) {
-                if (isfirst){
+                if (isfirst) {
                     val intent = Intent(ACTION_REQUEST_MANAGE_MEDIA)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .setData("package:kim.tkland.musicbeewifisync".toUri())
@@ -156,10 +156,10 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 val stats = File("/storage/emulated/0/gmmp/stats.xml")
 
                 if (stats.exists()) {
-                if (uriStr.isNullOrEmpty()) {
-                    showErrorDialog(showDialog, true)
+                    if (uriStr.isNullOrEmpty()) {
+                        showErrorDialog(showDialog, true)
+                    }
                 }
-            }
 
                 val currentContext = LocalContext.current
                 FirstSettingView()
@@ -202,7 +202,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 } else {
                     // Directly request the permission
                     Log.d("Permission", "Requesting READ_MEDIA_AUDIO")
-                    val mediaPermissions: MutableList<String> = MutableList<String>(0) {""}
+                    val mediaPermissions: MutableList<String> = MutableList<String>(0) { "" }
                     mediaPermissions.add(Manifest.permission.READ_MEDIA_AUDIO)
                     mediaPermissions.add(Manifest.permission.READ_MEDIA_IMAGES)
                     mediaPermissions.add(Manifest.permission.READ_MEDIA_VIDEO)
@@ -210,6 +210,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     requestMultiplePermissionsLauncher.launch(mediaPermissions.toTypedArray())
                 }
             }
+
             else -> {
                 // For Android 11 (API 30) and above, for all files access (if truly needed)
                 // or specific media permissions.
@@ -237,7 +238,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     Log.d("Permission", "All required storage permissions already granted")
                 } else {
                     Log.d("Permission", "Requesting READ_EXTERNAL_STORAGE")
-                    val mediaPermissions: MutableList<String> = MutableList<String>(0) {""}
+                    val mediaPermissions: MutableList<String> = MutableList<String>(0) { "" }
                     mediaPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
                     mediaPermissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
                     requestMultiplePermissionsLauncher.launch(mediaPermissions.toTypedArray())
@@ -310,7 +311,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 )
             },
             bottomBar = {
-                 Row(
+                Row(
                     // Or a Compose Row
                     modifier = Modifier
                         .fillMaxWidth()
@@ -340,11 +341,12 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 }
             }
         ) { innerPadding ->
-            if(showDialog.value) {
+            /*
+            if (showDialog.value) {
                 AlertDialog(
                     onDismissRequest = { showDialog.value = false },
-                    title = {Text(getString(R.string.statsSelect))},
-                    text = {Text(getString(R.string.statsSelectMessage))},
+                    title = { Text(getString(R.string.statsSelect)) },
+                    text = { Text(getString(R.string.statsSelectMessage)) },
                     confirmButton = {
                         Button(
                             onClick = {
@@ -358,12 +360,12 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     },
                     dismissButton = null
                 )
-            }
-            if(showErrorDialog1.value) {
+            }*/
+            if (showErrorDialog1.value) {
                 AlertDialog(
                     onDismissRequest = { showErrorDialog1.value = false },
-                    title = {Text(getString(R.string.syncErrorHeader))},
-                    text = {Text(getString(R.string.errorServerNotFound))},
+                    title = { Text(getString(R.string.syncErrorHeader)) },
+                    text = { Text(getString(R.string.errorServerNotFound)) },
                     confirmButton = {
                         Button(
                             onClick = {
@@ -376,11 +378,11 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     dismissButton = null
                 )
             }
-            if(showErrorDialog2.value) {
+            if (showErrorDialog2.value) {
                 AlertDialog(
                     onDismissRequest = { showErrorDialog2.value = false },
-                    title = {Text(getString(R.string.syncErrorHeader))},
-                    text = {Text(getString(R.string.errorLocateServerNoConfig))},
+                    title = { Text(getString(R.string.syncErrorHeader)) },
+                    text = { Text(getString(R.string.errorLocateServerNoConfig)) },
                     confirmButton = {
                         Button(
                             onClick = {
@@ -398,7 +400,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 modifier = Modifier
                     .background(Color(getColor(white)))
                     .padding(innerPadding),
-                    //.padding(statusBarPadding),
+                //.padding(statusBarPadding),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start,
             ) {
@@ -437,7 +439,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     StorageRadioGroup(initialStorage.intValue, 20)
                 }
                 // 2025/09/17 有効にしてみる->問題ない
-                Row(modifier = Modifier.padding(top = 30.dp)){
+                Row(modifier = Modifier.padding(top = 30.dp)) {
                     CheckableRow(
                         text = applicationContext.getString(R.string.settingsDebugMode),
                     )
@@ -490,7 +492,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         // showDialogState.value = true
         // dialogTitleState.value = title
         // dialogMessageState.value = message
-        when(dialog) {
+        when (dialog) {
             showDialog -> showDialog.value = v
             showErrorDialog1 -> showErrorDialog1.value = v
             showErrorDialog2 -> showErrorDialog2.value = v
@@ -592,7 +594,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
     @Composable
     private fun CheckableRow(text: String) {
-        var debugMode by remember {mutableStateOf(value = WifiSyncServiceSettings.debugMode)}
+        var debugMode by remember { mutableStateOf(value = WifiSyncServiceSettings.debugMode) }
 
         Row(
             modifier = Modifier

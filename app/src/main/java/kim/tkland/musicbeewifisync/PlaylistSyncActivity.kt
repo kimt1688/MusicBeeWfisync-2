@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
@@ -27,6 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +57,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import java.net.SocketTimeoutException
@@ -62,6 +68,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
 
     private val isListChecked = mutableStateListOf<Boolean>(false)
     private val listFilename = mutableStateListOf<String>("")
+    var showFullScanDialogShow = mutableStateOf(false)
 
     constructor() : super("") {
     }
@@ -212,14 +219,14 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                                     text = { Text(getString(R.string.menuFullScanFiles)) },
                                     onClick = {
                                         expanded = false
-                                        onFullScanMenuItemClick()
+                                        showFullScanDialogShow.value = true
                                     }
                                 )
                                 DropdownMenuItem(
                                     text = { Text(getString(R.string.menuAllPlaylistsDelete)) },
                                     onClick = {
                                         expanded = false
-                                        onDeleteAllPlaylistsClick()
+                                        setContent { OnDeleteAllPlaylistsClick() }
                                     }
                                 )
                                 DropdownMenuItem(

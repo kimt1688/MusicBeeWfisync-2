@@ -94,6 +94,7 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.ui.graphics)
+    implementation(libs.hilt.android)
     /*
     implementation(libs.rendering)
     debugImplementation(libs.androidx.ui.tooling)
@@ -141,6 +142,7 @@ dependencies {
     implementation (libs.kotlinx.coroutines.android)
     implementation (platform(libs.compose.bom))
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.foundation.layout)
     //androidTestImplementation (platform(libs.compose.bom))
     //androidTestImplementation(libs.androidx.ui.test.junit4)
     //debugImplementation(libs.androidx.ui.tooling)

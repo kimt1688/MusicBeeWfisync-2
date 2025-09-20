@@ -1,5 +1,7 @@
 package kim.tkland.musicbeewifisync
 
+import androidx.compose.runtime.getValue // <-- Add this
+import androidx.compose.runtime.setValue
 import android.R.color.black
 import android.R.color.white
 import android.app.ActivityManager.TaskDescription
@@ -10,6 +12,7 @@ import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +26,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
@@ -43,6 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.net.toUri
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -62,14 +68,43 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.RectangleShape
-
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.invoke
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class MainActivity() : WifiSyncBaseActivity("") {
+    private var MainActivity.showProgress: Boolean
+        get() = viewModel.showDialog.value
+        set(value) {}
+    private val MainActivity.viewModel: WifiSyncViewModel
+        get() = this.viewModels<WifiSyncViewModel>().value
     private var serverStatusThread: Thread? = null
     private var configErrorMessage: MutableState<String> = mutableStateOf("")
     var showDialog = mutableStateOf(false)
+    //private val viewModel: WifiSyncViewModel by viewModels()
+    //private var showProgress: Boolean
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -119,7 +154,14 @@ class MainActivity() : WifiSyncBaseActivity("") {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
         var expanded by remember { mutableStateOf(false) }
+        var showFullScanDialogShow by remember { mutableStateOf(false) }
+        val showDialogFromViewModel by viewModel.showDialog.collectAsStateWithLifecycle()
+        var showProgressDialogShow by remember { mutableStateOf(showDialogFromViewModel) }
 
+        // You'll need to observe changes from the ViewModel and update the local state
+        LaunchedEffect(showDialogFromViewModel) {
+            showProgressDialogShow = showDialogFromViewModel
+        }
         var isSyncFromMusicBeeChecked by remember { mutableStateOf(WifiSyncServiceSettings.syncFromMusicBee) }
         var isSyncToPlaycountsChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayCounts) }
         var isSyncToRatingChecked by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncRatings) }
@@ -211,14 +253,14 @@ class MainActivity() : WifiSyncBaseActivity("") {
                                 text = { Text(getString(R.string.menuFullScanFiles)) },
                                 onClick = {
                                     expanded = false
-                                    onFullScanMenuItemClick()
+                                    showFullScanDialogShow = true
                                 }
                             )
                             DropdownMenuItem(
                                 text = { Text(getString(R.string.menuAllPlaylistsDelete)) },
                                 onClick = {
                                     expanded = false
-                                    onDeleteAllPlaylistsClick()
+                                    setContent { OnDeleteAllPlaylistsClick() }
                                 }
                             )
                             DropdownMenuItem(
@@ -238,9 +280,11 @@ class MainActivity() : WifiSyncBaseActivity("") {
                     )
             },
             bottomBar = {
-                Row( // Or a Compose Row
-                    modifier = Modifier.fillMaxWidth()
-                                .padding(navigationBarPadding),
+                Row(
+                    // Or a Compose Row
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(navigationBarPadding),
                 ) {
                     Button(
                         modifier = Modifier
@@ -338,6 +382,63 @@ class MainActivity() : WifiSyncBaseActivity("") {
                 }
             }
         ) { innerPadding ->
+            if (showProgress) {
+                CreateProgressDialog(viewModel)
+            }
+            if (showFullScanDialogShow) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showFullScanDialogShow = false
+                    }, // ダイアログの外側をクリックしたときの処理
+                    icon = { // Use the dedicated 'icon' parameter
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_dialog_info),
+                            contentDescription = "Info Icon"
+                        )  /* Provide a content description)*/
+                    },
+                    title = { Text(getString(R.string.syncConfirmHeader)) },
+                    text = { Text(getString(R.string.alertDialogMessage)) },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                runBlocking {
+                                    val deffered = async {
+                                        showFullScanDialogShow = false
+                                    }
+                                    deffered.await()
+                                }
+                                getMusicFiles()
+                                val thread = Thread(getMusicFilesThread)
+                                viewModel.setValues(thread, getString(R.string.progressDialogMessage))
+                                lifecycleScope.launch {
+                                    viewModel.doAsyncWork()
+                                }
+                                showProgressDialogShow = false // ダイアログを閉じる
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            )
+                        ) { /* Handle confirm action */
+                            Text(getString(android.R.string.ok)) // Or use a string resource
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                showFullScanDialogShow = false
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            )
+                        ) { /* Handle confirm action */
+                            Text(getString(android.R.string.cancel)) // Or use a string resource
+                        }
+                    }
+                )
+            }
+
             if (showDialog.value) {
                 AlertDialog(
                     onDismissRequest = {

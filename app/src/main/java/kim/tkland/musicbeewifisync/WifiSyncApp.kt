@@ -9,8 +9,10 @@ import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import android.provider.MediaStore
 import android.util.Log
+import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.atomic.AtomicReference
 
+@HiltAndroidApp
 class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
     @JvmField
     var currentActivity: Activity? = null

@@ -2,7 +2,6 @@ package kim.tkland.musicbeewifisync
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
-import android.content.DialogInterface
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -10,17 +9,68 @@ import android.os.Bundle
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.util.Log
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import kim.tkland.musicbeewifisync.PlaylistSyncActivity.FileSelectedInfo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.lang.Thread.interrupted
+import java.net.SocketTimeoutException
+import kotlin.getValue
 
 abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppCompatActivity() {
     protected var mainWindow: WifiSyncBaseActivity? = this
     protected var buttonTextEnabledColor = 0
     protected var buttonTextDisabledColor = 0
-    protected var progressDialog: WifiSyncAlertDialog? = null
+    var showDeleteAllPlaylistsDialog = mutableStateOf(false)
+
+    var getMusicFilesThread = Thread()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,119 +85,137 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
         super.onDestroy()
     }
 
-    fun onFullScanMenuItemClick() {
-        AlertDialog.Builder((application as WifiSyncApp).currentActivity!!)
-            .setTitle(R.string.progressDialogTitle)
-            .setMessage(R.string.alertDialogMessage)
-            .setPositiveButton("OK") { dialog: DialogInterface, _ ->
-                // OKボタン押下時に実行したい処理を記述
-                listNewFiles()
-                dialog.dismiss()
-            }
-            .setNeutralButton(getString(R.string.syncCancel)) { dialog: DialogInterface, _ ->
-                // クリックしたときの処理
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
 
-    // 有線 Syncのファイルを見つけて登録する
-    protected fun listNewFiles() {
-        val thread = Thread(GetMusicFiles())
-        showWifiSyncAlertDialog(resources.getString(R.string.progressDialogMessage), thread, null)
-    }
-
-    protected inner class GetMusicFiles() : Thread() {
-        private var interrupted: Boolean = false
-            get() = field
-            set(value) {
-                field = value
-            }
-
-        override fun run() {
+    protected fun getMusicFiles() {
+        getMusicFilesThread = Thread(Runnable {
             val sm = applicationContext.getSystemService(StorageManager::class.java)
             val svl = sm.storageVolumes
             for (sv in svl) {
-                if (interrupted() || interrupted) {
-                    interrupted = true
-                    return
+                if (getMusicFilesThread.isInterrupted) {
+                    return@Runnable
                 }
                 if (sv.directory != null) {
                     val path = "${sv.directory!!.absolutePath}/Music/"
                     searchFilesInDirectory(File(path))
                 }
             }
+        })
+    }
 
-            progressDialog!!.dismiss()
+    @Throws(InterruptedException::class)
+    private fun searchFilesInDirectory(dir: File) {
+        val files: Array<File>? = dir.listFiles()
+        if (files!!.isNotEmpty()) {
+            //ファイルが存在していた時のみ処理を行う
+            for (f in files) {
+                if (getMusicFilesThread.isInterrupted) {
+                    return
+                }
+                if (f.isDirectory()) {
+                    //ディレクトリの場合再帰的に検索する
+                    searchFilesInDirectory(f)
+                } else {
+                    MediaScannerConnection.scanFile(
+                        applicationContext,
+                        arrayOf(f.path),
+                        null,
+                        null
+                    )
+                }
+            }
         }
+    }
 
-        @Throws(InterruptedException::class)
-        private fun searchFilesInDirectory(dir: File) {
-            val files: Array<File>? = dir.listFiles()
-            if (files!!.isNotEmpty()) {
-                //ファイルが存在していた時のみ処理を行う
-                for (f in files) {
-                    if (interrupted() || interrupted) {
-                        interrupted = true
-                        return
-                    }
-                    if (f.isDirectory()) {
-                        //ディレクトリの場合再帰的に検索する
-                        searchFilesInDirectory(f)
-                    } else {
-                        MediaScannerConnection.scanFile(
-                            applicationContext,
-                            arrayOf(f.path),
-                            null,
-                            null
+    @Composable
+    fun CreateProgressDialog(vm: WifiSyncViewModel) {
+        val msg by vm.msg.collectAsState()
+
+        Dialog(
+            onDismissRequest = { },
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .height(200.dp)
+                    .width(300.dp)
+                    .background(Color.White)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .height(150.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(start = 10.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(50.dp),
+                            color = Color(getColor(R.color.colorAccent)),
+                            trackColor = Color(getColor(R.color.colorButtonTextEnabled))
                         )
+                    }
+                    Column() {
+                        Text(
+                            text = msg,
+                            modifier = Modifier.padding(start = 20.dp, top = 16.dp)
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.padding(top = 150.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Column(horizontalAlignment = Alignment.End
+                    ) {
+                        Button(
+                            onClick = {
+                                // showDialog = false
+                                vm.cancelProcess()
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            )
+                        ) { /* Handle confirm action */
+                            Text(getString(android.R.string.cancel)) // Or use a string resource
+                        }
                     }
                 }
             }
         }
     }
 
-
-    private inner class MediaScannerClient() : MediaScannerConnection.MediaScannerConnectionClient {
-        override fun onMediaScannerConnected() : Unit {
-
-        }
-
-        override fun onScanCompleted(path: String, uri: Uri): Unit {
-
-        }
-    }
-
-    @SuppressLint("InflateParams")
-    fun showWifiSyncAlertDialog(msg: String, thread: Thread, savedInstanceState: Bundle?) {
+    @SuppressLint("InflateParams", "ViewModelConstructorInComposable")
+    fun showWifiSyncAlertDialog(msg: String, thread: Thread) {
         // Create an instance of the dialog fragment and show it.
-        progressDialog = WifiSyncAlertDialog()
-        progressDialog!!.thread = WifiSyncAlertDialogThread(thread, progressDialog!!)
-        progressDialog!!.msg = msg
-
-        progressDialog!!.show(supportFragmentManager, "WIFISYNC_DIALOG")
-        progressDialog!!.thread!!.thread!!.start()
+        setContent {
+            val viewModel = WifiSyncViewModel()
+            CreateProgressDialog(viewModel)
+            viewModel.StartThreadAndShowDialog(thread, msg)
+        }
     }
-
-    fun onDeleteAllPlaylistsClick() {
-//    fun onDeleteAllPlaylistsClick(item: MenuItem) {
+    @Composable
+    fun OnDeleteAllPlaylistsClick() {
         /// 確認ダイアログを出してOKの時に処理
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle(R.string.progressDialogTitle)
-            .setMessage(R.string.menuAllPlaylistsDeleteConfirm)
-            .setCancelable(true)
-            .setPositiveButton("OK") { dialog: DialogInterface, _ ->
-                // OKボタン押下時に実行したい処理を記述
-                dialog.dismiss()
-                val thread = Thread(DeleteAllPlaylists())
-                showWifiSyncAlertDialog(getString(R.string.playlistDeletingMessage), thread, null)
-            }
-            .setNegativeButton("Cancel") { dialog: DialogInterface, _ ->
-                // クリックしたときの処理
-                dialog.dismiss()
-            }
-            .show()
+        if (showDeleteAllPlaylistsDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showDeleteAllPlaylistsDialog.value = false },
+                title = { Text(getString(R.string.progressDialogTitle)) },
+                text = { Text(getString(R.string.menuAllPlaylistsDeleteConfirm)) },
+                confirmButton = {
+                    val thread = Thread(DeleteAllPlaylists())
+                    showWifiSyncAlertDialog(getString(R.string.playlistDeletingMessage), thread)
+                    showDeleteAllPlaylistsDialog.value = false
+                },
+                dismissButton = {
+                    showDeleteAllPlaylistsDialog.value = false
+                }
+            )
+        }
     }
 
     protected inner class DeleteAllPlaylists() : Thread() {
@@ -175,7 +243,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                     )
                 } catch (e: Exception) {
                     Log.d("SQLite Error", e.stackTraceToString())
-                    progressDialog!!.dismiss()
+                    //progressDialog!!.dismiss()
                     interrupt()
                     return
                 }
@@ -188,13 +256,13 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                             (application as WifiSyncApp).delete(contentUri)
                         } while (cursor.moveToNext())
                         cursor.close()
-                        progressDialog!!.dismiss()
+                        //progressDialog!!.dismiss()
                         interrupt()
                         return
                     } catch (e: InterruptedException) {
                         Log.d("onDeleteAllPlaylistsClick", e.toString())
                         Log.d("onDeleteAllPlaylistsClick", e.stackTraceToString())
-                        progressDialog!!.dismiss()
+                        //progressDialog!!.dismiss()
                         interrupt()
                         return
                     }
@@ -202,7 +270,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
             } catch (ex: Exception) {
                 Log.d("onDeleteAllPlaylistsClick", ex.toString())
                 Log.d("onDeleteAllPlaylistsClick", ex.stackTraceToString())
-                progressDialog!!.dismiss()
+                //progressDialog!!.dismiss()
                 interrupt()
                 return
             }

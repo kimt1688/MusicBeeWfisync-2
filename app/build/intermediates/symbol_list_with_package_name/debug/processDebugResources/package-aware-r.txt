@@ -5799,6 +5799,7 @@ string syncCompleted
 string syncCompletedFail
 string syncCompletedFailErrorLog
 string syncCompletedFailMessage
+string syncConfirmHeader
 string syncDeleteConfirm1
 string syncDeleteConfirm9
 string syncErrorHeader

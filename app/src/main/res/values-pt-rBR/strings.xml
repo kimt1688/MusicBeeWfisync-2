@@ -94,5 +94,6 @@
     <string name="menuAllPlaylistsDelete">Delete All Playlists in Device</string>
     <string name="menuAllPlaylistsDeleteConfirm">Really want to delete all playlists?</string>
     <string name="playlistDeletingMessage">Deleting playlists…</string>
+    <string name="syncConfirmHeader">Confirm</string>
 
 </resources>
