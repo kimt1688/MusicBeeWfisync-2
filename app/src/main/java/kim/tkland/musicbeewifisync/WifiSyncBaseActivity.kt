@@ -72,6 +72,8 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
 
     var getMusicFilesThread = Thread()
 
+    var deleteAllPlaylistsThread = Thread()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -190,36 +192,12 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
     }
 
     @SuppressLint("InflateParams", "ViewModelConstructorInComposable")
-    fun showWifiSyncAlertDialog(msg: String, thread: Thread) {
+    fun showWifiSyncAlertDialog(msg: String) {
         // Create an instance of the dialog fragment and show it.
-        setContent {
-            val viewModel = WifiSyncViewModel()
-            CreateProgressDialog(viewModel)
-            viewModel.StartThreadAndShowDialog(thread, msg)
-        }
+        showDeleteAllPlaylistsDialog.value = true
     }
-    @Composable
-    fun OnDeleteAllPlaylistsClick() {
-        /// 確認ダイアログを出してOKの時に処理
-        if (showDeleteAllPlaylistsDialog.value) {
-            AlertDialog(
-                onDismissRequest = { showDeleteAllPlaylistsDialog.value = false },
-                title = { Text(getString(R.string.progressDialogTitle)) },
-                text = { Text(getString(R.string.menuAllPlaylistsDeleteConfirm)) },
-                confirmButton = {
-                    val thread = Thread(DeleteAllPlaylists())
-                    showWifiSyncAlertDialog(getString(R.string.playlistDeletingMessage), thread)
-                    showDeleteAllPlaylistsDialog.value = false
-                },
-                dismissButton = {
-                    showDeleteAllPlaylistsDialog.value = false
-                }
-            )
-        }
-    }
-
-    protected inner class DeleteAllPlaylists() : Thread() {
-        override fun run() {
+    protected fun deleteAllPlaylists() {
+        deleteAllPlaylistsThread = Thread(Runnable {
             val playListCollection = MediaStore.Audio.Playlists.getContentUri(
                 MediaStore.getExternalVolumeNames(applicationContext)
                     .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
@@ -244,12 +222,15 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                 } catch (e: Exception) {
                     Log.d("SQLite Error", e.stackTraceToString())
                     //progressDialog!!.dismiss()
-                    interrupt()
-                    return
+                    //interrupt()
+                    return@Runnable
                 }
                 if (cursor != null) {
                     try {
                         cursor.moveToFirst()
+                        if (cursor.count == 0) {
+                            return@Runnable
+                        }
                         do {
                             contentUri =
                                 ContentUris.withAppendedId(playListCollection, cursor.getLong(0))
@@ -257,23 +238,23 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                         } while (cursor.moveToNext())
                         cursor.close()
                         //progressDialog!!.dismiss()
-                        interrupt()
-                        return
+                        //interrupt()
+                        return@Runnable
                     } catch (e: InterruptedException) {
                         Log.d("onDeleteAllPlaylistsClick", e.toString())
                         Log.d("onDeleteAllPlaylistsClick", e.stackTraceToString())
                         //progressDialog!!.dismiss()
-                        interrupt()
-                        return
+                        //interrupt()
+                        return@Runnable
                     }
                 }
             } catch (ex: Exception) {
                 Log.d("onDeleteAllPlaylistsClick", ex.toString())
                 Log.d("onDeleteAllPlaylistsClick", ex.stackTraceToString())
                 //progressDialog!!.dismiss()
-                interrupt()
-                return
+                //interrupt()
+                return@Runnable
             }
-        }
+        })
     }
 }

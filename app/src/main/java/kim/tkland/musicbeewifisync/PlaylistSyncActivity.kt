@@ -248,7 +248,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                                     text = { Text(getString(R.string.menuAllPlaylistsDelete)) },
                                     onClick = {
                                         expanded = false
-                                        setContent { OnDeleteAllPlaylistsClick() }
+                                        showDeleteAllPlaylistsDialog.value = true
                                     }
                                 )
                                 DropdownMenuItem(
@@ -401,6 +401,60 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
         ) { innerPadding ->
             if (showProgress) {
                 CreateProgressDialog(viewModel)
+            }
+            if (showDeleteAllPlaylistsDialog.value) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteAllPlaylistsDialog.value = false },
+                    icon = { // Use the dedicated 'icon' parameter
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_dialog_info),
+                            contentDescription = "Info Icon"
+                        )  /* Provide a content description)*/
+                    },
+                    title = { Text(getString(R.string.progressDialogTitle)) },
+                    text = { Text(getString(R.string.menuAllPlaylistsDeleteConfirm)) },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                runBlocking {
+                                    val deffered = async {
+                                        showDeleteAllPlaylistsDialog.value = false
+                                    }
+                                    deffered.await()
+                                }
+                                deleteAllPlaylists()
+                                val thread = Thread(deleteAllPlaylistsThread)
+                                viewModel.setValues(
+                                    thread,
+                                    getString(R.string.playlistDeletingMessage)
+                                )
+                                lifecycleScope.launch {
+                                    viewModel.doAsyncWork()
+                                }
+                                showDeleteAllPlaylistsDialog.value = false // ダイアログを閉じる
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            )
+                        ) { /* Handle confirm action */
+                            Text(getString(android.R.string.ok)) // Or use a string resource
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                showDeleteAllPlaylistsDialog.value = false
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            )
+                        ) { /* Handle confirm action */
+                            Text(getString(android.R.string.cancel)) // Or use a string resource
+                        }
+                    }
+                )
             }
             if (showFullScanDialogShow) {
                 AlertDialog(
