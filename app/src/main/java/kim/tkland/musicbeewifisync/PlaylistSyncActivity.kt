@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -59,7 +61,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.net.SocketTimeoutException
 
@@ -76,8 +82,16 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
     constructor(playlistName: String) : super(playlistName) {
     }
 
+    private var PlaylistSyncActivity.showProgress: Boolean
+        get() = viewModel.showDialog.value
+        set(value) {}
+    private val PlaylistSyncActivity.viewModel: WifiSyncViewModel
+        get() = this.viewModels<WifiSyncViewModel>().value
+
     private var syncPreview = false
     private var playlistLoaderThread: Thread? = null
+
+    var showDialog = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (intent.getBooleanExtra("playlistSync", false)) {
@@ -138,6 +152,14 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
         val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
         val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
         var data by remember { mutableStateOf("Loading...") }
+        var showFullScanDialogShow by remember { mutableStateOf(false) }
+        val showDialogFromViewModel by viewModel.showDialog.collectAsStateWithLifecycle()
+        var showProgressDialogShow by remember { mutableStateOf(showDialogFromViewModel) }
+
+        // You'll need to observe changes from the ViewModel and update the local state
+        LaunchedEffect(showDialogFromViewModel) {
+            showProgressDialogShow = showDialogFromViewModel
+        }
 
         Scaffold(
             topBar = {
@@ -219,7 +241,7 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                                     text = { Text(getString(R.string.menuFullScanFiles)) },
                                     onClick = {
                                         expanded = false
-                                        showFullScanDialogShow.value = true
+                                        showFullScanDialogShow = true
                                     }
                                 )
                                 DropdownMenuItem(
@@ -377,6 +399,62 @@ class PlaylistSyncActivity : WifiSyncBaseActivity {
                 }
             }
         ) { innerPadding ->
+            if (showProgress) {
+                CreateProgressDialog(viewModel)
+            }
+            if (showFullScanDialogShow) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showFullScanDialogShow = false
+                    }, // ダイアログの外側をクリックしたときの処理
+                    icon = { // Use the dedicated 'icon' parameter
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_dialog_info),
+                            contentDescription = "Info Icon"
+                        )  /* Provide a content description)*/
+                    },
+                    title = { Text(getString(R.string.syncConfirmHeader)) },
+                    text = { Text(getString(R.string.alertDialogMessage)) },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                runBlocking {
+                                    val deffered = async {
+                                        showFullScanDialogShow = false
+                                    }
+                                    deffered.await()
+                                }
+                                getMusicFiles()
+                                val thread = Thread(getMusicFilesThread)
+                                viewModel.setValues(thread, getString(R.string.progressDialogMessage))
+                                lifecycleScope.launch {
+                                    viewModel.doAsyncWork()
+                                }
+                                showProgressDialogShow = false // ダイアログを閉じる
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            )
+                        ) { /* Handle confirm action */
+                            Text(getString(android.R.string.ok)) // Or use a string resource
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                showFullScanDialogShow = false
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            )
+                        ) { /* Handle confirm action */
+                            Text(getString(android.R.string.cancel)) // Or use a string resource
+                        }
+                    }
+                )
+            }
             Column(
                 modifier = Modifier
                     .background(Color(getColor(android.R.color.white)))
