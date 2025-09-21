@@ -1,22 +1,11 @@
 package kim.tkland.musicbeewifisync
 
-import android.Manifest
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
-import android.net.LinkAddress
-import android.net.LinkProperties
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.wifi.WifiInfo
-import android.net.wifi.WifiManager
-import androidx.annotation.RequiresPermission
-import java.math.BigInteger
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.UnknownHostException
-import java.nio.ByteOrder
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 class IpAddressProviderImpl(context: Context, overrideSearchIP: InetAddress?) : IpAddressProvider {

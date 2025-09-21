@@ -464,8 +464,6 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
                     showErrorDialog(showErrorDialog2, true)
                 } else {
-                    // Successfully found server, proceed
-                    //finish() // or navigate
                     WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
                     WifiSyncServiceSettings.saveSettings(applicationContext)
                     val intent = Intent(context, MainActivity::class.java)
