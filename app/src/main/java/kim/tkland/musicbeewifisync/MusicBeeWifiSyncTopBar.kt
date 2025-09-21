@@ -25,7 +25,6 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +33,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.ContextCompat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,10 +66,10 @@ fun MusicBeeWifiSyncTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SyncScreenTopBar(
-    appBarTitle: MutableState<String>,
+    appBarTitle: String,
     expanded: Boolean,
     onExpandedChange: (Boolean)-> Unit,
-    showDeleteAllPlaylistsDialog: MutableState<Boolean>,
+    showDeleteAllPlaylistsDialog: Boolean,
     showFullScanDialogShow: Boolean,
     onShowFullScanDialogShowChange: (Boolean)-> Unit,
     isFullSync: Boolean)
@@ -83,7 +82,7 @@ fun SyncScreenTopBar(
             Box(
             ) {
                 Text(
-                    text = appBarTitle.value,
+                    text = appBarTitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -94,7 +93,7 @@ fun SyncScreenTopBar(
                 Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
             }
             DropdownMenu(
-                modifier = Modifier.background(Color(resources.getColor(white))),
+                modifier = Modifier.background(Color(ContextCompat.getColor(context,white))),
                 expanded = expanded,
                 onDismissRequest = { onExpandedChange(false) }
             ) {
@@ -115,9 +114,9 @@ fun SyncScreenTopBar(
                                 Checkbox(
                                     checked = true,
                                     colors = CheckboxDefaults.colors(
-                                        checkmarkColor = Color(resources.getColor(android.R.color.white)),
-                                        uncheckedColor = Color(resources.getColor(android.R.color.black)),
-                                        checkedColor = Color(resources.getColor(R.color.colorAccent)),                                                    ),
+                                        checkmarkColor = Color(ContextCompat.getColor(context,android.R.color.white)),
+                                        uncheckedColor = Color(ContextCompat.getColor(context,android.R.color.black)),
+                                        checkedColor = Color(ContextCompat.getColor(context,R.color.colorAccent)),                                                    ),
                                     onCheckedChange = { isChecked ->
                                     }
                                 )
@@ -132,7 +131,6 @@ fun SyncScreenTopBar(
                             )
                             intent.putExtra("fullSync", true)
                             onExpandedChange(false)
-                            startActivity(context, intent, null)
                             context.startActivity(intent)
                         } else {
                             onExpandedChange(false)
@@ -168,9 +166,9 @@ fun SyncScreenTopBar(
                                 Checkbox(
                                     checked = true,
                                     colors = CheckboxDefaults.colors(
-                                        checkmarkColor = Color(resources.getColor(android.R.color.white)),
-                                        uncheckedColor = Color(resources.getColor(android.R.color.black)),
-                                        checkedColor = Color(resources.getColor(R.color.colorAccent)),                                                ),
+                                        checkmarkColor = Color(ContextCompat.getColor(context, android.R.color.white)),
+                                        uncheckedColor = Color(ContextCompat.getColor(context,android.R.color.black)),
+                                        checkedColor = Color(ContextCompat.getColor(context,R.color.colorAccent)),                                                ),
                                     onCheckedChange = { }
                                 )
                             }
@@ -213,6 +211,68 @@ fun SyncScreenTopBar(
                         context.startActivity(intent)
                     }
                 )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ResultScreenTopBar(
+    appBarTitle: String,
+    expanded: Boolean,
+    onExpandedChange: (Boolean)-> Unit)
+{
+    val resources = LocalResources.current
+    val context = LocalContext.current
+
+    MusicBeeWifiSyncTopBar(
+        title = {
+            Box(
+            ) {
+                Text(
+                    text = appBarTitle,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        },
+        actions = {
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+            ) {
+                IconButton(onClick = { onExpandedChange(!expanded) }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
+                }
+                DropdownMenu(
+                    modifier = Modifier.background(Color(ContextCompat.getColor(context, white))),
+                    expanded = expanded,
+                    onDismissRequest = { onExpandedChange(false) }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(resources.getString(R.string.menuSyncSettings)) },
+                        onClick = {
+                            val intent = Intent(
+                                context,
+                                SettingsActivity::class.java
+                            )
+                            onExpandedChange(false)
+                            context.startActivity(intent)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(resources.getString(R.string.menuWifiSyncLog)) },
+                        onClick = {
+                            val intent = Intent(
+                                context,
+                                ViewErrorLogActivity::class.java
+                            )
+                            onExpandedChange(false)
+                            context.startActivity(intent)
+                        }
+                    )
+                }
             }
         }
     )

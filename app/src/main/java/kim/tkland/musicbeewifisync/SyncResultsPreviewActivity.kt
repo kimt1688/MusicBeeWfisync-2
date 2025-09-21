@@ -2,7 +2,6 @@ package kim.tkland.musicbeewifisync
 
 import android.R.color.white
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -36,20 +35,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
@@ -181,53 +175,12 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
 
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+
             topBar = {
-                MusicBeeWifiSyncTopBar(
-                    title = {
-                        Text(
-                            title,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    actions = {
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
-                        ) {
-                            IconButton(onClick = { expanded = !expanded }) {
-                                Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
-                            }
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(getString(R.string.menuSyncSettings)) },
-                                    onClick = {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            SettingsActivity::class.java
-                                        )
-                                        expanded = false
-                                        startActivity(intent)
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(getString(R.string.menuWifiSyncLog)) },
-                                    onClick = {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            ViewErrorLogActivity::class.java
-                                        )
-                                        expanded = false
-                                        startActivity(intent)
-                                    }
-                                )
-                            }
-                        }
-                    },
-                    scrollBehavior = scrollBehavior
+                ResultScreenTopBar(
+                    title,
+                    expanded,
+                    { newValue -> expanded = newValue },
                 )
             },
             bottomBar = {
@@ -347,56 +300,10 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         Scaffold(
             // modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                MusicBeeWifiSyncTopBar(
-                    title = {
-                        Box( // Wrap the Text in a Box
-                        ) {
-                            Text(
-                                text = title,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    },
-                   actions = {
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
-                        ) {
-                            IconButton(onClick = { expanded = !expanded }) {
-                                Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
-                            }
-                            DropdownMenu(
-                                modifier = Modifier.background(Color(getColor(white))),
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(getString(R.string.menuSyncSettings)) },
-                                    onClick = {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            SettingsActivity::class.java
-                                        )
-                                        expanded = false
-                                        startActivity(intent)
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(getString(R.string.menuWifiSyncLog)) },
-                                    onClick = {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            ViewErrorLogActivity::class.java
-                                        )
-                                        expanded = false
-                                        startActivity(intent)
-                                    }
-                                )
-                            }
-                        }
-                    },
-                    scrollBehavior = scrollBehavior
+                ResultScreenTopBar(
+                    title,
+                    expanded,
+                    { newValue -> expanded = newValue },
                 )
             },
             bottomBar = {

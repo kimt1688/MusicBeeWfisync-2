@@ -15,8 +15,7 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
     protected var errorColor = 0
     @JvmField
     protected var warningColor = 0
-
-    protected var isPreview = mutableStateOf(false)
+    protected var appBarTitle = mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

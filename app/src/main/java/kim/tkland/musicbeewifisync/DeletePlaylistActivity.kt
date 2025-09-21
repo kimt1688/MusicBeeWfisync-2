@@ -41,15 +41,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 
-class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
+class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     private var checkCount by mutableStateOf("")
-
     private val isListChecked = mutableStateListOf<Boolean>(false)
     private val listFilename = mutableStateListOf<String>("")
     private var PlaylistSyncActivity.showProgress: Boolean
         get() = viewModel.showDialog.value
         set(value) {}
-    private val PlaylistSyncActivity.viewModel: WifiSyncViewModel
+    private val DeletePlaylistActivity.viewModel: WifiSyncViewModel
         get() = this.viewModels<WifiSyncViewModel>().value
     private var syncPreview = false
     private var playlistLoaderThread: Thread? = null
@@ -69,7 +68,7 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
         job.join()
     }
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (intent.getBooleanExtra("playlistSync", false)) {
+        if (intent.getBooleanExtra("deleteplaylist", false)) {
             syncPreview = true
         }
 
@@ -139,13 +138,10 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
         super.CustomView()
         Scaffold(
             topBar = {
-                SyncScreenTopBar(appBarTitle.value,
+                ResultScreenTopBar(appBarTitle.value,
                     expanded,
                     { newValue -> expanded = newValue},
-                    showDeleteAllPlaylistsDialog.value,
-                    showFullScanDialogShow,
-                    {newValue -> showFullScanDialogShow = newValue},
-                    isFullSync.value)
+                )
             },
             bottomBar = {
                 buttons.BottomBarContent()
@@ -308,45 +304,45 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
     ) {
         playlistLoaderThread = Thread(Runnable {
 
-        while (true) {
-            try {
-                val values = ArrayList<FileSelectedInfo>()
-                val lookup = CaseInsensitiveMap()
-                for (playlistName in WifiSyncServiceSettings.syncCustomPlaylistNames) {
-                    lookup[playlistName] = null
-                }
-                for (playlistName in WifiSyncService.musicBeePlaylists) {
-                    values.add(
-                        FileSelectedInfo(
-                            playlistName,
-                            lookup.containsKey(playlistName)
-                        )
-                    )
-                    onIsListCheckChange(lookup.containsKey(playlistName))
-                    onListFilenameChange(playlistName)
-                }
-                selectedPlaylists = values
-                runOnUiThread {
-                    if (!playlistLoaderThread!!.isInterrupted) {
-                        showPlaylistsSelectedCount(
-                            checkCount = checkCount,
-                            onCheckCountChange = onCheckCountChange
-                        )
+            while (true) {
+                try {
+                    val values = ArrayList<FileSelectedInfo>()
+                    val lookup = CaseInsensitiveMap()
+                    for (playlistName in WifiSyncServiceSettings.syncCustomPlaylistNames) {
+                        lookup[playlistName] = null
                     }
+                    for (playlistName in WifiSyncService.musicBeePlaylists) {
+                        values.add(
+                            FileSelectedInfo(
+                                playlistName,
+                                lookup.containsKey(playlistName)
+                            )
+                        )
+                        onIsListCheckChange(lookup.containsKey(playlistName))
+                        onListFilenameChange(playlistName)
+                    }
+                    selectedPlaylists = values
+                    runOnUiThread {
+                        if (!playlistLoaderThread!!.isInterrupted) {
+                            showPlaylistsSelectedCount(
+                                checkCount = checkCount,
+                                onCheckCountChange = onCheckCountChange
+                            )
+                        }
+                    }
+                    return@Runnable
+                } catch (ex: InterruptedException) {
+                    throw ex
+                } catch (ex: SocketTimeoutException) {
+                    //showPlaylistRetrievalError()
+                    Thread.sleep(2500)
+                } catch (ex: Exception) {
+                    ErrorHandler.logError("loadPlaylists", ex)
+                    //showPlaylistRetrievalError()
+                    return@Runnable
                 }
-                return@Runnable
-            } catch (ex: InterruptedException) {
-                throw ex
-            } catch (ex: SocketTimeoutException) {
-                //showPlaylistRetrievalError()
-                Thread.sleep(2500)
-            } catch (ex: Exception) {
-                ErrorHandler.logError("loadPlaylists", ex)
-                //showPlaylistRetrievalError()
-                return@Runnable
             }
-        }
-      })
+        })
     }
 
 
