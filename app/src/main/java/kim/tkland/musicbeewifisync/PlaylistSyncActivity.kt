@@ -3,6 +3,7 @@ package kim.tkland.musicbeewifisync
 import android.R.color.white
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
@@ -43,7 +44,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.net.SocketTimeoutException
 
@@ -62,6 +68,18 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
     val isOpenDialog = mutableStateOf(false)
     var isSyncPlaylistsDeleteFiles = mutableStateOf(WifiSyncServiceSettings.syncDeleteUnselectedFiles)
 
+    suspend fun doAsyncWork() {
+        val job = CoroutineScope(Dispatchers.Default).launch {
+            // バックグラウンドで時間のかかる処理
+            playlistLoaderThread?.start()
+            Log.d("PlaylistSyncActivity.loadPlaylist", "Thread started")
+            playlistLoaderThread?.join()
+            Log.d("PlaylistSyncActivity.loadPlaylist", "Thread finished")
+        }
+
+        // スレッドをブロックせずにコルーチンの完了を待つ
+        job.join()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         if (intent.getBooleanExtra("playlistSync", false)) {
             syncPreview = true
@@ -88,7 +106,11 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
                     onCheckCountChange = { newCheckCountValue: String ->
                         checkCount =
                             newCheckCountValue // Also update here if showPlaylists modifies it
-                    })
+                    }
+                )
+                lifecycleScope.launch {
+                    doAsyncWork()
+                }
                 // ここでスレッドを待ちたい！！！
                 //playlistLoaderThread?.join()
             } else {
@@ -123,147 +145,19 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
         }
 
         isFullSync.value = false
-        isPlaylistSync.value = true
         appBarTitle.value = getString(R.string.title_activity_sync_playlists)
         val buttons = WifiSyncSyncButtons(::onPreviewButtonClick, ::onSyncNowButtonClick)
 
         super.CustomView()
         Scaffold(
             topBar = {
-                MusicBeeWifiSyncTopBar(
-                    title = {
-                        Box(
-                        ) {
-                            Text(
-                                text = appBarTitle.value,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { expanded = !expanded }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
-                        }
-                        DropdownMenu(
-                            modifier = Modifier.background(Color(getColor(white))),
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Column(horizontalAlignment = Alignment.Start) {
-                                            Text(getString(R.string.menuWifiFullSync))
-                                        }
-                                        if (isFullSync.value) {
-                                            Column(horizontalAlignment = Alignment.End) {
-                                                Checkbox(
-                                                    checked = true,
-                                                    colors = CheckboxDefaults.colors(
-                                                        checkmarkColor = Color(getColor(android.R.color.white)),
-                                                        uncheckedColor = Color(getColor(android.R.color.black)),
-                                                        checkedColor = Color(getColor(R.color.colorAccent)),                                                    ),
-                                                    onCheckedChange = { isChecked ->
-                                                    }
-                                                )
-                                            }
-                                        }
-                                    }
-                                },
-                                onClick = {
-                                    if(isPlaylistSync.value) {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            MainActivity::class.java
-                                        )
-                                        intent.putExtra("fullSync", true)
-                                        expanded = false
-                                        startActivity(intent)
-                                    } else {
-                                        expanded = false
-                                    }
-                                }
-                            )
-                            DropdownMenuItem(
-                                onClick = {
-                                    if(isFullSync.value) {
-                                        val intent = Intent(
-                                            applicationContext,
-                                            PlaylistSyncActivity::class.java
-                                        )
-                                        intent.putExtra("playlistSync", true)
-                                        expanded = false
-                                        startActivity(intent)
-                                    } else {
-                                        expanded = false
-                                    }
-                                },
-                                text = {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(
-                                            modifier = Modifier.weight(1f),
-                                            horizontalAlignment = Alignment.Start
-                                        ) {
-                                            Text(getString(R.string.menuWifiPlaylistSync))
-                                        }
-                                        if (isPlaylistSync.value) {
-                                            Checkbox(
-                                                checked = true,
-                                                colors = CheckboxDefaults.colors(
-                                                    checkmarkColor = Color(getColor(android.R.color.white)),
-                                                    uncheckedColor = Color(getColor(android.R.color.black)),
-                                                    checkedColor = Color(getColor(R.color.colorAccent)),                                                ),
-                                                onCheckedChange = { }
-                                            )
-                                        }
-                                    }
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuSyncSettings)) },
-                                onClick = {
-                                    val intent = Intent(
-                                        applicationContext,
-                                        SettingsActivity::class.java
-                                    )
-                                    expanded = false
-                                    startActivity(intent)
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuFullScanFiles)) },
-                                onClick = {
-                                    expanded = false
-                                    showFullScanDialogShow = true
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuAllPlaylistsDelete)) },
-                                onClick = {
-                                    expanded = false
-                                    showDeleteAllPlaylistsDialog.value = true
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuWifiSyncLog)) },
-                                onClick = {
-                                    val intent = Intent(
-                                        applicationContext,
-                                        ViewErrorLogActivity::class.java
-                                    )
-                                    expanded = false
-                                    startActivity(intent)
-                                }
-                            )
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                )
+                SyncScreenTopBar(appBarTitle,
+                    expanded,
+                    { newValue -> expanded = newValue},
+                    showDeleteAllPlaylistsDialog,
+                    showFullScanDialogShow,
+                    {newValue -> showFullScanDialogShow = newValue},
+                    isFullSync.value)
             },
             bottomBar = {
                 buttons.BottomBarContent()
@@ -465,12 +359,6 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
             }
         }
       })
-        runBlocking {
-            val deferredResult = async {
-                playlistLoaderThread!!.start()
-            }
-            deferredResult.await()
-        }
     }
 
 

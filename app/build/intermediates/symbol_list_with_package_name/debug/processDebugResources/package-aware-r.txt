@@ -4917,7 +4917,6 @@ id preferences_detail
 id preferences_header
 id preferences_sliding_pane_layout
 id pressed
-id progressBar
 id progress_circular
 id progress_horizontal
 id radio
@@ -5034,7 +5033,6 @@ id textSpacerNoButtons
 id textSpacerNoTitle
 id textStart
 id textTop
-id textView
 id text_input_end_icon
 id text_input_error_icon
 id text_input_start_icon
@@ -5272,7 +5270,6 @@ layout design_navigation_menu
 layout design_navigation_menu_item
 layout design_text_input_end_icon
 layout design_text_input_start_icon
-layout dialog_sync_progress
 layout expand_button
 layout image_frame
 layout ime_base_split_test_activity
@@ -7311,6 +7308,7 @@ styleable FloatingToolbar backgroundTint marginBottomSystemWindowInsets marginLe
 styleable FlowLayout horizontalItemSpacing lineSpacing
 styleable FontFamily fontProviderAuthority fontProviderCerts fontProviderFallbackQuery fontProviderFetchStrategy fontProviderFetchTimeout fontProviderPackage fontProviderQuery fontProviderSystemFontFamily
 styleable FontFamilyFont android_font android_fontWeight android_fontStyle android_ttcIndex android_fontVariationSettings font fontStyle fontVariationSettings fontWeight ttcIndex
+styleable FontFamilyProviderFallback fontProviderQuery fontProviderSystemFontFamily fontVariationSettings
 styleable ForegroundLinearLayout android_foreground android_foregroundGravity foregroundInsidePadding
 styleable Fragment android_name android_id android_tag
 styleable FragmentContainerView android_name android_tag

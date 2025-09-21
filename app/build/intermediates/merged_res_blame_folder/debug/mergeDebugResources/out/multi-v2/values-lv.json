@@ -4,23 +4,6 @@
             "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-67:/values-lv/values-lv.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\de92d81c8b1824d261da3baf09a5de5e\\transformed\\navigation-ui-2.9.3\\res\\values-lv\\values-lv.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,169",
-                        "endColumns": "113,122",
-                        "endOffsets": "164,287"
-                    },
-                    "to": {
-                        "startLines": "232,233",
-                        "startColumns": "4,4",
-                        "startOffsets": "22803,22917",
-                        "endColumns": "113,122",
-                        "endOffsets": "22912,23035"
-                    }
-                },
-                {
                     "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\2cf5cdf56df0e5898f36debc724463f0\\transformed\\ui-release\\res\\values-lv\\values-lv.xml",
                     "from": {
                         "startLines": "3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21",
@@ -91,7 +74,24 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\36021e4319728fa161a16495e5d3a638\\transformed\\material3\\res\\values-lv\\values-lv.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\f1c5661096003545edaffe759c62e303\\transformed\\core-1.17.0\\res\\values-lv\\values-lv.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,153,255,355,456,563,671,786",
+                        "endColumns": "97,101,99,100,106,107,114,100",
+                        "endOffsets": "148,250,350,451,558,666,781,882"
+                    },
+                    "to": {
+                        "startLines": "39,40,41,42,43,44,45,251",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "3686,3784,3886,3986,4087,4194,4302,24499",
+                        "endColumns": "97,101,99,100,106,107,114,100",
+                        "endOffsets": "3779,3881,3981,4082,4189,4297,4412,24595"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\3a6b555c9a881a74fc64e4b506bcbb32\\transformed\\material3\\res\\values-lv\\values-lv.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -108,7 +108,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\9121b2d65ed1cc2d6927f191e96cd9e9\\transformed\\material\\res\\values-lv\\values-lv.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\2456c9e8efedfa373d326206cbcfcc2d\\transformed\\material\\res\\values-lv\\values-lv.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -125,20 +125,20 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\6e2773df30cb7cc0dbec09fb8f208520\\transformed\\core-1.16.0\\res\\values-lv\\values-lv.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\592c45997568070ebca87ad389475769\\transformed\\navigation-ui-2.9.4\\res\\values-lv\\values-lv.xml",
                     "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,153,255,355,456,563,671,786",
-                        "endColumns": "97,101,99,100,106,107,114,100",
-                        "endOffsets": "148,250,350,451,558,666,781,882"
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,169",
+                        "endColumns": "113,122",
+                        "endOffsets": "164,287"
                     },
                     "to": {
-                        "startLines": "39,40,41,42,43,44,45,251",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "3686,3784,3886,3986,4087,4194,4302,24499",
-                        "endColumns": "97,101,99,100,106,107,114,100",
-                        "endOffsets": "3779,3881,3981,4082,4189,4297,4412,24595"
+                        "startLines": "232,233",
+                        "startColumns": "4,4",
+                        "startOffsets": "22803,22917",
+                        "endColumns": "113,122",
+                        "endOffsets": "22912,23035"
                     }
                 },
                 {

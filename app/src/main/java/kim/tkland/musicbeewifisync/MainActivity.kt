@@ -129,141 +129,23 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
         var isSyncToPlaylistsEnabled by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) }
 
         isFullSync.value = true
-        isPlaylistSync.value = false
         appBarTitle.value = getString(R.string.app_name)
         val buttons = WifiSyncSyncButtons(::onPreviewButtonClick, ::onSyncNowButtonClick)
 
         super.CustomView()
         Scaffold(
             topBar = {
-                MusicBeeWifiSyncTopBar(
-                    title = {
-                        Box(
-                        ) {
-                            Text(
-                                text = appBarTitle.value,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { expanded = !expanded }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Menu...")
-                        }
-                        DropdownMenu(
-                            modifier = Modifier.background(Color(getColor(white))),
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(
-                                            modifier = Modifier.weight(1f),
-                                            horizontalAlignment = Alignment.Start
-                                        ) {
-                                            Text(getString(R.string.menuWifiFullSync))
-                                        }
-                                        if (isFullSync.value) {
-                                            Checkbox(
-                                                checked = true,
-                                                colors = CheckboxDefaults.colors(
-                                                    checkmarkColor = Color(getColor(android.R.color.white)),
-                                                    uncheckedColor = Color(getColor(android.R.color.black)),
-                                                    checkedColor = Color(getColor(R.color.colorAccent)),                                                    ),
-                                                onCheckedChange = { isChecked ->
-                                                }
-                                            )
-                                        }
-                                    }
-                                },
-                                onClick = {
-                                    expanded = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                onClick = {
-                                    val intent = Intent(
-                                        applicationContext,
-                                        PlaylistSyncActivity::class.java
-                                    )
-                                    intent.putExtra("playlistSync", true)
-                                    expanded = false
-                                    startActivity(intent)
-                                },
-                                text = {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(
-                                            modifier = Modifier.weight(1f),
-                                            horizontalAlignment = Alignment.Start
-                                        ) {
-                                            Text(getString(R.string.menuWifiPlaylistSync))
-                                        }
-                                        if (isPlaylistSync.value) {
-                                            Checkbox(
-                                                checked = true,
-                                                colors = CheckboxDefaults.colors(
-                                                    checkmarkColor = Color(getColor(android.R.color.white)),
-                                                    uncheckedColor = Color(getColor(android.R.color.black)),
-                                                    checkedColor = Color(getColor(R.color.colorAccent)),                                                ),
-                                                onCheckedChange = { }
-                                            )
-                                        }
-                                    }
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuSyncSettings)) },
-                                onClick = {
-                                    val intent = Intent(
-                                        applicationContext,
-                                        SettingsActivity::class.java
-                                    )
-                                    expanded = false
-                                    startActivity(intent)
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuFullScanFiles)) },
-                                onClick = {
-                                    expanded = false
-                                    showFullScanDialogShow = true
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuAllPlaylistsDelete)) },
-                                onClick = {
-                                    expanded = false
-                                    showDeleteAllPlaylistsDialog.value = true
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(getString(R.string.menuWifiSyncLog)) },
-                                onClick = {
-                                    val intent = Intent(
-                                        applicationContext,
-                                        ViewErrorLogActivity::class.java
-                                    )
-                                    expanded = false
-                                    startActivity(intent)
-                                }
-                            )
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                )
+                SyncScreenTopBar(appBarTitle,
+                    expanded,
+                    { newValue -> expanded = newValue},
+                    showDeleteAllPlaylistsDialog,
+                    showFullScanDialogShow,
+                    {newValue -> showFullScanDialogShow = newValue},
+                    isFullSync.value)
             },
             bottomBar = {
                 buttons.BottomBarContent()
-            }
+            },
         )
         { innnerPadding ->
             Column(

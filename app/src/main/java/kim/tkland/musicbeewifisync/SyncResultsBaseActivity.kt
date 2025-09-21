@@ -2,6 +2,7 @@ package kim.tkland.musicbeewifisync
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 
@@ -14,6 +15,9 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
     protected var errorColor = 0
     @JvmField
     protected var warningColor = 0
+
+    protected var isPreview = mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)

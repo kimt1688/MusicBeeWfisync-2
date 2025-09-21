@@ -40,10 +40,6 @@
         "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxhdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "kim.tkland.musicbeewifisync.app-debug-69:/layout_dialog_sync_progress.xml.flat",
-        "source": "kim.tkland.musicbeewifisync.app-main-72:/layout/dialog_sync_progress.xml"
-    },
-    {
         "merged": "kim.tkland.musicbeewifisync.app-debug-69:/mipmap-xxxhdpi_ic_sync.webp.flat",
         "source": "kim.tkland.musicbeewifisync.app-main-72:/mipmap-xxxhdpi/ic_sync.webp"
     },

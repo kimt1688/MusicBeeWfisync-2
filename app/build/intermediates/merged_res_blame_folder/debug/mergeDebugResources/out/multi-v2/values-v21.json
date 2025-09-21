@@ -4,6 +4,25 @@
             "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-67:/values-v21/values-v21.xml",
             "map": [
                 {
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\f1c5661096003545edaffe759c62e303\\transformed\\core-1.17.0\\res\\values-v21\\values-v21.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,13",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,173,237,304,368,484,610,736,864,1036",
+                        "endLines": "2,3,4,5,6,7,8,9,12,17",
+                        "endColumns": "117,63,66,63,115,125,125,127,12,12",
+                        "endOffsets": "168,232,299,363,479,605,731,859,1031,1383"
+                    },
+                    "to": {
+                        "startLines": "2,7,8,9,275,276,283,287,385,388",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,559,623,690,19440,19556,20013,20307,27299,27471",
+                        "endLines": "2,7,8,9,275,276,283,287,387,392",
+                        "endColumns": "117,63,66,63,115,125,125,127,12,12",
+                        "endOffsets": "168,618,685,749,19551,19677,20134,20430,27466,27818"
+                    }
+                },
+                {
                     "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\a6ffba56a553af8571fe9d00158a4802\\transformed\\leanback-1.2.0\\res\\values-v21\\values-v21.xml",
                     "from": {
                         "startLines": "2,3,7,13,17,20,25,29,50,54,60,64,67,72,76,96,99,103",
@@ -94,25 +113,6 @@
                         "endLines": "279,282,286,290",
                         "endColumns": "12,12,12,12",
                         "endOffsets": "19845,20008,20302,20597"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\6e2773df30cb7cc0dbec09fb8f208520\\transformed\\core-1.16.0\\res\\values-v21\\values-v21.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,13",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,173,237,304,368,484,610,736,864,1036",
-                        "endLines": "2,3,4,5,6,7,8,9,12,17",
-                        "endColumns": "117,63,66,63,115,125,125,127,12,12",
-                        "endOffsets": "168,232,299,363,479,605,731,859,1031,1383"
-                    },
-                    "to": {
-                        "startLines": "2,7,8,9,275,276,283,287,385,388",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,559,623,690,19440,19556,20013,20307,27299,27471",
-                        "endLines": "2,7,8,9,275,276,283,287,387,392",
-                        "endColumns": "117,63,66,63,115,125,125,127,12,12",
-                        "endOffsets": "168,618,685,749,19551,19677,20134,20430,27466,27818"
                     }
                 }
             ]

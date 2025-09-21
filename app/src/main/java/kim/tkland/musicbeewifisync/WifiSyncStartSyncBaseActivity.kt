@@ -41,7 +41,6 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
     protected var configErrorMessage: MutableState<String> = mutableStateOf("")
 
     protected var isFullSync = mutableStateOf(false)
-    protected var isPlaylistSync = mutableStateOf(false)
 
     protected var appBarTitle = mutableStateOf("")
 
