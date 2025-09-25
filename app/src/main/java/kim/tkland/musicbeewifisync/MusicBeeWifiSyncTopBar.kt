@@ -211,6 +211,18 @@ fun SyncScreenTopBar(
                         context.startActivity(intent)
                     }
                 )
+                // for Test(delete playlists)
+                DropdownMenuItem(
+                    text = { Text(resources.getString(R.string.menudeletePlaylists)) },
+                    onClick = {
+                        val intent = Intent(
+                            context,
+                            DeletePlaylistActivity::class.java
+                        )
+                        onExpandedChange(false)
+                        context.startActivity(intent)
+                    }
+                )
             }
         }
     )

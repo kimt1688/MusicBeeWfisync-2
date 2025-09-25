@@ -75,13 +75,9 @@
         <activity
             android:name="kim.tkland.musicbeewifisync.ViewErrorLogActivity"
             android:label="@string/title_activity_view_error_log" />
-
-        <uses-library
-            android:name="androidx.window.extensions"
-            android:required="false" />
-        <uses-library
-            android:name="androidx.window.sidecar"
-            android:required="false" />
+        <activity
+            android:name="kim.tkland.musicbeewifisync.DeletePlaylistActivity"
+            android:label="@string/title_activity_delete_playlists" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"
@@ -97,6 +93,13 @@
                 android:name="androidx.profileinstaller.ProfileInstallerInitializer"
                 android:value="androidx.startup" />
         </provider>
+
+        <uses-library
+            android:name="androidx.window.extensions"
+            android:required="false" />
+        <uses-library
+            android:name="androidx.window.sidecar"
+            android:required="false" />
 
         <activity
             android:name="androidx.compose.ui.tooling.PreviewActivity"

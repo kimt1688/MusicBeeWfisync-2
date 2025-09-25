@@ -7,6 +7,7 @@
     <string name="title_activity_sync_status">Status da Sincronização</string>
     <string name="title_activity_view_error_log">Registro de Erros</string>
     <string name="title_activity_sync_playlists">Sincronizar Playlists</string>
+    <string name="title_activity_delete_playlists">Delete Playlists</string>
     <string name="title_channel_name">Status de Sincronização Wi-Fi</string>
     <string name="syncNotificationInfo">Sincronizando arquivos e playlists com o Musicbee.</string>
     <string name="settingsLocateServerInfo0">Antes de usar a sincronização por Wi-Fi, você deve executar pelo menos uma sincronização com cabo usb.</string>
@@ -35,9 +36,12 @@
     <string name="syncNow">Sincronizar</string>
     <string name="syncPreview">Prever</string>
     <string name="syncPlaylistsPrompt">Especifique as playlists para sincronizar:</string>
+    <string name="deletePlaylistsPrompt">Specify the playlists to delete:</string>
     <string name="syncPlaylists0">Nenhuma playlist selecionada</string>
     <string name="syncPlaylists1">1 playlist selecionada</string>
     <string name="syncPlaylistsN">%d playlists selecionadas</string>
+    <string name="deletePlaylists1">1 playlist deleted</string>
+    <string name="deletePlaylistsN">%d playlists deleted.</string>
     <string name="syncPlaylistsDeleteUnselected">apagar arquivos fora das playlists escolhidas</string>
     <string name="syncStop">Parar</string>
     <string name="syncCancel">Cancelar</string>
@@ -79,6 +83,7 @@
     <string name="errorSyncParamsPlayerNotSelected">Você precisa escolher o player para sincronização reversa.</string>
     <string name="menuSyncSettings">Configurações</string>
     <string name="menuWifiSyncLog">Registro de Erros</string>
+    <string name="menudeletePlaylists">Delete Playlists</string>
     <string name="menuWifiFullSync">Sincronização Total</string>
     <string name="menuWifiPlaylistSync">Sincronização de Playlists</string>
     <string name="settingsLocateServerInfo4">Passo 3. (Opcional) Defina o IP do PC executando MusicBee se detecção automática falhar:</string>
@@ -95,5 +100,6 @@
     <string name="menuAllPlaylistsDeleteConfirm">Really want to delete all playlists?</string>
     <string name="playlistDeletingMessage">Deleting playlists…</string>
     <string name="syncConfirmHeader">Confirm</string>
+    <string name="deletePlaylists0">No playlists deleted.</string>
 
 </resources>

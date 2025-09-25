@@ -5489,6 +5489,10 @@ string close_sheet
 string copy
 string default_error_message
 string default_popup_window_title
+string deletePlaylists0
+string deletePlaylists1
+string deletePlaylistsN
+string deletePlaylistsPrompt
 string dest_title
 string dropdown_menu
 string errorConfigNotMatched
@@ -5668,6 +5672,7 @@ string menuSyncSettings
 string menuWifiFullSync
 string menuWifiPlaylistSync
 string menuWifiSyncLog
+string menudeletePlaylists
 string mimeTypeError
 string mimeTypeErrorMessage
 string mtrl_badge_numberless_content_description
@@ -5828,6 +5833,7 @@ string syncToRatings
 string syncToUsingPlayer
 string tab
 string template_percent
+string title_activity_delete_playlists
 string title_activity_settings
 string title_activity_settings2
 string title_activity_sync_playlists

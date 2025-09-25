@@ -62,5 +62,8 @@
         <activity
             android:name=".ViewErrorLogActivity"
             android:label="@string/title_activity_view_error_log" />
+        <activity
+            android:name=".DeletePlaylistActivity"
+            android:label="@string/title_activity_delete_playlists" />
     </application>
 </manifest>

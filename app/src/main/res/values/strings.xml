@@ -6,6 +6,7 @@
     <string name="title_activity_sync_status">Sync Status</string>
     <string name="title_activity_view_error_log">Error Log</string>
     <string name="title_activity_sync_playlists">Sync Playlists</string>
+    <string name="title_activity_delete_playlists">Delete Playlists</string>
     <string name="title_channel_name">Wifi Sync Status</string>
     <string name="syncNotificationInfo">Synchronizing files and playlists from MusicBee.</string>
     <string name="settingsLocateServerInfo0">Before using Wifi Sync, you need to have run a wired sync from MusicBee at least once.</string>
@@ -35,9 +36,13 @@
     <string name="syncNow">Sync Now</string>
     <string name="syncPreview">Preview</string>
     <string name="syncPlaylistsPrompt">Specify the playlists to sync:</string>
+    <string name="deletePlaylistsPrompt">Specify the playlists to delete:</string>
     <string name="syncPlaylists0">No playlists selected</string>
     <string name="syncPlaylists1">1 playlist selected</string>
     <string name="syncPlaylistsN">%d playlists selected</string>
+    <string name="deletePlaylists0">No playlists deleted.</string>
+    <string name="deletePlaylists1">1 playlist deleted.</string>
+    <string name="deletePlaylistsN">%d playlists deleted.</string>
     <string name="syncPlaylistsDeleteUnselected">delete files not in the selected playlists from the device</string>
     <string name="syncStop">Stop</string>
     <string name="syncCancel">Cancel</string>
@@ -79,6 +84,7 @@
     <string name="errorSyncParamsPlayerNotSelected">You need to choose the player to reverse sync from.</string>
     <string name="menuSyncSettings">Settings</string>
     <string name="menuWifiSyncLog">Error Log</string>
+    <string name="menudeletePlaylists">Delete Playlists</string>
     <string name="menuWifiFullSync">Full Sync</string>
     <string name="menuWifiPlaylistSync">Playlist Sync</string>
     <string name="errorInvalidIp">This is not a valid IP address</string>
