@@ -1,8 +1,10 @@
 package kim.tkland.musicbeewifisync
 
-import androidx.compose.runtime.getValue // <-- Add this
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import android.os.Bundle
+import android.util.Log
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,6 +30,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -52,29 +56,40 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        setContent {
+            if (showDialog.value) {
+                AlertDialog(
+                    onDismissRequest = {
+                    }, // ダイアログの外側をクリックしたときの処理
+                    icon = { // Use the dedicated 'icon' parameter
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_dialog_alert),
+                            contentDescription = "Error Icon"
+                        )  /* Provide a content description)*/
+                    },
+                    title = { Text(getString(R.string.syncErrorHeader)) },
+                    text = { Text(configErrorMessage.value) },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showDialog.value = false
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            )
+                        ) { /* Handle confirm action */
+                            Text(getString(android.R.string.ok)) // Or use a string resource
+                        }
+                    },
+                    dismissButton = null,
+                )
+            }
+        }
     }
-
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    open fun CustomView() {
-        val topAppBarState = rememberTopAppBarState()
-        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
-        var expanded by remember { mutableStateOf(false) }
-        var showFullScanDialogShow by remember { mutableStateOf(false) }
-        val showDialogFromViewModel by viewModel.showDialog.collectAsStateWithLifecycle()
-        var showProgressDialogShow by remember { mutableStateOf(showDialogFromViewModel) }
-
-        // You'll need to observe changes from the ViewModel and update the local state
-        LaunchedEffect(showDialogFromViewModel) {
-            showProgressDialogShow = showDialogFromViewModel
-        }
-
-        statusBarPadding = WindowInsets.statusBars.asPaddingValues()
-        navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
-
-        if (showProgress) {
-            CreateProgressDialog(viewModel)
-        }
+    fun ShowAllPlaylistsDialog() {
         if (showDeleteAllPlaylistsDialog.value) {
             AlertDialog(
                 onDismissRequest = { showDeleteAllPlaylistsDialog.value = false },
@@ -96,15 +111,15 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
                                 deffered.await()
                             }
                             deleteAllPlaylists()
-                            val thread = Thread(deleteAllPlaylistsThread)
                             viewModel.setValues(
-                                thread,
+                                deleteAllPlaylistsThread,
                                 getString(R.string.playlistDeletingMessage)
                             )
-                            lifecycleScope.launch {
-                                viewModel.doAsyncWork()
+                            Log.d("Thread", "Thread: deleteAllPlaylists() isAlive: ${deleteAllPlaylistsThread.isAlive}")
+                            setContent {
+                                CreateProgressDialog(viewModel)
+                                CustomView()
                             }
-                            showDeleteAllPlaylistsDialog.value = false // ダイアログを閉じる
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(getColor(R.color.colorButtonBackground)),
@@ -129,6 +144,30 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
                 }
             )
         }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    override fun CustomView() {
+        val topAppBarState = rememberTopAppBarState()
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+        var expanded by remember { mutableStateOf(false) }
+        var showFullScanDialogShow by remember { mutableStateOf(false) }
+        val showDialogFromViewModel by viewModel.showDialog.collectAsStateWithLifecycle()
+        var showProgressDialogShow by remember { mutableStateOf(showDialogFromViewModel) }
+
+        // You'll need to observe changes from the ViewModel and update the local state
+        LaunchedEffect(showDialogFromViewModel) {
+            showProgressDialogShow = showDialogFromViewModel
+        }
+
+        statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+        navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
+
+        if (showProgress) {
+            CreateProgressDialog(viewModel)
+        }
+               /*
         if (showFullScanDialogShow) {
             AlertDialog(
                 onDismissRequest = {
@@ -152,15 +191,14 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
                                 deffered.await()
                             }
                             getMusicFiles()
-                            val thread = Thread(getMusicFilesThread)
                             viewModel.setValues(
-                                thread,
+                                getMusicFilesThread,
                                 getString(R.string.progressDialogMessage)
                             )
                             lifecycleScope.launch {
                                 viewModel.doAsyncWork()
                             }
-                            showProgressDialogShow = false // ダイアログを閉じる
+                            showFullScanDialogShow = false // ダイアログを閉じる
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(getColor(R.color.colorButtonBackground)),
@@ -185,39 +223,34 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
                 }
             )
         }
-
-        if (showDialog.value) {
-            AlertDialog(
-                onDismissRequest = {
-                }, // ダイアログの外側をクリックしたときの処理
-                icon = { // Use the dedicated 'icon' parameter
-                    Icon(
-                        painter = painterResource(id = android.R.drawable.ic_dialog_alert),
-                        contentDescription = "Error Icon"
-                    )  /* Provide a content description)*/
-                },
-                title = { Text(getString(R.string.syncErrorHeader)) },
-                text = { Text(configErrorMessage.value) },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            showDialog.value = false
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(getColor(R.color.colorButtonBackground)),
-                            contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
-                        )
-                    ) { /* Handle confirm action */
-                        Text(getString(android.R.string.ok)) // Or use a string resource
-                    }
-                },
-                dismissButton = null,
-            )
-        }
+*/
     }
 
     abstract fun onPreviewButtonClick()
     abstract fun onSyncNowButtonClick()
+
+    fun showFullScanDialog() {
+        setContent {
+            val viewModel: WifiSyncViewModel = viewModel()
+            getMusicFiles()
+            viewModel.setValues(
+                getMusicFilesThread,
+                getString(R.string.progressDialogMessage)
+            )
+            CreateProgressDialog(viewModel)
+            CustomView()
+        }
+    }
+
+    fun showDeleteAllPlaylistsDialog() {
+        setContent {
+            val viewModel: WifiSyncViewModel = viewModel()
+            showDeleteAllPlaylistsDialog.value = true
+            ShowAllPlaylistsDialog()
+        }
+
+    }
+
 
     override fun onDestroy() {
         mainWindow = null

@@ -46,6 +46,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity() : WifiSyncStartSyncBaseActivity() {
     var initialReverseSyncPlayer = mutableIntStateOf(2)
@@ -133,10 +134,8 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                 SyncScreenTopBar(appBarTitle.value,
                     expanded,
                     { newValue -> expanded = newValue},
-                    showDeleteAllPlaylistsDialog.value,
-                    showFullScanDialogShow,
-                    {newValue -> showFullScanDialogShow = newValue},
-                    {newValue -> showDeleteAllPlaylistsDialog.value = newValue},
+                    { showFullScanDialog() },
+                    { showDeleteAllPlaylistsDialog() },
                     isFullSync.value)
             },
             bottomBar = {

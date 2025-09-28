@@ -142,10 +142,8 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
                 SyncScreenTopBar(appBarTitle.value,
                     expanded,
                     { newValue -> expanded = newValue},
-                    showDeleteAllPlaylistsDialog.value,
-                    showFullScanDialogShow,
-                    {newValue -> showFullScanDialogShow = newValue},
-                    {newValue -> showDeleteAllPlaylistsDialog.value = newValue},
+                    { showFullScanDialog()},
+                    { showDeleteAllPlaylistsDialog() },
                     isFullSync.value)
             },
             bottomBar = {

@@ -17,7 +17,8 @@ class WifiSyncViewModel : ViewModel() {
     val showDialog: StateFlow<Boolean> = _showDialog
     private val _msg = MutableStateFlow("")
     val msg: StateFlow<String> = _msg
-    private var thread: Thread? = null
+    
+    var thread: Thread? = null
 
     // 起動時にダイアログを表示し、スレッド処理を開始する
     @Composable
@@ -38,10 +39,12 @@ class WifiSyncViewModel : ViewModel() {
     }
 
     suspend fun doAsyncWork() {
-        val job = CoroutineScope(Dispatchers.Default).launch {
+        val job = CoroutineScope(Dispatchers.IO).launch {
             // バックグラウンドで時間のかかる処理
             _showDialog.value = true
-            thread?.start()
+            if (thread?.state == Thread.State.NEW) {
+                thread?.start()
+            }
             Log.d("WifiSyncViewModel", "Thread started")
             thread?.join()
             Log.d("WifiSyncViewModel", "Thread finished")

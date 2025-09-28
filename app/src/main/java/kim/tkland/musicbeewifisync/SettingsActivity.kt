@@ -185,6 +185,9 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     }
 
     @Composable
+    override fun CustomView() {}
+
+    @Composable
     fun StatsAlertDialog(showDialog: MutableState<Boolean>, onConfirm: () -> Unit) {
         if (showDialog.value) {
             AlertDialog(

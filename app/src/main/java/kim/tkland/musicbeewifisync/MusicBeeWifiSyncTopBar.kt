@@ -72,10 +72,8 @@ fun SyncScreenTopBar(
     appBarTitle: String,
     expanded: Boolean,
     onExpandedChange: (Boolean)-> Unit,
-    showDeleteAllPlaylistsDialog: Boolean,
-    showFullScanDialogShow: Boolean,
-    onShowFullScanDialogShowChange: (Boolean)-> Unit,
-    onShowDeleteAllPlaylistsDialog: (Boolean)-> Unit,
+    showFullScanDialog:()-> Unit,
+    showDeleteAllPlaylistsDialog: ()-> Unit,
     isFullSync: Boolean)
 {
     val resources = LocalResources.current
@@ -226,14 +224,14 @@ fun SyncScreenTopBar(
                     text = { Text(resources.getString(R.string.menuFullScanFiles)) },
                     onClick = {
                         onExpandedChange(false)
-                        onShowFullScanDialogShowChange(true)
+                        showFullScanDialog()
                     }
                 )
                 DropdownMenuItem(
                     text = { Text(resources.getString(R.string.menuAllPlaylistsDelete)) },
                     onClick = {
                         onExpandedChange(false)
-                        onShowDeleteAllPlaylistsDialog(true)
+                        showDeleteAllPlaylistsDialog()
                     }
                 )
                 DropdownMenuItem(

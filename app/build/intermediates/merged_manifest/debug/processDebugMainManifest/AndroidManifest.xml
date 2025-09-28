@@ -38,6 +38,7 @@
         android:name="kim.tkland.musicbeewifisync.WifiSyncApp"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
+        android:enableOnBackInvokedCallback="true"
         android:extractNativeLibs="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
