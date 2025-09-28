@@ -24,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,7 +62,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
 
     protected fun getMusicFiles() {
         getMusicFilesThread = Thread(Runnable {
-            val sm = applicationContext.getSystemService(StorageManager::class.java)
+            val sm = this.getSystemService(StorageManager::class.java)
             val svl = sm.storageVolumes
             for (sv in svl) {
                 if (getMusicFilesThread.isInterrupted) {
@@ -89,7 +90,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                     searchFilesInDirectory(f)
                 } else {
                     MediaScannerConnection.scanFile(
-                        applicationContext,
+                        this,
                         arrayOf(f.path),
                         null,
                         null
@@ -103,58 +104,66 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
     fun CreateProgressDialog(vm: WifiSyncViewModel) {
         val msg by vm.msg.collectAsState()
 
-        Dialog(
-            onDismissRequest = { },
-            properties = DialogProperties(
-                dismissOnBackPress = false,
-                dismissOnClickOutside = false
-            )
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(200.dp)
-                    .width(300.dp)
-                    .background(Color.White)
+        LaunchedEffect(Unit) {
+            vm.doAsyncWork()
+            vm.cancelProcess()
+        }
+
+        if (vm.showDialog.collectAsState().value) {
+            Dialog(
+                onDismissRequest = { },
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false
+                )
             ) {
-                Row(
+                Box(
                     modifier = Modifier
-                        .padding(top = 20.dp)
-                        .height(150.dp)
+                        .height(200.dp)
+                        .width(300.dp)
+                        .background(Color.White)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(start = 10.dp),
-                        horizontalAlignment = Alignment.Start
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                            .height(150.dp)
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(50.dp),
-                            color = Color(getColor(R.color.colorAccent)),
-                            trackColor = Color(getColor(R.color.colorButtonTextEnabled))
-                        )
-                    }
-                    Column() {
-                        Text(
-                            text = msg,
-                            modifier = Modifier.padding(start = 20.dp, top = 16.dp)
-                        )
-                    }
-                }
-                Row(
-                    modifier = Modifier.padding(top = 150.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Column(horizontalAlignment = Alignment.End
-                    ) {
-                        Button(
-                            onClick = {
-                                // showDialog = false
-                                vm.cancelProcess()
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(getColor(R.color.colorButtonBackground)),
-                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                        Column(
+                            modifier = Modifier.padding(start = 10.dp),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(50.dp),
+                                color = Color(getColor(R.color.colorAccent)),
+                                trackColor = Color(getColor(R.color.colorButtonTextEnabled))
                             )
-                        ) { /* Handle confirm action */
-                            Text(getString(android.R.string.cancel)) // Or use a string resource
+                        }
+                        Column() {
+                            Text(
+                                text = msg,
+                                modifier = Modifier.padding(start = 20.dp, top = 16.dp)
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.padding(top = 150.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Button(
+                                onClick = {
+                                    // showDialog = false
+                                    vm.cancelProcess()
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                    contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                                )
+                            ) { /* Handle confirm action */
+                                Text(getString(android.R.string.cancel)) // Or use a string resource
+                            }
                         }
                     }
                 }

@@ -71,7 +71,10 @@ import androidx.core.content.ContextCompat
 import java.io.File
 import androidx.core.content.edit
 import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class SettingsActivity : WifiSyncBaseActivity("") {
@@ -157,7 +160,19 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
                 if (stats.exists()) {
                     if (uriStr.isNullOrEmpty()) {
-                        showErrorDialog(showDialog, true)
+                        showDialog.value = true
+                        StatsAlertDialog(showDialog = showDialog) {
+                            setContent {
+                                val viewModel: WifiSyncViewModel = viewModel()
+                                getMusicFiles()
+                                viewModel.setValues(
+                                    getMusicFilesThread,
+                                    getString(R.string.progressDialogMessage)
+                                )
+                                CreateProgressDialog(viewModel)
+                            }
+                            launcher.launch(setLaunchIntent())
+                        }
                     }
                 }
 
@@ -166,6 +181,26 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             } else {
                 OptionSettingView()
             }
+        }
+    }
+
+    @Composable
+    fun StatsAlertDialog(showDialog: MutableState<Boolean>, onConfirm: () -> Unit) {
+        if (showDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showDialog.value = false },
+                title = { Text(text = getString(R.string.statsSelect)) },
+                text = { Text(text = getString(R.string.statsSelectMessage)) },
+                confirmButton = {
+                    Button(                    onClick = {
+                        onConfirm()
+                        showDialog.value = false
+                    }
+                    ) {
+                        Text("OK")
+                    }
+                }
+            )
         }
     }
 
@@ -341,26 +376,6 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 }
             }
         ) { innerPadding ->
-            /*
-            if (showDialog.value) {
-                AlertDialog(
-                    onDismissRequest = { showDialog.value = false },
-                    title = { Text(getString(R.string.statsSelect)) },
-                    text = { Text(getString(R.string.statsSelectMessage)) },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                launcher.launch(setLaunchIntent())
-                                listNewFiles()
-                                showDialog.value = false
-                            }
-                        ) {
-                            Text(getString(android.R.string.ok))
-                        }
-                    },
-                    dismissButton = null
-                )
-            }*/
             if (showErrorDialog1.value) {
                 AlertDialog(
                     onDismissRequest = { showErrorDialog1.value = false },

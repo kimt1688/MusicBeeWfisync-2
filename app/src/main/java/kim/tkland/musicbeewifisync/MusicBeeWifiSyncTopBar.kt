@@ -2,6 +2,7 @@ package kim.tkland.musicbeewifisync
 
 import android.R.color.white
 import android.content.Intent
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +36,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +75,7 @@ fun SyncScreenTopBar(
     showDeleteAllPlaylistsDialog: Boolean,
     showFullScanDialogShow: Boolean,
     onShowFullScanDialogShowChange: (Boolean)-> Unit,
+    onShowDeleteAllPlaylistsDialog: (Boolean)-> Unit,
     isFullSync: Boolean)
 {
     val resources = LocalResources.current
@@ -114,9 +118,25 @@ fun SyncScreenTopBar(
                                 Checkbox(
                                     checked = true,
                                     colors = CheckboxDefaults.colors(
-                                        checkmarkColor = Color(ContextCompat.getColor(context,android.R.color.white)),
-                                        uncheckedColor = Color(ContextCompat.getColor(context,android.R.color.black)),
-                                        checkedColor = Color(ContextCompat.getColor(context,R.color.colorAccent)),                                                    ),
+                                        checkmarkColor = Color(
+                                            ContextCompat.getColor(
+                                                context,
+                                                android.R.color.white
+                                            )
+                                        ),
+                                        uncheckedColor = Color(
+                                            ContextCompat.getColor(
+                                                context,
+                                                android.R.color.black
+                                            )
+                                        ),
+                                        checkedColor = Color(
+                                            ContextCompat.getColor(
+                                                context,
+                                                R.color.colorAccent
+                                            )
+                                        ),
+                                    ),
                                     onCheckedChange = { isChecked ->
                                     }
                                 )
@@ -166,9 +186,25 @@ fun SyncScreenTopBar(
                                 Checkbox(
                                     checked = true,
                                     colors = CheckboxDefaults.colors(
-                                        checkmarkColor = Color(ContextCompat.getColor(context, android.R.color.white)),
-                                        uncheckedColor = Color(ContextCompat.getColor(context,android.R.color.black)),
-                                        checkedColor = Color(ContextCompat.getColor(context,R.color.colorAccent)),                                                ),
+                                        checkmarkColor = Color(
+                                            ContextCompat.getColor(
+                                                context,
+                                                android.R.color.white
+                                            )
+                                        ),
+                                        uncheckedColor = Color(
+                                            ContextCompat.getColor(
+                                                context,
+                                                android.R.color.black
+                                            )
+                                        ),
+                                        checkedColor = Color(
+                                            ContextCompat.getColor(
+                                                context,
+                                                R.color.colorAccent
+                                            )
+                                        ),
+                                    ),
                                     onCheckedChange = { }
                                 )
                             }
@@ -197,7 +233,7 @@ fun SyncScreenTopBar(
                     text = { Text(resources.getString(R.string.menuAllPlaylistsDelete)) },
                     onClick = {
                         onExpandedChange(false)
-                        onShowFullScanDialogShowChange(true)
+                        onShowDeleteAllPlaylistsDialog(true)
                     }
                 )
                 DropdownMenuItem(

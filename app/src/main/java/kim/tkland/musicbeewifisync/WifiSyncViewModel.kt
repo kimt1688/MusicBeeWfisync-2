@@ -1,18 +1,15 @@
 package kim.tkland.musicbeewifisync
 
-import android.R.id.message
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
-import androidx.compose.runtime.collectAsState
 
 @HiltViewModel
 class WifiSyncViewModel : ViewModel() {
