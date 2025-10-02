@@ -133,6 +133,7 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
                     Button(
                         onClick = {
                             showDeleteAllPlaylistsDialog.value = false
+                            setContent { CustomView() }
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(getColor(R.color.colorButtonBackground)),
