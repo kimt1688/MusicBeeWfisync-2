@@ -11,6 +11,9 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -73,6 +76,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     private val listFilename = mutableStateListOf<String>("")
     private val listFullPath = mutableStateListOf<String>("")
 
+    lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
     private val DeletePlaylistActivity.viewModel: WifiSyncViewModel
         get() = this.viewModels<WifiSyncViewModel>().value
     private var syncPreview = false
@@ -101,6 +105,16 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
         //enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        resultLauncher = registerForActivityResult(
+            ActivityResultContracts.StartIntentSenderForResult()
+        ) { result ->
+            // ここに結果の処理コードを記述
+            if (result.resultCode == RESULT_OK) {
+                Log.d("DeletePlaylistActivity", "Result OK")
+            } else {
+                Log.d("DeletePlaylistActivity", "Result NOT OK")
+            }
+        }
         // Playlistのロード
         isListChecked.clear()
         listFilename.clear()
@@ -283,6 +297,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
             }
         )
         { innerPadding ->
+            /*
             if (deleteConfirmationDialogShow.value) {
                 AlertDialog(
                     onDismissRequest = {
@@ -328,6 +343,8 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                     dismissButton = null
                 )
             }
+
+             */
             Column(
                 modifier = Modifier
                     .background(Color(getColor(white)))
@@ -484,17 +501,31 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     private fun deletePlaylists() {
         count.intValue = 0
         var deleteTrackCount = 0
+        val loopStartIndex = selectedPlaylists!!.size - 1
 
-        for(i in 0 until selectedPlaylists!!.size) {
+        for(i in loopStartIndex downTo 0) {
             if (selectedPlaylists!![i].checked) {
                 val id = filePathToId(listFullPath[i])
                 val uri = filePathToUri(listFullPath[i])
 
-                // val file = File(getAbsolutePathFromId(id))
+                val file = File(getAbsolutePathFromId(id))
                 // Log.d("Delete target Playlist File", file.toString())
                 // TODO プレイリストの内容を消す（MediaStoreからのクエリからの何かしらでできたはず ）
-                deleteTrackCount += deletePlaylistTracks(applicationContext, id)
-                (application as WifiSyncApp).delete(uri)
+                if (file.extension.equals("m3u", false) || file.extension.equals("m3u8", false)) {
+                    deleteM3UPlaylistTracks(file)
+                } else {
+                    deletePlaylistTracks(applicationContext, id)
+                }
+                val uriList = ArrayList<Uri>()
+                uriList.add(uri)
+                deleteUri(uriList)
+
+                selectedPlaylists!!.removeAt(i)
+                listFilename.removeAt(i)
+                listFullPath.removeAt(i)
+                isListChecked.removeAt(i)
+
+                setContent { CustomView() }
                 //if (file.exists()) {
                 //    file.delete()
                 //}
@@ -507,12 +538,36 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                 count.intValue++
             }
         }
+        /*
         deleteConfirmationDialogMessage = when(count.intValue) {
             0 -> getString(R.string.deletePlaylists0)
             1 -> getString(R.string.deletePlaylists1)
             else -> getString(R.string.deletePlaylistsN, count.intValue)
         }
         deleteConfirmationDialogShow.value = true
+
+         */
+    }
+
+    fun deleteUri(uriList:List<Uri>) {
+        val pendingIntent =
+            MediaStore.createDeleteRequest(contentResolver, uriList)
+
+        val intentSenderRequest = IntentSenderRequest.Builder(pendingIntent).build()
+        resultLauncher.launch(intentSenderRequest)
+    }
+
+    fun deleteM3UPlaylistTracks(playlist: File) {
+        val uriList = ArrayList<Uri>()
+
+        playlist.forEachLine {
+            if (it.startsWith("#")) {
+                return@forEachLine
+            }
+            val uri = filePathToSongUri(it.substring(1))
+            uriList.add(uri)
+        }
+        deleteUri(uriList)
     }
 
     fun deletePlaylistTracks(
@@ -522,6 +577,8 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     ): Int {
         val resolver = context.contentResolver
         var countDel = 0
+        val uriList = ArrayList<Uri>()
+
         try {
             val uri = MediaStore.Audio.Playlists.Members.getContentUri(
                 MediaStore.getExternalVolumeNames(context)
@@ -549,9 +606,10 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                         MediaStore.getExternalVolumeNames(context)
                             .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]), cursor.getLong(0))
 
-                    (application as WifiSyncApp).delete(deleteUri)
+                    uriList.add(deleteUri)
                     countDel += 1
                } while (cursor.moveToNext())
+               deleteUri(uriList)
                 cursor.close()
             }
         } catch (e: Exception) {
@@ -619,6 +677,48 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
         return return_uri
     }
 
+    fun filePathToSongUri(filePath: String): Uri {
+        var id: Long = 0
+        val cr = applicationContext.contentResolver
+
+        val uri = MediaStore.Audio.Media.getContentUri(
+            MediaStore.getExternalVolumeNames(applicationContext)
+                .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
+        )
+        val projection =
+            arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.RELATIVE_PATH)
+        val selectionArgs = arrayOf(
+            filePath.substring(filePath.lastIndexOf('/') + 1),
+            filePath.substring(0, filePath.lastIndexOf('/') + 1),
+        )
+
+        Log.d("filePathToUri()", "selectionArgs:${selectionArgs[0]}, ${selectionArgs[1]}")
+
+        val cursor = cr.query(
+            uri, projection,
+            "${MediaStore.Audio.Media.DISPLAY_NAME} = ? and ${MediaStore.Audio.Media.RELATIVE_PATH} = ?", selectionArgs, null
+        )
+
+        if (cursor != null) {
+            if (cursor.count > 0) {
+                cursor.moveToFirst()
+                do {
+                    val idIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
+                    id = cursor.getString(idIndex).toLong()
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+        }
+
+        val return_uri = ContentUris.withAppendedId(
+            MediaStore.Audio.Media.getContentUri(
+                MediaStore.getExternalVolumeNames(applicationContext)
+                    .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
+            ),
+            id
+        )
+        return return_uri
+    }
     fun filePathToId(filePath: String): Long {
         var id: Long = 0
         val cr = applicationContext.contentResolver
