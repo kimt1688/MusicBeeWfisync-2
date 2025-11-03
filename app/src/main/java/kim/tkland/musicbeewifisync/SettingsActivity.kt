@@ -143,7 +143,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
             findViewById<View>(R.id.settingsInfo0).visibility = View.GONE
             findViewById<View>(R.id.settingsInfo1).visibility = View.GONE
             findViewById<View>(R.id.settingsInfo2).visibility = View.GONE
-            serverButton?.let { it.visibility = View.GONE }
+            //serverButton?.let { it.visibility = View.GONE }
             debugMode?.let { it.visibility = View.VISIBLE }
             settingsStoragePrompt.setText(R.string.settingsStorageSettingsPrompt)
             if (!Build.MODEL.equals(WifiSyncServiceSettings.deviceName, ignoreCase = true)) {

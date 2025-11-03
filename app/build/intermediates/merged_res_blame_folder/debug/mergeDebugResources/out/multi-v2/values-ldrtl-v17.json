@@ -4,24 +4,7 @@
             "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-72:/values-ldrtl-v17/values-ldrtl-v17.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.2\\transforms\\377e53ea5de7852734dfe1e2d9b8293b\\transformed\\material-1.12.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,191",
-                        "endColumns": "135,140",
-                        "endOffsets": "186,327"
-                    },
-                    "to": {
-                        "startLines": "3,4",
-                        "startColumns": "4,4",
-                        "startOffsets": "133,269",
-                        "endColumns": "135,140",
-                        "endOffsets": "264,405"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.2\\transforms\\e85b490019a0c8ac2e8cb7b0a5163253\\transformed\\leanback-1.2.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\c832a485461906de75a9927550f52463\\transformed\\leanback-1.2.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
                     "from": {
                         "startLines": "2,3,4",
                         "startColumns": "4,4,4",
@@ -35,6 +18,23 @@
                         "startOffsets": "55,410,455",
                         "endColumns": "77,44,46",
                         "endOffsets": "128,450,497"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\602eabfd3ddc440056989c66049e5c18\\transformed\\material-1.12.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,191",
+                        "endColumns": "135,140",
+                        "endOffsets": "186,327"
+                    },
+                    "to": {
+                        "startLines": "3,4",
+                        "startColumns": "4,4",
+                        "startOffsets": "133,269",
+                        "endColumns": "135,140",
+                        "endOffsets": "264,405"
                     }
                 }
             ]
