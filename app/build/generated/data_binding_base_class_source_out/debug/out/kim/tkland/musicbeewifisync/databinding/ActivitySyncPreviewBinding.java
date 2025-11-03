@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
@@ -23,6 +24,9 @@ import kim.tkland.musicbeewifisync.R;
 public final class ActivitySyncPreviewBinding implements ViewBinding {
   @NonNull
   private final ConstraintLayout rootView;
+
+  @NonNull
+  public final Toolbar myToolbar;
 
   @NonNull
   public final TextView previewErrorMessage;
@@ -48,12 +52,13 @@ public final class ActivitySyncPreviewBinding implements ViewBinding {
   @NonNull
   public final CheckBox syncExcludeErrors;
 
-  private ActivitySyncPreviewBinding(@NonNull ConstraintLayout rootView,
+  private ActivitySyncPreviewBinding(@NonNull ConstraintLayout rootView, @NonNull Toolbar myToolbar,
       @NonNull TextView previewErrorMessage, @NonNull ListView previewResults,
       @NonNull TextView previewStatusMessage, @NonNull ProgressBar previewWaitIndicator,
       @NonNull LinearLayout proceedSyncButton, @NonNull ImageView proceedSyncButtonImage,
       @NonNull TextView proceedSyncButtonText, @NonNull CheckBox syncExcludeErrors) {
     this.rootView = rootView;
+    this.myToolbar = myToolbar;
     this.previewErrorMessage = previewErrorMessage;
     this.previewResults = previewResults;
     this.previewStatusMessage = previewStatusMessage;
@@ -91,6 +96,12 @@ public final class ActivitySyncPreviewBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.my_toolbar;
+      Toolbar myToolbar = ViewBindings.findChildViewById(rootView, id);
+      if (myToolbar == null) {
+        break missingId;
+      }
+
       id = R.id.previewErrorMessage;
       TextView previewErrorMessage = ViewBindings.findChildViewById(rootView, id);
       if (previewErrorMessage == null) {
@@ -139,9 +150,9 @@ public final class ActivitySyncPreviewBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivitySyncPreviewBinding((ConstraintLayout) rootView, previewErrorMessage,
-          previewResults, previewStatusMessage, previewWaitIndicator, proceedSyncButton,
-          proceedSyncButtonImage, proceedSyncButtonText, syncExcludeErrors);
+      return new ActivitySyncPreviewBinding((ConstraintLayout) rootView, myToolbar,
+          previewErrorMessage, previewResults, previewStatusMessage, previewWaitIndicator,
+          proceedSyncButton, proceedSyncButtonImage, proceedSyncButtonText, syncExcludeErrors);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

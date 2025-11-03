@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Guideline;
 import androidx.viewbinding.ViewBinding;
@@ -24,6 +25,9 @@ import kim.tkland.musicbeewifisync.R;
 public final class ActivityPlaylistSyncBinding implements ViewBinding {
   @NonNull
   private final ConstraintLayout rootView;
+
+  @NonNull
+  public final Toolbar myToolbar;
 
   @NonNull
   public final TextView syncNoPlaylistsMessage;
@@ -56,14 +60,15 @@ public final class ActivityPlaylistSyncBinding implements ViewBinding {
   public final TextView syncPlaylistsStartButtonText;
 
   private ActivityPlaylistSyncBinding(@NonNull ConstraintLayout rootView,
-      @NonNull TextView syncNoPlaylistsMessage, @NonNull TextView syncPlaylistsCountMessage,
-      @NonNull CheckBox syncPlaylistsDeleteFiles,
+      @NonNull Toolbar myToolbar, @NonNull TextView syncNoPlaylistsMessage,
+      @NonNull TextView syncPlaylistsCountMessage, @NonNull CheckBox syncPlaylistsDeleteFiles,
       @NonNull Guideline syncPlaylistsHalfWidthGuideline,
       @NonNull Button syncPlaylistsPreviewButton, @NonNull TextView syncPlaylistsPrompt,
       @NonNull ListView syncPlaylistsSelector, @NonNull LinearLayout syncPlaylistsStartButton,
       @NonNull ImageView syncPlaylistsStartButtonImage,
       @NonNull TextView syncPlaylistsStartButtonText) {
     this.rootView = rootView;
+    this.myToolbar = myToolbar;
     this.syncNoPlaylistsMessage = syncNoPlaylistsMessage;
     this.syncPlaylistsCountMessage = syncPlaylistsCountMessage;
     this.syncPlaylistsDeleteFiles = syncPlaylistsDeleteFiles;
@@ -103,6 +108,12 @@ public final class ActivityPlaylistSyncBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.my_toolbar;
+      Toolbar myToolbar = ViewBindings.findChildViewById(rootView, id);
+      if (myToolbar == null) {
+        break missingId;
+      }
+
       id = R.id.syncNoPlaylistsMessage;
       TextView syncNoPlaylistsMessage = ViewBindings.findChildViewById(rootView, id);
       if (syncNoPlaylistsMessage == null) {
@@ -163,10 +174,11 @@ public final class ActivityPlaylistSyncBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityPlaylistSyncBinding((ConstraintLayout) rootView, syncNoPlaylistsMessage,
-          syncPlaylistsCountMessage, syncPlaylistsDeleteFiles, syncPlaylistsHalfWidthGuideline,
-          syncPlaylistsPreviewButton, syncPlaylistsPrompt, syncPlaylistsSelector,
-          syncPlaylistsStartButton, syncPlaylistsStartButtonImage, syncPlaylistsStartButtonText);
+      return new ActivityPlaylistSyncBinding((ConstraintLayout) rootView, myToolbar,
+          syncNoPlaylistsMessage, syncPlaylistsCountMessage, syncPlaylistsDeleteFiles,
+          syncPlaylistsHalfWidthGuideline, syncPlaylistsPreviewButton, syncPlaylistsPrompt,
+          syncPlaylistsSelector, syncPlaylistsStartButton, syncPlaylistsStartButtonImage,
+          syncPlaylistsStartButtonText);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

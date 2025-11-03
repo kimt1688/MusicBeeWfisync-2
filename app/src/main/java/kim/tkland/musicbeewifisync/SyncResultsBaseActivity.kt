@@ -69,6 +69,8 @@ abstract class SyncResultsBaseActivity : AppCompatActivity() {
         }
         WindowCompat.getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars = true
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightNavigationBars = true
 
     }
 

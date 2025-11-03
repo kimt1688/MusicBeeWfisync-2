@@ -1,6 +1,7 @@
 package kim.tkland.musicbeewifisync
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -255,6 +256,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
     private fun showGrantAccessButton() {
     }
 
+    @SuppressLint("SetTextI18n")
     fun onLocateServerButton_Click(view: View) {
         settingsLocateServerNoConfig!!.visibility = View.GONE
         WifiSyncServiceSettings.deviceStorageIndex =
@@ -262,7 +264,15 @@ class SettingsActivity : WifiSyncBaseActivity() {
         WifiSyncServiceSettings.saveSettings(mainWindow)
         // settingsWaitIndicator!!.visibility = View.VISIBLE
         val locateServerThread = Thread(Runnable {
-            val serverIPAddress = WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
+            var serverIPAddress: String? = null
+            if (findViewById<TextView>(R.id.connectToIPAddress).text.length > 0) {
+                serverIPAddress = findViewById<TextView>(R.id.connectToIPAddress).text.toString()
+            } else {
+                serverIPAddress = WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
+            }
+            // windowに出してみる。
+            findViewById<TextView>(R.id.connectingToIPAddress).text = "Connecting To:$serverIPAddress"
+
             runOnUiThread {
                 if (mainWindow != null) {
                     // settingsWaitIndicator!!.visibility = View.INVISIBLE

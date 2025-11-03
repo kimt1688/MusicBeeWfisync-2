@@ -76,6 +76,8 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
         }
         WindowCompat.getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars = true
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightNavigationBars = true
     }
 
     override fun onDestroy() {

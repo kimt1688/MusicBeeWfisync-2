@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
@@ -21,6 +22,9 @@ import kim.tkland.musicbeewifisync.R;
 public final class ActivitySyncStatusBinding implements ViewBinding {
   @NonNull
   private final ConstraintLayout rootView;
+
+  @NonNull
+  public final Toolbar myToolbar;
 
   @NonNull
   public final Button stopSyncButton;
@@ -40,11 +44,12 @@ public final class ActivitySyncStatusBinding implements ViewBinding {
   @NonNull
   public final ProgressBar syncWaitIndicator;
 
-  private ActivitySyncStatusBinding(@NonNull ConstraintLayout rootView,
+  private ActivitySyncStatusBinding(@NonNull ConstraintLayout rootView, @NonNull Toolbar myToolbar,
       @NonNull Button stopSyncButton, @NonNull TextView syncCompletionStatusMessage,
       @NonNull ListView syncFailedResults, @NonNull ProgressBar syncProgressBar,
       @NonNull TextView syncProgressMessage, @NonNull ProgressBar syncWaitIndicator) {
     this.rootView = rootView;
+    this.myToolbar = myToolbar;
     this.stopSyncButton = stopSyncButton;
     this.syncCompletionStatusMessage = syncCompletionStatusMessage;
     this.syncFailedResults = syncFailedResults;
@@ -80,6 +85,12 @@ public final class ActivitySyncStatusBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.my_toolbar;
+      Toolbar myToolbar = ViewBindings.findChildViewById(rootView, id);
+      if (myToolbar == null) {
+        break missingId;
+      }
+
       id = R.id.stopSyncButton;
       Button stopSyncButton = ViewBindings.findChildViewById(rootView, id);
       if (stopSyncButton == null) {
@@ -116,7 +127,7 @@ public final class ActivitySyncStatusBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivitySyncStatusBinding((ConstraintLayout) rootView, stopSyncButton,
+      return new ActivitySyncStatusBinding((ConstraintLayout) rootView, myToolbar, stopSyncButton,
           syncCompletionStatusMessage, syncFailedResults, syncProgressBar, syncProgressMessage,
           syncWaitIndicator);
     }

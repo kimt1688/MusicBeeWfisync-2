@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
@@ -21,16 +22,29 @@ public final class ActivityViewErrorLogBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
+  public final ConstraintLayout containerForToolbar;
+
+  @NonNull
   public final Button copyToClipboardButton;
 
   @NonNull
   public final TextView errorText;
 
+  @NonNull
+  public final Toolbar myToolbar;
+
+  @NonNull
+  public final TextView viewLogTitle;
+
   private ActivityViewErrorLogBinding(@NonNull ConstraintLayout rootView,
-      @NonNull Button copyToClipboardButton, @NonNull TextView errorText) {
+      @NonNull ConstraintLayout containerForToolbar, @NonNull Button copyToClipboardButton,
+      @NonNull TextView errorText, @NonNull Toolbar myToolbar, @NonNull TextView viewLogTitle) {
     this.rootView = rootView;
+    this.containerForToolbar = containerForToolbar;
     this.copyToClipboardButton = copyToClipboardButton;
     this.errorText = errorText;
+    this.myToolbar = myToolbar;
+    this.viewLogTitle = viewLogTitle;
   }
 
   @Override
@@ -60,6 +74,12 @@ public final class ActivityViewErrorLogBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.container_for_toolbar;
+      ConstraintLayout containerForToolbar = ViewBindings.findChildViewById(rootView, id);
+      if (containerForToolbar == null) {
+        break missingId;
+      }
+
       id = R.id.copyToClipboardButton;
       Button copyToClipboardButton = ViewBindings.findChildViewById(rootView, id);
       if (copyToClipboardButton == null) {
@@ -72,8 +92,20 @@ public final class ActivityViewErrorLogBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityViewErrorLogBinding((ConstraintLayout) rootView, copyToClipboardButton,
-          errorText);
+      id = R.id.my_toolbar;
+      Toolbar myToolbar = ViewBindings.findChildViewById(rootView, id);
+      if (myToolbar == null) {
+        break missingId;
+      }
+
+      id = R.id.viewLogTitle;
+      TextView viewLogTitle = ViewBindings.findChildViewById(rootView, id);
+      if (viewLogTitle == null) {
+        break missingId;
+      }
+
+      return new ActivityViewErrorLogBinding((ConstraintLayout) rootView, containerForToolbar,
+          copyToClipboardButton, errorText, myToolbar, viewLogTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
