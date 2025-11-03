@@ -1,7 +1,10 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.color.transparent
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
@@ -11,6 +14,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -32,34 +36,23 @@ class ViewErrorLogActivity : AppCompatActivity() {
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             val bars =
                 windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-            // Apply the insets as a margin to the view. This solution sets
-            // only the bottom, left, and right dimensions, but you can apply whichever
-            // insets are appropriate to your layout. You can also update the view padding
-            // if that's more appropriate.
 
-            v.updateLayoutParams() {
-                v.left = (insets.left).toInt()
-                v.bottom = (insets.bottom).toInt()
-                v.right = (insets.right).toInt()
-            }
+            //v.updateLayoutParams() {
+            //    v.top = (insets.top).toInt()
+                //v.left = (insets.left).toInt()
+                //v.bottom = (insets.bottom).toInt()
+                //v.right = (insets.right).toInt()
+            //}
             v.updatePadding(
-                left = bars.left,
+            //    left = bars.left,
                 top = bars.top,
-                right = bars.right,
+            //    right = bars.right,
                 bottom = bars.bottom,
             )
-
-            // Apply the insets as padding to the view. Here, set all the dimensions
-            // as appropriate to your layout. You can also update the view's margin if
-            // more appropriate.
-            v.updatePadding(insets.left, insets.top, insets.right, insets.bottom)
-
-            // Return CONSUMED if you don't want the window insets to keep passing
-            // down to descendant views.
             WindowInsetsCompat.CONSUMED
         }
-        WindowCompat.getInsetsController(window, window.decorView)
-            .isAppearanceLightStatusBars = true
+        //WindowCompat.getInsetsController(window, window.decorView)
+        //    .isAppearanceLightStatusBars = true
         setSupportActionBar(findViewById(R.id.my_toolbar))
         errorText = findViewById(R.id.errorText)
         errorText?.let{ it.movementMethod = ScrollingMovementMethod() }

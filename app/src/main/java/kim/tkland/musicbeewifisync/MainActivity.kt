@@ -1,5 +1,6 @@
 package kim.tkland.musicbeewifisync
 
+import android.app.ActivityManager
 import android.app.ActivityManager.TaskDescription
 import android.content.Intent
 import android.os.Bundle
@@ -33,7 +34,7 @@ class MainActivity : WifiSyncBaseActivity() {
     private var syncToRatings: CheckBox? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         ErrorHandler.initialise(this)

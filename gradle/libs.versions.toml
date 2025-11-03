@@ -12,7 +12,7 @@ fragmentKtx = "1.8.8"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 kotlin = "2.1.10"
-androidGradlePlugin = "8.12.0"
+androidGradlePlugin = "8.12.1"
 kotlinStdlib = "2.1.21"
 kotlinxCoroutinesAndroid = "1.10.2"
 leanback = "1.2.0"
@@ -24,6 +24,7 @@ preferenceKtx = "1.2.1"
 runtime = "1.8.2"
 uiToolingPreview = "1.8.2"
 appcompat = "1.7.1"
+activity = "1.10.1"
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityCompose" }
@@ -55,6 +56,7 @@ kotlinx-coroutines-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutin
 material = { module = "com.google.android.material:material", version.ref = "material" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 org-eclipse-jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "orgEclipseJdtAnnotation" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

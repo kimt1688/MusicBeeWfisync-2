@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 128
+        versionCode = 127
         versionName = "2.8.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -84,6 +84,7 @@ dependencies {
     implementation (libs.kotlin.reflect)
     implementation (libs.androidx.leanback)
     implementation(project(":app:poweramp_api_lib"))
+    implementation(libs.androidx.activity)
     testImplementation (libs.junit)
     androidTestImplementation (libs.androidx.junit)
     testImplementation (libs.androidx.espresso.core)

@@ -17,7 +17,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     private var proceedSyncButtonText: TextView? = null
     private var waitResultsThread: Thread? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sync_preview)
         val actionBar = supportActionBar
