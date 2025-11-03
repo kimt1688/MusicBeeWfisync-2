@@ -5830,6 +5830,7 @@ string syncToPlaycounts
 string syncToPlaylists
 string syncToPrompt
 string syncToRatings
+string syncToSkipcounts
 string syncToUsingPlayer
 string tab
 string template_percent

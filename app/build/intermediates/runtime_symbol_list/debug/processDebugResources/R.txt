@@ -5829,6 +5829,7 @@ int string syncToPlaycounts 0x7f120188
 int string syncToPlaylists 0x7f120189
 int string syncToPrompt 0x7f12018a
 int string syncToRatings 0x7f12018b
+int string syncToSkipcounts 0x7f12019b
 int string syncToUsingPlayer 0x7f12018c
 int string tab 0x7f12018d
 int string template_percent 0x7f12018e

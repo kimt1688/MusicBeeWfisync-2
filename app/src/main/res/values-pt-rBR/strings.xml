@@ -32,6 +32,7 @@
     <string name="syncToPlaylists">playlists</string>
     <string name="syncToRatings">avaliações</string>
     <string name="syncToPlaycounts">número de reproduções</string>
+    <string name="syncToSkipcounts">contagem de saltos</string>
     <string name="syncToUsingPlayer">do player:</string>
     <string name="syncNow">Sincronizar</string>
     <string name="syncPreview">Prever</string>

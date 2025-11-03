@@ -9,47 +9,47 @@
 9        android:targetSdkVersion="35" />
 10
 11    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-11-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:5-80
-11-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:22-77
+11-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:5-80
+11-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:22-77
 12    <uses-permission
-12-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:8:5-10:38
+12-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:8:5-10:38
 13        android:name="android.permission.READ_MEDIA_AUDIO"
-13-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:9:9-59
+13-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:9:9-59
 14        android:minSdkVersion="33" />
-14-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:10:9-35
+14-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:10:9-35
 15    <uses-permission
-15-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:11:5-13:38
+15-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:11:5-13:38
 16        android:name="android.permission.READ_EXTERNAL_STORAGE"
-16-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:12:9-64
+16-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:12:9-64
 17        android:maxSdkVersion="32" />
-17-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:13:9-35
+17-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:13:9-35
 18    <uses-permission android:name="android.permission.MANAGE_MEDIA" />
-18-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:14:5-16:47
-18-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:15:9-55
+18-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:14:5-16:47
+18-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:15:9-55
 19    <uses-permission android:name="android.permission.STORAGE" />
-19-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:17:5-66
-19-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:17:22-63
+19-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:17:5-66
+19-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:17:22-63
 20    <uses-permission android:name="android.permission.INTERNET" />
-20-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:18:5-67
-20-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:18:22-64
+20-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:18:5-67
+20-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:18:22-64
 21    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-21-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:19:5-77
-21-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:19:22-74
+21-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:19:5-77
+21-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:19:22-74
 22    <uses-permission
-22-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:20:5-22:38
+22-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:20:5-22:38
 23        android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
-23-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:21:9-71
+23-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:21:9-71
 24        android:minSdkVersion="34" />
-24-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:22:9-35
+24-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:22:9-35
 25    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-25-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:23:5-79
-25-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:23:22-76
+25-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:23:5-79
+25-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:23:22-76
 26
 27    <queries>
-27-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:25:5-27:15
+27-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:25:5-27:15
 28        <package android:name="com.maxmpz.audioplayer" />
-28-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:9-58
-28-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:18-55
+28-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:9-58
+28-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:18-55
 29    </queries>
 30
 31    <permission
@@ -64,91 +64,91 @@
 35-->[androidx.core:core:1.17.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b8b562e559c7198f6ea7498e8c4c9a8c\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
 36
 37    <application
-37-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:29:5-70:19
+37-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:29:5-70:19
 38        android:name="kim.tkland.musicbeewifisync.WifiSyncApp"
-38-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:9-36
+38-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:9-36
 39        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
 39-->[androidx.core:core:1.17.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b8b562e559c7198f6ea7498e8c4c9a8c\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
 40        android:debuggable="true"
 41        android:enableOnBackInvokedCallback="true"
-41-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:35:9-51
+41-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:35:9-51
 42        android:extractNativeLibs="false"
 43        android:icon="@mipmap/ic_launcher"
-43-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:31:9-43
+43-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:31:9-43
 44        android:label="@string/app_name"
-44-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:32:9-41
+44-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:32:9-41
 45        android:roundIcon="@mipmap/ic_launcher_round"
-45-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:33:9-54
+45-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:33:9-54
 46        android:supportsRtl="true"
-46-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:34:9-35
+46-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:34:9-35
 47        android:testOnly="true"
 48        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
-48-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:36:9-65
+48-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:36:9-65
 49        <service
-49-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:38:9-41:56
+49-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:38:9-41:56
 50            android:name="kim.tkland.musicbeewifisync.WifiSyncService"
-50-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:39:13-44
+50-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:39:13-44
 51            android:exported="false"
-51-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:40:13-37
+51-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:40:13-37
 52            android:foregroundServiceType="dataSync" />
-52-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:13-53
+52-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:13-53
 53
 54        <activity
-54-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:42:9-51:20
+54-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:42:9-51:20
 55            android:name="kim.tkland.musicbeewifisync.MainActivity"
-55-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:43:13-41
+55-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:43:13-41
 56            android:exported="true" >
-56-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:44:13-36
+56-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:44:13-36
 57            <intent-filter>
-57-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:45:13-50:29
+57-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:45:13-50:29
 58                <action android:name="android.intent.action.MAIN" />
-58-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:46:17-69
-58-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:46:25-66
+58-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:46:17-69
+58-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:46:25-66
 59                <action android:name="android.intent.action.VIEW" />
-59-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:17-69
-59-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:25-66
+59-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:17-69
+59-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:25-66
 60
 61                <category android:name="android.intent.category.LAUNCHER" />
-61-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:17-77
-61-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:27-74
+61-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:17-77
+61-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:27-74
 62            </intent-filter>
 63        </activity>
 64        <activity
-64-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:52:9-54:63
+64-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:52:9-54:63
 65            android:name="kim.tkland.musicbeewifisync.SettingsActivity"
-65-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:53:13-45
+65-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:53:13-45
 66            android:label="@string/title_activity_settings" />
-66-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:54:13-60
+66-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:54:13-60
 67        <activity
-67-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:55:9-57:66
+67-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:55:9-57:66
 68            android:name="kim.tkland.musicbeewifisync.SyncResultsStatusActivity"
-68-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:56:13-54
+68-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:56:13-54
 69            android:label="@string/title_activity_sync_status" />
-69-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:57:13-63
+69-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:57:13-63
 70        <activity
-70-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:58:9-60:67
+70-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:58:9-60:67
 71            android:name="kim.tkland.musicbeewifisync.SyncResultsPreviewActivity"
-71-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:59:13-55
+71-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:59:13-55
 72            android:label="@string/title_activity_sync_preview" />
-72-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:60:13-64
+72-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:60:13-64
 73        <activity
-73-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:61:9-63:69
+73-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:61:9-63:69
 74            android:name="kim.tkland.musicbeewifisync.PlaylistSyncActivity"
-74-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:62:13-49
+74-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:62:13-49
 75            android:label="@string/title_activity_sync_playlists" />
-75-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:63:13-66
+75-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:63:13-66
 76        <activity
-76-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:64:9-66:69
+76-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:64:9-66:69
 77            android:name="kim.tkland.musicbeewifisync.ViewErrorLogActivity"
-77-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:65:13-49
+77-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:65:13-49
 78            android:label="@string/title_activity_view_error_log" />
-78-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:66:13-66
+78-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:66:13-66
 79        <activity
-79-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:67:9-69:71
+79-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:67:9-69:71
 80            android:name="kim.tkland.musicbeewifisync.DeletePlaylistActivity"
-80-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:68:13-51
+80-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:68:13-51
 81            android:label="@string/title_activity_delete_playlists" />
-81-->D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:69:13-68
+81-->D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:69:13-68
 82
 83        <provider
 83-->[androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\063565db8ca8d96d75c5721b4c92d477\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20

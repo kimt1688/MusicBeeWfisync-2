@@ -32,6 +32,7 @@
     <string name="syncToPlaylists">playlists</string>
     <string name="syncToRatings">ratings</string>
     <string name="syncToPlaycounts">playcounts</string>
+    <string name="syncToSkipcounts">skipcounts</string>
     <string name="syncToUsingPlayer">from player:</string>
     <string name="syncNow">Sync Now</string>
     <string name="syncPreview">Preview</string>

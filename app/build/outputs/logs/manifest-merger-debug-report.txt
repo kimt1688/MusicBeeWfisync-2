@@ -1,10 +1,10 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-71:12
-INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-71:12
-INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-71:12
-INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-71:12
-MERGED from [:app:poweramp_api_lib] D:\mws-poweramp\MusicBeeWfisync-2\app\poweramp_api_lib\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-71:12
+INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-71:12
+INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-71:12
+INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:1-71:12
+MERGED from [:app:poweramp_api_lib] D:\official\MusicBeeWfisync-2\app\poweramp_api_lib\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.4] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a81a74c91d402197784df2a3ce31a793\transformed\navigation-runtime-release\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-common-android:2.9.4] C:\Users\toshi\.gradle\caches\8.14.3\transforms\e303708a68e20a165b9feca80138b606\transformed\navigation-common-release\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-fragment:2.9.4] C:\Users\toshi\.gradle\caches\8.14.3\transforms\d86fa40e709a654aa66338b83e32e502\transformed\navigation-fragment-2.9.4\AndroidManifest.xml:17:1-22:12
@@ -109,71 +109,71 @@ MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\toshi\.gradle\caches\8.14.
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b256beb68678b3f9abedd0ca90af81b2\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
 MERGED from [com.google.dagger:dagger-lint-aar:2.57.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\df0faa2c7c5964ffc942daa5c17b61a8\transformed\dagger-lint-aar-2.57.1\AndroidManifest.xml:16:1-19:12
 	package
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:4:5-42
-		INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:4:5-42
+		INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
 	android:versionName
-		INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
+		INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
 	xmlns:tools
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:3:5-51
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:3:5-51
 	android:versionCode
-		INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
+		INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:11-69
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:2:11-69
 	tools:ignore
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:5:5-113
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:5:5-113
 uses-permission#android.permission.ACCESS_MEDIA_LOCATION
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:5-80
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:5-80
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:22-77
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:7:22-77
 uses-permission#android.permission.READ_MEDIA_AUDIO
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:8:5-10:38
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:8:5-10:38
 	android:minSdkVersion
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:10:9-35
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:10:9-35
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:9:9-59
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:9:9-59
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:11:5-13:38
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:11:5-13:38
 	android:maxSdkVersion
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:13:9-35
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:13:9-35
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:12:9-64
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:12:9-64
 uses-permission#android.permission.MANAGE_MEDIA
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:14:5-16:47
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:14:5-16:47
 	tools:ignore
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:16:9-44
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:16:9-44
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:15:9-55
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:15:9-55
 uses-permission#android.permission.STORAGE
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:17:5-66
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:17:5-66
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:17:22-63
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:17:22-63
 uses-permission#android.permission.INTERNET
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:18:5-67
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:18:5-67
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:18:22-64
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:18:22-64
 uses-permission#android.permission.FOREGROUND_SERVICE
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:19:5-77
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:19:5-77
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:19:22-74
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:19:22-74
 uses-permission#android.permission.FOREGROUND_SERVICE_DATA_SYNC
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:20:5-22:38
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:20:5-22:38
 	android:minSdkVersion
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:22:9-35
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:22:9-35
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:21:9-71
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:21:9-71
 uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:23:5-79
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:23:5-79
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:23:22-76
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:23:22-76
 queries
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:25:5-27:15
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:25:5-27:15
 package#com.maxmpz.audioplayer
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:9-58
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:9-58
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:18-55
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:26:18-55
 application
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:29:5-70:19
-INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:29:5-70:19
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:29:5-70:19
+INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:29:5-70:19
 MERGED from [com.google.android.material:material:1.13.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8af008180b4be7ebe89b88fe33cdb845\transformed\material-1.13.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.13.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\8af008180b4be7ebe89b88fe33cdb845\transformed\material-1.13.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.2.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a18434e093bbd25dfde57cd4b5daba5e\transformed\constraintlayout-2.2.1\AndroidManifest.xml:7:5-20
@@ -195,95 +195,95 @@ MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.g
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\29e3d1b3f18cfe49150819dcf66a22e2\transformed\startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\29e3d1b3f18cfe49150819dcf66a22e2\transformed\startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
 	android:extractNativeLibs
-		INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
+		INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.17.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b8b562e559c7198f6ea7498e8c4c9a8c\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:34:9-35
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:34:9-35
 	android:label
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:32:9-41
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:32:9-41
 	android:roundIcon
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:33:9-54
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:33:9-54
 	tools:targetApi
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:37:9-29
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:37:9-29
 	android:icon
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:31:9-43
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:31:9-43
 	android:theme
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:36:9-65
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:36:9-65
 	android:enableOnBackInvokedCallback
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:35:9-51
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:35:9-51
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:9-36
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:30:9-36
 service#kim.tkland.musicbeewifisync.WifiSyncService
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:38:9-41:56
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:38:9-41:56
 	android:exported
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:40:13-37
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:40:13-37
 	android:foregroundServiceType
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:13-53
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:41:13-53
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:39:13-44
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:39:13-44
 activity#kim.tkland.musicbeewifisync.MainActivity
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:42:9-51:20
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:42:9-51:20
 	android:exported
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:44:13-36
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:44:13-36
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:43:13-41
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:43:13-41
 intent-filter#action:name:android.intent.action.MAIN+action:name:android.intent.action.VIEW+category:name:android.intent.category.LAUNCHER
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:45:13-50:29
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:45:13-50:29
 action#android.intent.action.MAIN
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:46:17-69
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:46:17-69
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:46:25-66
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:46:25-66
 action#android.intent.action.VIEW
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:17-69
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:17-69
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:25-66
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:47:25-66
 category#android.intent.category.LAUNCHER
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:17-77
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:17-77
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:27-74
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:49:27-74
 activity#kim.tkland.musicbeewifisync.SettingsActivity
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:52:9-54:63
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:52:9-54:63
 	android:label
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:54:13-60
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:54:13-60
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:53:13-45
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:53:13-45
 activity#kim.tkland.musicbeewifisync.SyncResultsStatusActivity
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:55:9-57:66
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:55:9-57:66
 	android:label
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:57:13-63
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:57:13-63
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:56:13-54
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:56:13-54
 activity#kim.tkland.musicbeewifisync.SyncResultsPreviewActivity
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:58:9-60:67
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:58:9-60:67
 	android:label
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:60:13-64
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:60:13-64
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:59:13-55
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:59:13-55
 activity#kim.tkland.musicbeewifisync.PlaylistSyncActivity
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:61:9-63:69
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:61:9-63:69
 	android:label
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:63:13-66
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:63:13-66
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:62:13-49
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:62:13-49
 activity#kim.tkland.musicbeewifisync.ViewErrorLogActivity
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:64:9-66:69
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:64:9-66:69
 	android:label
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:66:13-66
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:66:13-66
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:65:13-49
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:65:13-49
 activity#kim.tkland.musicbeewifisync.DeletePlaylistActivity
-ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:67:9-69:71
+ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:67:9-69:71
 	android:label
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:69:13-68
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:69:13-68
 	android:name
-		ADDED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:68:13-51
+		ADDED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml:68:13-51
 uses-sdk
-INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
-INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
-MERGED from [:app:poweramp_api_lib] D:\mws-poweramp\MusicBeeWfisync-2\app\poweramp_api_lib\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:app:poweramp_api_lib] D:\mws-poweramp\MusicBeeWfisync-2\app\poweramp_api_lib\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
+INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
+MERGED from [:app:poweramp_api_lib] D:\official\MusicBeeWfisync-2\app\poweramp_api_lib\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:app:poweramp_api_lib] D:\official\MusicBeeWfisync-2\app\poweramp_api_lib\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.4] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a81a74c91d402197784df2a3ce31a793\transformed\navigation-runtime-release\AndroidManifest.xml:20:5-44
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.4] C:\Users\toshi\.gradle\caches\8.14.3\transforms\a81a74c91d402197784df2a3ce31a793\transformed\navigation-runtime-release\AndroidManifest.xml:20:5-44
 MERGED from [androidx.navigation:navigation-common-android:2.9.4] C:\Users\toshi\.gradle\caches\8.14.3\transforms\e303708a68e20a165b9feca80138b606\transformed\navigation-common-release\AndroidManifest.xml:20:5-44
@@ -491,9 +491,9 @@ MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\toshi\.gradle\cache
 MERGED from [com.google.dagger:dagger-lint-aar:2.57.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\df0faa2c7c5964ffc942daa5c17b61a8\transformed\dagger-lint-aar-2.57.1\AndroidManifest.xml:18:3-42
 MERGED from [com.google.dagger:dagger-lint-aar:2.57.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\df0faa2c7c5964ffc942daa5c17b61a8\transformed\dagger-lint-aar-2.57.1\AndroidManifest.xml:18:3-42
 	android:targetSdkVersion
-		INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
+		INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from D:\mws-poweramp\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
+		INJECTED from D:\official\MusicBeeWfisync-2\app\src\main\AndroidManifest.xml
 provider#androidx.startup.InitializationProvider
 ADDED from [androidx.emoji2:emoji2:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\063565db8ca8d96d75c5721b4c92d477\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
 MERGED from [androidx.lifecycle:lifecycle-process:2.10.0-alpha03] C:\Users\toshi\.gradle\caches\8.14.3\transforms\05d9c0567590da9c55c7c0a66e2f5358\transformed\lifecycle-process-2.10.0-alpha03\AndroidManifest.xml:24:9-32:20
