@@ -169,15 +169,21 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                                     getMusicFilesThread,
                                     getString(R.string.progressDialogMessage)
                                 )
-                                CreateProgressDialog(viewModel)
+                                runBlocking {
+                                    setContent {
+                                        CreateProgressDialog(viewModel)
+                                    }
+                                }
+                                runBlocking {
+                                    launcher.launch(setLaunchIntent())
+                                    setContent {
+                                        FirstSettingView()
+                                    }
+                                }
                             }
-                            launcher.launch(setLaunchIntent())
                         }
                     }
                 }
-
-                val currentContext = LocalContext.current
-                FirstSettingView()
             } else {
                 OptionSettingView()
             }

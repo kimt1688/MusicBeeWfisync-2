@@ -1435,10 +1435,10 @@ class WifiSyncService : Service() {
                                     val filename: String = reader.readUTF()
                                     val rating: Byte = reader.readByte()
                                     val lastPlayedDate: Long = reader.readLong()
-                                    val skipCount: Int = reader.readInt()
                                     val playCount: Int = reader.readInt()
+                                    val skipCount: Int = reader.readInt()
                                     cachedStatsLookup[filename] =
-                                        FileStatsInfo(filename, rating, lastPlayedDate, skipCount, playCount)
+                                        FileStatsInfo(filename, rating, lastPlayedDate, playCount ,skipCount)
                                 }
                             }
                         }
@@ -1513,7 +1513,7 @@ class WifiSyncService : Service() {
                             }
                             if (!settingsReverseSyncSkipCounts) {
                                 latestStatsInfo.skipCount = cachedStatsInfo.skipCount
-                                incrementalPlayCount = 0
+                                incrementalSkipCount = 0
                             } else {
                                 incrementalSkipCount =
                                     latestStatsInfo.skipCount - cachedStatsInfo.skipCount
@@ -1523,8 +1523,8 @@ class WifiSyncService : Service() {
                             writeString(latestStatsInfo.fileUrl)
                             writeByte(if ((!settingsReverseSyncRatings || !ratingChanged)) 0 else latestStatsInfo.rating.toInt())
                             writeLong(if ((!settingsReverseSyncPlayCounts)) 0 else latestStatsInfo.lastPlayedDate)
-                            writeInt(if ((!settingsReverseSyncSkipCounts || incrementalSkipCount <= 0)) 0 else incrementalSkipCount)
                             writeInt(if ((!settingsReverseSyncPlayCounts || incrementalPlayCount <= 0)) 0 else incrementalPlayCount)
+                            writeInt(if ((!settingsReverseSyncSkipCounts || incrementalSkipCount <= 0)) 0 else incrementalSkipCount)
                         }
                     }
                     if (!settingsSyncPreview) {
@@ -1538,8 +1538,8 @@ class WifiSyncService : Service() {
                                         writer.writeUTF(stats.fileUrl)
                                         writer.writeByte(stats.rating.toInt())
                                         writer.writeLong(stats.lastPlayedDate)
-                                        writer.writeInt(stats.skipCount)
                                         writer.writeInt(stats.playCount)
+                                        writer.writeInt(stats.skipCount)
                                     }
                                     writer.flush()
                                 }
@@ -1752,7 +1752,7 @@ class WifiSyncService : Service() {
                     ) {
                         lastFileUrl = lastFileUrl.substring(storageRootPath.length + 1)
                     }
-                    stats.add(FileStatsInfo(lastFileUrl, lastRating, lastPlayedDate, lastSkipCount, lastPlayCount))
+                    stats.add(FileStatsInfo(lastFileUrl, lastRating, lastPlayedDate, lastPlayCount, lastSkipCount))
                     lastFileUrl = ""
                 }
             }
@@ -1980,8 +1980,8 @@ class WifiSyncService : Service() {
         val fileUrl: String,
         var rating: Byte,
         var lastPlayedDate: Long,
-        var skipCount: Int,
-        var playCount: Int
+        var playCount: Int,
+        var skipCount: Int
     )
 
     companion object {

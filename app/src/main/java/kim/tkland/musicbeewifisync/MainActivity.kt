@@ -397,6 +397,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                                                     WifiSyncServiceSettings.reverseSyncPlayer = 0
                                                     initialReverseSyncPlayer.intValue = 2
                                                     isSyncToPlaycountsEnabled = false
+                                                    isSyncToSkipCountsEnabled = false
                                                     isSyncToRatingEnabled = false
                                                     isSyncToPlaylistsEnabled = false
                                                     WifiSyncServiceSettings.reverseSyncPlayCounts =
@@ -457,6 +458,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                                                 WifiSyncServiceSettings.reverseSyncPlayer = 0
                                                 initialReverseSyncPlayer.intValue = 2
                                                 isSyncToPlaycountsEnabled = false
+                                                isSyncToSkipCountsEnabled = false
                                                 isSyncToRatingEnabled = false
                                                 isSyncToPlaylistsEnabled = false
                                                 WifiSyncServiceSettings.reverseSyncPlayCounts =
