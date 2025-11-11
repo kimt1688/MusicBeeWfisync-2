@@ -57,6 +57,7 @@
             android:label="@string/title_activity_sync_status" />
         <activity
             android:name=".SyncResultsPreviewActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_sync_preview" />
         <activity
             android:name=".PlaylistSyncActivity"
