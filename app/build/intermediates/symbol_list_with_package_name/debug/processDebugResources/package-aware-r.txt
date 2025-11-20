@@ -5083,6 +5083,7 @@ id view_offset_helper
 id view_transition
 id view_tree_disjoint_parent
 id view_tree_lifecycle_owner
+id view_tree_navigation_event_dispatcher_owner
 id view_tree_on_back_pressed_dispatcher_owner
 id view_tree_saved_state_registry_owner
 id view_tree_view_model_store_owner
@@ -5581,6 +5582,7 @@ string m3c_bottom_sheet_dismiss_description
 string m3c_bottom_sheet_drag_handle_description
 string m3c_bottom_sheet_expand_description
 string m3c_bottom_sheet_pane_title
+string m3c_button_group_more_options
 string m3c_date_input_headline
 string m3c_date_input_headline_description
 string m3c_date_input_invalid_for_pattern
@@ -5618,6 +5620,7 @@ string m3c_dropdown_menu_expanded
 string m3c_dropdown_menu_toggle
 string m3c_floating_toolbar_collapse
 string m3c_floating_toolbar_expand
+string m3c_floating_toolbar_more_options
 string m3c_search_bar_search
 string m3c_snackbar_dismiss
 string m3c_snackbar_pane_title

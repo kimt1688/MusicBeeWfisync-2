@@ -22,6 +22,7 @@ import android.os.FileObserver
 import android.os.IBinder
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.text.TextUtils.indexOf
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
@@ -1365,26 +1366,52 @@ class WifiSyncService : Service() {
             try {
                 var files: ArrayList<FileInfo>? = null
                 when (settingsReverseSyncPlayer) {
-                    WifiSyncServiceSettings.PLAYER_GONEMAD -> files =
-                        storage!!.getFiles(playlistsFolderPath)
-                    WifiSyncServiceSettings.PLAYER_POWERAMP -> /*
-                            //Uri playlistsUri = Uri.parse("content://com.maxmpz.audioplayer.data/playlists");
-                            //String[] projection = new String[] {"_id", "playlist_path", "playlist", "mtime", "num_files"};
-                            Uri playlistsUri = Uri.parse("content://com.maxmpz.audioplayer.data/playlists/7/files");
-                            String[] projection = new String[] {"folder_file_id", "sort"};
-                            try (Cursor cursor = getContentResolver().query(playlistsUri, projection, null, null, null)) {
-                                while (cursor.moveToNext()) {
-                                    String id = cursor.getString(0);
-                                    String path = cursor.getString(1);
-                                    //String name = cursor.getString(2);
-                                    //long mTime = cursor.getLong(3);
-                                    //Date xx = new Date(mTime * 1000);
-                                    //String aa = cursor.getString(5);
-                                    String x = path + id;
-                                }
+                    WifiSyncServiceSettings.PLAYER_GONEMAD ->
+                        files = storage!!.getFiles(playlistsFolderPath)
+                    WifiSyncServiceSettings.PLAYER_POWERAMP -> {
+                        val contentResolver = contentResolver
+                        val projection = arrayOf(
+                            TableDefs.Playlists.PLAYLIST,
+                            TableDefs.Playlists.MTIME,
+                            TableDefs.Playlists.UPDATED_AT,
+                            TableDefs.Playlists.PATH
+                        )
+                    contentResolver.query(
+                        PowerampAPI.ROOT_URI.buildUpon().appendEncodedPath("playlists").build(),
+                        projection,
+                        null, //"folder_files.played_times > 0",
+                        null,
+                        null
+                    ).use { cursor ->
+                        if (cursor != null) {
+                            files = ArrayList()
+                            while (cursor.moveToNext()) {
+                                val filename = cursor.getString(3).substring(cursor.getString(3).indexOf("/") + 1)
+                                files.add(FileInfo(filename, cursor.getLong(2) * 1000))
                             }
-*/
-                        files = ArrayList()
+                        }
+                    }
+                        /*
+                        //Uri playlistsUri = Uri.parse("content://com.maxmpz.audioplayer.data/playlists");
+                        //String[] projection = new String[] {"_id", "playlist_path", "playlist", "mtime", "num_files"};
+                        Uri playlistsUri = Uri.parse("content://com.maxmpz.audioplayer.data/playlists/7/files");
+                        String[] projection = new String[] {"folder_file_id", "sort"};
+                        try (Cursor cursor = getContentResolver().query(playlistsUri, projection, null, null, null)) {
+                            while (cursor.moveToNext()) {
+                                String id = cursor.getString(0);
+                                String path = cursor.getString(1);
+                                //String name = cursor.getString(2);
+                                //long mTime = cursor.getLong(3);
+                                //Date xx = new Date(mTime * 1000);
+                                //String aa = cursor.getString(5);
+                                String x = path + id;
+                            }
+                        }
+                        */
+
+                 }
+                 else ->
+                    files = null
                 }
                 for (info: FileInfo in files!!) {
                     writeString(storage!!.getDecodedUrl(info.filename))
@@ -1436,7 +1463,12 @@ class WifiSyncService : Service() {
                                     val rating: Byte = reader.readByte()
                                     val lastPlayedDate: Long = reader.readLong()
                                     val playCount: Int = reader.readInt()
-                                    val skipCount: Int = reader.readInt()
+                                    var skipCount = 0
+                                    try {
+                                        skipCount = reader.readInt()
+                                    } catch (ex: EOFException) {
+                                        skipCount = 0
+                                    }
                                     cachedStatsLookup[filename] =
                                         FileStatsInfo(filename, rating, lastPlayedDate, playCount ,skipCount)
                                 }
