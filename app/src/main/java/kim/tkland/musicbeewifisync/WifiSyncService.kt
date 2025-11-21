@@ -1387,7 +1387,7 @@ class WifiSyncService : Service() {
                             files = ArrayList()
                             while (cursor.moveToNext()) {
                                 val filename = cursor.getString(3).substring(cursor.getString(3).indexOf("/") + 1)
-                                files.add(FileInfo(filename, cursor.getLong(2) * 1000))
+                                files.add(FileInfo(filename, cursor.getLong(2)))
                             }
                         }
                     }
