@@ -1464,10 +1464,10 @@ class WifiSyncService : Service() {
                                     val lastPlayedDate: Long = reader.readLong()
                                     val playCount: Int = reader.readInt()
                                     var skipCount = 0
-                                    try {
-                                        skipCount = reader.readInt()
-                                    } catch (ex: EOFException) {
+                                    if (WifiSyncServiceSettings.isSkipcountReverceSyncFirst) {
                                         skipCount = 0
+                                    } else {
+                                        skipCount = reader.readInt()
                                     }
                                     cachedStatsLookup[filename] =
                                         FileStatsInfo(filename, rating, lastPlayedDate, playCount ,skipCount)
@@ -1574,6 +1574,7 @@ class WifiSyncService : Service() {
                                         writer.writeInt(stats.skipCount)
                                     }
                                     writer.flush()
+                                    WifiSyncServiceSettings.isSkipcountReverceSyncFirst = false
                                 }
                             }
                         }
@@ -2785,6 +2786,7 @@ class FileErrorInfo(val errorCategory: Int, val filename: String, val errorMessa
 }
 
 internal object WifiSyncServiceSettings {
+    var isSkipcountReverceSyncFirst = true
     var defaultIpAddressValue = ""
     var deviceName: String? = Build.MODEL
     var deviceStorageIndex = 0
@@ -2812,6 +2814,10 @@ internal object WifiSyncServiceSettings {
                 FileInputStream(settingsFile).use { fs ->
                     DataInputStream(fs).use { reader ->
                         val version: Int = reader.readInt()
+                        if (version < 8)
+                            isSkipcountReverceSyncFirst = true
+                        else
+                            reader.readBoolean()
                         defaultIpAddressValue = reader.readUTF()
                         deviceName = reader.readUTF()
                         deviceStorageIndex = reader.readInt()
@@ -2835,7 +2841,8 @@ internal object WifiSyncServiceSettings {
                         reverseSyncPlayer = reader.readInt()
                         reverseSyncPlaylists = reader.readBoolean()
                         reverseSyncRatings = reader.readBoolean()
-                        reverseSyncSkipCounts = reader.readBoolean()
+                        if (version > 6)
+                            reverseSyncSkipCounts = reader.readBoolean()
                         reverseSyncPlayCounts = reader.readBoolean()
                         reverseSyncPlaylistsPath = reader.readUTF()
                         if (version < 6) {
@@ -2856,7 +2863,8 @@ internal object WifiSyncServiceSettings {
             val settingsFile = File(context!!.filesDir, "MusicBeeWifiSyncSettings.dat")
             FileOutputStream(settingsFile).use { fs ->
                 DataOutputStream(fs).use { writer ->
-                    writer.writeInt(7)
+                    writer.writeInt(8)
+                    writer.writeBoolean(isSkipcountReverceSyncFirst)
                     writer.writeUTF(defaultIpAddressValue)
                     writer.writeUTF(deviceName)
                     writer.writeInt(deviceStorageIndex)
