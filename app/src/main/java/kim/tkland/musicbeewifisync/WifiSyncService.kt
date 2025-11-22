@@ -1575,6 +1575,7 @@ class WifiSyncService : Service() {
                                     }
                                     writer.flush()
                                     WifiSyncServiceSettings.isSkipcountReverceSyncFirst = false
+                                    WifiSyncServiceSettings.saveSettings(applicationContext)
                                 }
                             }
                         }
@@ -2786,7 +2787,7 @@ class FileErrorInfo(val errorCategory: Int, val filename: String, val errorMessa
 }
 
 internal object WifiSyncServiceSettings {
-    var isSkipcountReverceSyncFirst = true
+    var isSkipcountReverceSyncFirst = false
     var defaultIpAddressValue = ""
     var deviceName: String? = Build.MODEL
     var deviceStorageIndex = 0
@@ -2817,7 +2818,7 @@ internal object WifiSyncServiceSettings {
                         if (version < 8)
                             isSkipcountReverceSyncFirst = true
                         else
-                            reader.readBoolean()
+                            isSkipcountReverceSyncFirst = reader.readBoolean()
                         defaultIpAddressValue = reader.readUTF()
                         deviceName = reader.readUTF()
                         deviceStorageIndex = reader.readInt()

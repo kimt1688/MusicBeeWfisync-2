@@ -271,15 +271,15 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         }
         AlertDialog(
             onDismissRequest = { showDialogState.value = false }, // ダイアログの外側をクリックしたときの処理
+            confirmButton = confirmButtonComposable,
+            dismissButton = dismissButtonComposable, // Pass the conditionally defined dismiss button
             icon = { // Use the dedicated 'icon' parameter
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_dialog_alert),
                     contentDescription = "Error Icon")  /* Provide a content description)*/
             },
-            title = { getString(R.string.syncErrorHeader) },
-            text = { getString(errorMessageId) },
-            confirmButton = confirmButtonComposable,
-            dismissButton = dismissButtonComposable // Pass the conditionally defined dismiss button
+            title = { Text(getString(R.string.syncErrorHeader)) },
+            text = { Text(getString(errorMessageId)) }
         )
     }
 
