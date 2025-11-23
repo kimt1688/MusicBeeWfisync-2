@@ -2855,7 +2855,7 @@ internal object WifiSyncServiceSettings {
     var reverseSyncRatings = false
     var reverseSyncSkipCounts = true
     var reverseSyncPlayCounts = true
-    var debugMode = true
+    var debugMode = false
     var permissionsUpgraded = false
     fun loadSettings(context: Context) {
         defaultIpAddressValue = ""
