@@ -16,8 +16,8 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 149
-        versionName = "3.0.19"
+        versionCode = 150
+        versionName = "3.0.20"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         targetSdk = 35

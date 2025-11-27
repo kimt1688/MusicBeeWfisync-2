@@ -22,7 +22,6 @@ import android.os.FileObserver
 import android.os.IBinder
 import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.text.TextUtils.indexOf
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
@@ -498,7 +497,6 @@ class WifiSyncService : Service() {
             }
         }
 
-       /* readUTF()のバグ回避バージョン */
        @Throws(SocketException::class)
        private fun readString(): String {
            var returnLength = 0
@@ -543,7 +541,8 @@ class WifiSyncService : Service() {
                 throw SocketException(ex.toString())
             }
             return retval
-        }*/
+        }
+         */
 
         /* writeUTF()のバグ回避バージョン */
         @Throws(SocketException::class)
@@ -1148,16 +1147,18 @@ class WifiSyncService : Service() {
 
         @Throws(Exception::class)
         private fun sendFile() {
-            val playListCollection = MediaStore.Audio.Playlists.getContentUri(
-                MediaStore.getExternalVolumeNames(context)
-                    .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
-            )
             val filePath = readString()
-            if (WifiSyncServiceSettings.debugMode) {
-                Log.i("sendFile", "Send: $filePath")
-            }
+            //if (WifiSyncServiceSettings.debugMode) {
+            //    logInfo("sendFile", "Send: $filePath")
+            //}
             readToEndOfCommand()
-            writeString(storage!!.getFileUrl(filePath))
+            val separatorIndex = filePath.lastIndexOf('/') + 1
+            val name = filePath.substring(separatorIndex)
+            writeString(name)
+            flushWriter()
+            if (WifiSyncServiceSettings.debugMode) {
+                logInfo("sendFile", "filename=$name")
+            }
             val buffer = Array(2) { ByteArray(65536) }
             val readCount = IntArray(2)
             val waitRead = AutoResetEvent(false)
@@ -1165,120 +1166,76 @@ class WifiSyncService : Service() {
             val exception = arrayOfNulls<Exception>(1)
             var fileLength: Long = -1
             var remainingBytes: Long = 0
-            val status: String = syncStatusOK
-            val separatorIndex = filePath.lastIndexOf('/') + 1
-            var writeLength: Long = 0
-            val path = filePath.take(separatorIndex)
-            val name = filePath.substring(separatorIndex)
+            var status: String = syncStatusOK
             try {
-                var cursor: Cursor? = null
-                var contentUri: Uri? = null
-                cursor = applicationContext.contentResolver.query(
-                    playListCollection,
-                    arrayOf(
-                        MediaStore.Audio.Playlists._ID,
-                        MediaStore.Audio.Playlists.RELATIVE_PATH,
-                        MediaStore.Audio.Playlists.DISPLAY_NAME
-                    ),
-                    "${MediaStore.Audio.Playlists.RELATIVE_PATH} = ? AND ${MediaStore.Audio.Playlists.DISPLAY_NAME} = ?",
-                    arrayOf(path, name),
-                    null,
-                    null
-                )
-
-                if (cursor != null) {
+                storage!!.openReadStream(filePath).use { fs ->
+                    fileLength = storage!!.getLength(filePath)
+                    if (WifiSyncServiceSettings.debugMode) {
+                        logInfo("sendFile", "fileLength=$fileLength")
+                    }
+                    writeLong(fileLength)
+                    flushWriter()
+                    val thread =
+                        Thread(SendFileWriteLoop(buffer, readCount, waitRead, waitWrite, exception))
+                    thread.start()
+                    remainingBytes = fileLength
                     try {
-                        if (cursor.count == 1) {
-                            cursor.moveToFirst()
-                            contentUri =
-                                ContentUris.withAppendedId(playListCollection, cursor.getLong(0))
+                        var bytesRead: Int
+                        var bufferIndex = 0
+                        while (true) {
+                            try {
+                                bytesRead = fs.read(buffer[bufferIndex], 0, 65536)
+                                waitWrite.waitOne()
+                            } catch (ex: InterruptedException) {
+                                bytesRead = -1
+                                exception[0] = ex
+                            } catch (ex: Exception) {
+                                logError("sendFile", ex)
+                                bytesRead = -1
+                                exception[0] = ex
+                            }
+                            readCount[bufferIndex] = bytesRead
+                            waitRead.set()
+                            if (exception[0] != null) {
+                                throw exception[0]!!
+                            } else if (bytesRead <= 0) {
+                                break
+                            }
+                            remainingBytes -= bytesRead.toLong()
+                            bufferIndex = if ((bufferIndex == 1)) 0 else 1
                         }
-                    } catch (e: Exception) {
-                        Log.d("SendFile", e.message!!)
-                        Log.d("SendFile", e.stackTraceToString())
-                        writeString(syncStatusFAIL)
-                        flushWriter()
-                        return
+                    } finally {
+                        thread.interrupt()
                     }
-                    cursor.close()
                 }
-
-                var ips: InputStream? = null
-                try {
-                    if (contentUri != null) {
-                        ips = contentResolver.openInputStream(contentUri)
-                    } else {
-                        // エラー処理
+            } catch (ex: Exception) {
+                logError("sendFile", ex, "file=$filePath")
+                if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
+                    throw ex
+                }
+                status = "$syncStatusFAIL ${ex.message}"
+                if (fileLength == -1L) {
+                    writeLong(0)
+                } else {
+                    while (remainingBytes > 0) {
+                        writeArray(
+                            buffer[0],
+                            if ((remainingBytes >= 65536)) 65536 else remainingBytes.toInt()
+                        )
+                        remainingBytes -= 65536
                     }
-
-                    ips.use { fs: InputStream? ->
-                        fileLength = storage!!.getLength(filePath)
-                        if (WifiSyncServiceSettings.debugMode) {
-                            Log.i("sendFile", "Send: $filePath, length=$fileLength")
-                        }
-                        writeLong(fileLength)
-                        flushWriter()
-                        val thread =
-                            Thread(
-                                sendFileWriteLoop(
-                                    buffer,
-                                    readCount,
-                                    waitRead,
-                                    waitWrite,
-                                    exception
-                                )
-                            )
-                        thread.start()
-                        remainingBytes = fileLength
-                        try {
-                            var bytesRead: Int
-                            var bufferIndex = 0
-                            while (true) {
-                                try {
-                                    bytesRead = fs!!.read(buffer[bufferIndex], 0, 65536)
-                                    if (WifiSyncServiceSettings.debugMode) {
-                                        Log.d("sendFile", "Read Length: $bytesRead")
-                                    }
-                                    waitWrite.waitOne()
-                                } catch (ex: InterruptedException) {
-                                    bytesRead = -1
-                                    exception[0] = ex
-                                } catch (ex: Exception) {
-                                    logError("sendFile", ex)
-                                    bytesRead = -1
-                                    exception[0] = ex
-                                }
-                                readCount[bufferIndex] = bytesRead
-                                waitRead.set()
-                                if (exception[0] != null) {
-                                    throw exception[0]!!
-                                } else if (bytesRead <= 0) {
-                                    break
-                                }
-                                writeLength += bytesRead.toLong()
-                                remainingBytes -= bytesRead.toLong()
-                                bufferIndex = if ((bufferIndex == 1)) 0 else 1
-                            }
-                        } finally {
-                            if (WifiSyncServiceSettings.debugMode) {
-                                Log.i("sendFile", "Write Length: $writeLength")
-                            }
-                            thread.interrupt()
-                        }
-                    }
-                } finally {
-                    ips?.close()
                 }
             } finally {
+                flushWriter()
                 writeString(status)
                 flushWriter()
-            }
-            if (WifiSyncServiceSettings.debugMode) {
-                Log.i("sendFile", "Send: $filePath Completed.")
+                if (WifiSyncServiceSettings.debugMode) {
+                    logInfo("sendFile", "status=$status")
+                }
             }
         }
 
-        private inner class sendFileWriteLoop(
+        private inner class SendFileWriteLoop(
             private val buffer: Array<ByteArray>,
             private val readCount: IntArray,
             private val waitRead: AutoResetEvent,
@@ -1513,7 +1470,7 @@ class WifiSyncService : Service() {
                                     val playCount: Int = reader.readInt()
 
                                     var skipCount: Int = 0
-                                    if (WifiSyncServiceSettings.loadSettingVersion >= 8 || WifiSyncServiceSettings.saveSettingVersion >= 8)
+                                    if (WifiSyncServiceSettings.loadSettingVersion > 6 || WifiSyncServiceSettings.saveSettingVersion > 6)
                                         skipCount = reader.readInt()
                                     cachedStatsLookup[filename] =
                                         FileStatsInfo(filename, rating, lastPlayedDate, playCount ,skipCount)
@@ -1621,7 +1578,8 @@ class WifiSyncService : Service() {
                                     }
                                     writer.flush()
                                     WifiSyncServiceSettings.isSkipcountReverceSyncFirst = false
-                                    WifiSyncServiceSettings.saveSettingVersion = 8
+                                    WifiSyncServiceSettings.saveSettingVersion =
+                                        WifiSyncServiceSettings.settingFileVersion
                                     WifiSyncServiceSettings.saveSettings(applicationContext)
                                 }
                             }

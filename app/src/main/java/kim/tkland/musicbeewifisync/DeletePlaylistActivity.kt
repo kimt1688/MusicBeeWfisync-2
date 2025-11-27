@@ -668,7 +668,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
         }
 
         val return_uri = ContentUris.withAppendedId(
-            MediaStore.Audio.Media.getContentUri(
+            MediaStore.Audio.Playlists.getContentUri(
                 MediaStore.getExternalVolumeNames(applicationContext)
                     .toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1]
             ),
