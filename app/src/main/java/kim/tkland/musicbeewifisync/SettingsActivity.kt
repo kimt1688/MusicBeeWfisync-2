@@ -71,10 +71,8 @@ import androidx.core.content.ContextCompat
 import java.io.File
 import androidx.core.content.edit
 import androidx.core.net.toUri
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class SettingsActivity : WifiSyncBaseActivity("") {
@@ -156,7 +154,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 val sharedPref =
                     getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
                 val uriStr = sharedPref.getString("accesseduri", "")
-                val stats = File("/storage/emulated/0/gmmp/stats.xml")
+                val stats = File(WifiSyncServiceSettings.gmmpStatsFile)
 
                 if (stats.exists()) {
                     if (uriStr.isNullOrEmpty()) {
@@ -176,6 +174,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                                 }
                                 runBlocking {
                                     launcher.launch(setLaunchIntent())
+                                    //processGMMPStatsXML()
                                     setContent {
                                         FirstSettingView()
                                     }
@@ -193,6 +192,20 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     @Composable
     override fun CustomView() {}
 
+    /*
+    fun processGMMPStatsXML() {
+        val stats = File(WifiSyncServiceSettings.gmmpStatsFile)
+        if (stats.exists()) {
+            val mUri: Uri = stats.path.toUri()
+            clearAllPersistedUriPermissions(applicationContext)
+            contentResolver.takePersistableUriPermission(
+                mUri, Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+        }
+    }
+     */
+
     @Composable
     fun StatsAlertDialog(showDialog: MutableState<Boolean>, onConfirm: () -> Unit) {
         if (showDialog.value) {
@@ -201,9 +214,10 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 title = { Text(text = getString(R.string.statsSelect)) },
                 text = { Text(text = getString(R.string.statsSelectMessage)) },
                 confirmButton = {
-                    Button(                    onClick = {
-                        onConfirm()
-                        showDialog.value = false
+                    Button(
+                        onClick = {
+                            onConfirm()
+                            showDialog.value = false
                     }
                     ) {
                         Text("OK")

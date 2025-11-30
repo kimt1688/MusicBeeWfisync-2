@@ -1,6 +1,3 @@
-import com.android.build.api.dsl.Packaging
-import com.android.sdklib.AndroidVersion.VersionCodes.*
-
 plugins {
     // Existing plugins
    id("com.android.application")
@@ -16,11 +13,11 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 150
-        versionName = "3.0.20"
+        versionCode = 151
+        versionName = "3.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        targetSdk = 35
+        targetSdk = 36
     }
 
     buildTypes {
@@ -95,10 +92,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.ui.graphics)
     implementation(libs.hilt.android)
-    /*
-    implementation(libs.rendering)
-    debugImplementation(libs.androidx.ui.tooling)
-    */
+
     implementation(libs.kotlinx.coroutines.core) // Or the latest version
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.compose.material3)

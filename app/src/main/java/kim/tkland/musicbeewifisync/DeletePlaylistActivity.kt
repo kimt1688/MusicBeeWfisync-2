@@ -5,7 +5,6 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -28,7 +27,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -56,7 +54,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp

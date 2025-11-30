@@ -1148,9 +1148,9 @@ class WifiSyncService : Service() {
         @Throws(Exception::class)
         private fun sendFile() {
             val filePath = readString()
-            //if (WifiSyncServiceSettings.debugMode) {
-            //    logInfo("sendFile", "Send: $filePath")
-            //}
+            if (WifiSyncServiceSettings.debugMode) {
+                logInfo("sendFile", "Send: $filePath")
+            }
             readToEndOfCommand()
             val separatorIndex = filePath.lastIndexOf('/') + 1
             val name = filePath.substring(separatorIndex)
@@ -1159,13 +1159,7 @@ class WifiSyncService : Service() {
             if (WifiSyncServiceSettings.debugMode) {
                 logInfo("sendFile", "filename=$name")
             }
-            val buffer = Array(2) { ByteArray(65536) }
-            val readCount = IntArray(2)
-            val waitRead = AutoResetEvent(false)
-            val waitWrite = AutoResetEvent(true)
-            val exception = arrayOfNulls<Exception>(1)
             var fileLength: Long = -1
-            var remainingBytes: Long = 0
             var status: String = syncStatusOK
             try {
                 storage!!.openReadStream(filePath).use { fs ->
@@ -1175,38 +1169,20 @@ class WifiSyncService : Service() {
                     }
                     writeLong(fileLength)
                     flushWriter()
-                    val thread =
-                        Thread(SendFileWriteLoop(buffer, readCount, waitRead, waitWrite, exception))
-                    thread.start()
-                    remainingBytes = fileLength
-                    try {
-                        var bytesRead: Int
-                        var bufferIndex = 0
-                        while (true) {
-                            try {
-                                bytesRead = fs.read(buffer[bufferIndex], 0, 65536)
-                                waitWrite.waitOne()
-                            } catch (ex: InterruptedException) {
-                                bytesRead = -1
-                                exception[0] = ex
-                            } catch (ex: Exception) {
-                                logError("sendFile", ex)
-                                bytesRead = -1
-                                exception[0] = ex
-                            }
-                            readCount[bufferIndex] = bytesRead
-                            waitRead.set()
-                            if (exception[0] != null) {
-                                throw exception[0]!!
-                            } else if (bytesRead <= 0) {
-                                break
-                            }
-                            remainingBytes -= bytesRead.toLong()
-                            bufferIndex = if ((bufferIndex == 1)) 0 else 1
-                        }
-                    } finally {
-                        thread.interrupt()
+
+                    val buffer = ByteArray(8192)
+                    var readlen : Int
+                    var writelen  : Int = 0
+
+                    while (fs.read(buffer).also { readlen = it } > 0) {
+                        writeArray(buffer, readlen)
+                        writelen += readlen
                     }
+                    if (WifiSyncServiceSettings.debugMode) {
+                        logInfo("sendFile", "writelen=$writelen")
+                    }
+                    writeString(syncEndOfData)
+                    flushWriter()
                 }
             } catch (ex: Exception) {
                 logError("sendFile", ex, "file=$filePath")
@@ -1214,55 +1190,12 @@ class WifiSyncService : Service() {
                     throw ex
                 }
                 status = "$syncStatusFAIL ${ex.message}"
-                if (fileLength == -1L) {
-                    writeLong(0)
-                } else {
-                    while (remainingBytes > 0) {
-                        writeArray(
-                            buffer[0],
-                            if ((remainingBytes >= 65536)) 65536 else remainingBytes.toInt()
-                        )
-                        remainingBytes -= 65536
-                    }
-                }
             } finally {
-                flushWriter()
                 writeString(status)
+                //writeString(syncEndOfData)
                 flushWriter()
                 if (WifiSyncServiceSettings.debugMode) {
                     logInfo("sendFile", "status=$status")
-                }
-            }
-        }
-
-        private inner class SendFileWriteLoop(
-            private val buffer: Array<ByteArray>,
-            private val readCount: IntArray,
-            private val waitRead: AutoResetEvent,
-            private val waitWrite: AutoResetEvent,
-            private val exception: Array<Exception?>
-        ) : Runnable {
-            override fun run() {
-                var bufferIndex = 0
-                var bytesRead: Int
-                try {
-                    while (true) {
-                        waitRead.waitOne()
-                        bytesRead = readCount[bufferIndex]
-                        if (bytesRead <= 0) {
-                            break
-                        }
-                        writeArray(buffer[bufferIndex], bytesRead)
-                        waitWrite.set()
-                        bufferIndex = if ((bufferIndex == 1)) 0 else 1
-                    }
-                } catch (ex: InterruptedException) {
-                    exception[0] = ex
-                } catch (ex: Exception) {
-                    exception[0] = ex
-                    logError("sendFileLoop", ex)
-                } finally {
-                    waitWrite.set()
                 }
             }
         }
@@ -1666,9 +1599,9 @@ class WifiSyncService : Service() {
                     val docId = DocumentsContract.getDocumentId(uri)
                     val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }
                         .toTypedArray()
-                    val type = split[0]
+                    //val type = split[0]
                     val contentUri: Uri? = MediaStore.Files.getContentUri("external")
-                    val selection = "_id=?"
+                    val selection = MediaStore.Files.FileColumns._ID + "=?"
                     val selectionArgs = arrayOf(
                         split[1]
                     )
@@ -1693,6 +1626,7 @@ class WifiSyncService : Service() {
             try {
                 cursor = context.contentResolver.query(
                     uri!!, projection, selection, selectionArgs, null
+                    //uri!!, projection, null, null, null
                 )
                 if (cursor != null && cursor.moveToFirst()) {
                     val cindex = cursor.getColumnIndexOrThrow(projection[0])
@@ -1709,7 +1643,8 @@ class WifiSyncService : Service() {
             val sharedPref = getSharedPreferences("kim.tkland.musicbeewifisync.sharedpref", MODE_PRIVATE)
             val uriStr = sharedPref.getString("accesseduri", "")!!
             val targetUri = uriStr.toUri()
-            if (uriStr.isEmpty()) {
+            val statsFile = File(WifiSyncServiceSettings.gmmpStatsFile)
+            if (!statsFile.exists() || uriStr.isEmpty()) {
                 return ArrayList()
             }
 
@@ -1717,7 +1652,7 @@ class WifiSyncService : Service() {
             val fileWriteStarted = AtomicBoolean(false)
             val fileWriteCompleted = AtomicBoolean(false)
 
-            val observer: FileObserver = object : FileObserver(File(getPathFromUri(applicationContext, targetUri)!!)) {
+            val observer = object : FileObserver(statsFile) {
                 override fun onEvent(event: Int, path: String?) {
                     when (event) {
                         OPEN -> fileWriteStarted.set(true)
@@ -1729,6 +1664,7 @@ class WifiSyncService : Service() {
                 }
             }
             observer.startWatching()
+
             try {
                 val serviceIntent = Intent()
                 serviceIntent.component =
@@ -2815,6 +2751,7 @@ internal object WifiSyncServiceSettings {
     var reverseSyncPlayCounts = true
     var debugMode = false
     var permissionsUpgraded = false
+    val gmmpStatsFile = "/storage/emulated/0/gmmp/stats.xml"
     fun loadSettings(context: Context) {
         defaultIpAddressValue = ""
         try {
