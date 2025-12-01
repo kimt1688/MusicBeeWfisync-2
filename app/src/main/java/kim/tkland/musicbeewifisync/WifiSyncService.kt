@@ -43,6 +43,7 @@ import kim.tkland.musicbeewifisync.WifiSyncService.Companion.syncProgressMessage
 import kotlinx.coroutines.DelicateCoroutinesApi
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
+import java.io.BufferedReader
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.EOFException
@@ -50,6 +51,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.io.InputStreamReader
 import java.io.InvalidObjectException
 import java.io.OutputStream
 import java.io.UTFDataFormatException
@@ -866,11 +868,14 @@ class WifiSyncService : Service() {
                         arrayOf(cursor_path, cursor_name),
                         "")
                     if (cursor != null) {
-                        if (cursor.count == 1) {
+                        if (WifiSyncServiceSettings.debugMode) {
+                            Log.d("receiveFile", "cursor.count:${cursor.count}")
+                        }
+                        //if (cursor.count == 1) {
                             cursor.moveToFirst()
                             contentUri =
                                 ContentUris.withAppendedId(audioCollection, cursor.getLong(0))
-                        }
+                        //}
                     }
                 }catch (ex: Exception) {
                     Log.d("receiveFile", "${ex.message}(file=$filePath)")
@@ -885,6 +890,10 @@ class WifiSyncService : Service() {
                     } else {
                         contentUri =
                             applicationContext.contentResolver.insert(audioCollection, values)
+                        if (WifiSyncServiceSettings.debugMode) {
+                            Log.d("receiveFile", "insert(uri):${contentUri}")
+                            Log.d("receiveFile", "insert(file):${filePath}")
+                        }
                         os = contentResolver.openOutputStream(contentUri!!, "wt")!!
                     }
                     os.use{fs: OutputStream? ->
@@ -986,11 +995,11 @@ class WifiSyncService : Service() {
                 }
                 if (cursor != null) {
                     try {
-                        if (cursor.count == 1) {
+                        //if (cursor.count == 1) {
                             cursor.moveToFirst()
                             contentUri =
                                 ContentUris.withAppendedId(playListCollection, cursor.getLong(0))
-                        }
+                        //}
                     } catch (e: Exception) {
                         Log.d("receivePlayList", e.message!!)
                         Log.d("receivePlayList", e.stackTraceToString())
@@ -1148,55 +1157,35 @@ class WifiSyncService : Service() {
         @Throws(Exception::class)
         private fun sendFile() {
             val filePath = readString()
-            if (WifiSyncServiceSettings.debugMode) {
-                logInfo("sendFile", "Send: $filePath")
-            }
             readToEndOfCommand()
             val separatorIndex = filePath.lastIndexOf('/') + 1
             val name = filePath.substring(separatorIndex)
             writeString(name)
             flushWriter()
-            if (WifiSyncServiceSettings.debugMode) {
-                logInfo("sendFile", "filename=$name")
-            }
             var fileLength: Long = -1
             var status: String = syncStatusOK
             try {
                 storage!!.openReadStream(filePath).use { fs ->
                     fileLength = storage!!.getLength(filePath)
-                    if (WifiSyncServiceSettings.debugMode) {
-                        logInfo("sendFile", "fileLength=$fileLength")
-                    }
                     writeLong(fileLength)
                     flushWriter()
 
-                    val buffer = ByteArray(8192)
-                    var readlen : Int
-                    var writelen  : Int = 0
-
-                    while (fs.read(buffer).also { readlen = it } > 0) {
-                        writeArray(buffer, readlen)
-                        writelen += readlen
+                    var readLength = 0
+                    val buffer = ByteArray(65536)
+                    while(fs.read(buffer, 0, 65536).also {readLength = it} > 0){
+                        writeArray(buffer, readLength)
                     }
-                    if (WifiSyncServiceSettings.debugMode) {
-                        logInfo("sendFile", "writelen=$writelen")
-                    }
-                    writeString(syncEndOfData)
-                    flushWriter()
+                    fs.close()
                 }
             } catch (ex: Exception) {
-                logError("sendFile", ex, "file=$filePath")
                 if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
                     throw ex
                 }
                 status = "$syncStatusFAIL ${ex.message}"
             } finally {
-                writeString(status)
-                //writeString(syncEndOfData)
                 flushWriter()
-                if (WifiSyncServiceSettings.debugMode) {
-                    logInfo("sendFile", "status=$status")
-                }
+                writeString(status)
+                flushWriter()
             }
         }
 
