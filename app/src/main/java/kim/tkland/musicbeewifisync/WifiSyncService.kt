@@ -43,15 +43,14 @@ import kim.tkland.musicbeewifisync.WifiSyncService.Companion.syncProgressMessage
 import kotlinx.coroutines.DelicateCoroutinesApi
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
-import java.io.BufferedReader
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.EOFException
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStream
-import java.io.InputStreamReader
 import java.io.InvalidObjectException
 import java.io.OutputStream
 import java.io.UTFDataFormatException
@@ -1162,14 +1161,12 @@ class WifiSyncService : Service() {
             val name = filePath.substring(separatorIndex)
             writeString(name)
             flushWriter()
-            var fileLength: Long = -1
+            val fileLength = storage!!.getLength(filePath)
+            writeLong(fileLength)
+            flushWriter()
             var status: String = syncStatusOK
             try {
                 storage!!.openReadStream(filePath).use { fs ->
-                    fileLength = storage!!.getLength(filePath)
-                    writeLong(fileLength)
-                    flushWriter()
-
                     var readLength = 0
                     val buffer = ByteArray(65536)
                     while(fs.read(buffer, 0, 65536).also {readLength = it} > 0){
@@ -1181,7 +1178,11 @@ class WifiSyncService : Service() {
                 if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
                     throw ex
                 }
-                status = "$syncStatusFAIL ${ex.message}"
+                if (FileNotFoundException::class.java.isAssignableFrom(ex.javaClass)){
+                    writeLong(0)
+                    flushWriter()
+                }
+                status = "${syncStatusFAIL} ${ex.message}"
             } finally {
                 flushWriter()
                 writeString(status)
