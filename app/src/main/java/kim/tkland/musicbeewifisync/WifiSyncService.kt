@@ -801,7 +801,6 @@ class WifiSyncService : Service() {
         @Throws(Exception::class)
         private fun receiveFile() {
             val filePath = readString()
-            Log.d("receiveFile()", "receive target filePath = $filePath")
             val fileLength = readLong()
             val fileDateModified = readLong()
             var contentUri: Uri? = null
@@ -830,7 +829,7 @@ class WifiSyncService : Service() {
                 val mimetype = MimeTypeMap.getSingleton()
                         .getMimeTypeFromExtension(ext.lowercase(Locale.getDefault()))
                 val separatorIndex = filePath.lastIndexOf('/') + 1
-                val path = filePath.substring(0, separatorIndex)
+                val path = filePath.take(separatorIndex)
                 val name = filePath.substring(separatorIndex)
                 val values = ContentValues().apply {
                     put(MediaStore.Audio.Media.RELATIVE_PATH, path)
@@ -870,11 +869,11 @@ class WifiSyncService : Service() {
                         if (WifiSyncServiceSettings.debugMode) {
                             Log.d("receiveFile", "cursor.count:${cursor.count}")
                         }
-                        //if (cursor.count == 1) {
+                        if (cursor.count == 1) {
                             cursor.moveToFirst()
                             contentUri =
                                 ContentUris.withAppendedId(audioCollection, cursor.getLong(0))
-                        //}
+                        }
                     }
                 }catch (ex: Exception) {
                     Log.d("receiveFile", "${ex.message}(file=$filePath)")
@@ -973,104 +972,117 @@ class WifiSyncService : Service() {
                     filePath
                 )
             )
-            try{
-                var cursor: Cursor? = null
+            var cursor: Cursor? = null
+            try {
+                cursor = applicationContext.contentResolver.query(
+                    playListCollection,
+                    arrayOf(
+                        MediaStore.Audio.Playlists._ID,
+                        MediaStore.Audio.Playlists.RELATIVE_PATH,
+                        MediaStore.Audio.Playlists.DISPLAY_NAME
+                    ),
+                    "${MediaStore.Audio.Playlists.RELATIVE_PATH} = ? AND ${MediaStore.Audio.Playlists.DISPLAY_NAME} = ?",
+                    arrayOf(path, playlistname),
+                    null,
+                    null
+                )
+            } catch (e: Exception){
+                Log.d("SQLite Error", e.stackTraceToString())
+                return
+            }
+            if (cursor != null) {
                 try {
-                    cursor = applicationContext.contentResolver.query(
-                        playListCollection,
-                        arrayOf(
-                            MediaStore.Audio.Playlists._ID,
-                            MediaStore.Audio.Playlists.RELATIVE_PATH,
-                            MediaStore.Audio.Playlists.DISPLAY_NAME
-                        ),
-                        "${MediaStore.Audio.Playlists.RELATIVE_PATH} = ? AND ${MediaStore.Audio.Playlists.DISPLAY_NAME} = ?",
-                        arrayOf(path, playlistname),
-                        null,
-                        null
-                    )
-                } catch (e: Exception){
-                    Log.d("SQLite Error", e.stackTraceToString())
+                    if (WifiSyncServiceSettings.debugMode) {
+                        Log.d("receivePlaylist", "cursor.count:${cursor.count}")
+                    }
+                    if (cursor.count == 1) {
+                        cursor.moveToFirst()
+                        contentUri =
+                            ContentUris.withAppendedId(playListCollection, cursor.getLong(0))
+                    }
+                } catch (e: Exception) {
+                    Log.d("receivePlayList", e.message!!)
+                    Log.d("receivePlayList", e.stackTraceToString())
                     return
                 }
-                if (cursor != null) {
-                    try {
-                        //if (cursor.count == 1) {
-                            cursor.moveToFirst()
-                            contentUri =
-                                ContentUris.withAppendedId(playListCollection, cursor.getLong(0))
-                        //}
-                    } catch (e: Exception) {
-                        Log.d("receivePlayList", e.message!!)
-                        Log.d("receivePlayList", e.stackTraceToString())
-                        return
-                    }
-                    cursor.close()
-                }
+                cursor.close()
+            }
 
-                val buffer = arrayOf(ByteArray(socketTextReadBufferLength), ByteArray(socketTextReadBufferLength))
-                val readCount = IntArray(2)
-                val waitRead = AutoResetEvent(false)
-                val waitWrite = AutoResetEvent(true)  // original
+            val buffer = ByteArray(socketTextReadBufferLength)
+            //val buffer = arrayOf(ByteArray(socketTextReadBufferLength), ByteArray(socketTextReadBufferLength))
+            var readCount: Int
+            //val readCount = IntArray(2)
+            //val waitRead = AutoResetEvent(false)
+            //val waitWrite = AutoResetEvent(true)  // original
 
-                val values = ContentValues().apply {
-                    put(MediaStore.Audio.Playlists.RELATIVE_PATH, path)
-                    put(MediaStore.Audio.Playlists.DISPLAY_NAME, playlistname)
-                }
-                if (mymetypebase.equals("m3u", ignoreCase = true)) {
-                    values.put(MediaStore.Audio.Playlists.MIME_TYPE, "audio/x-mpegurl")
-                } else if (mymetypebase.equals("m3u8", ignoreCase = true)) {
-                    values.put(
-                        MediaStore.Audio.Playlists.MIME_TYPE,
-                        "application/vnd.apple.mpegurl"
-                    )
-                } else if (mymetypebase.equals("wpl", ignoreCase = true)) {
-                    values.put(
-                        MediaStore.Audio.Playlists.MIME_TYPE,
-                        "application/vnd.ms-wpl"
-                    )
-                /*} else if (mymetypebase.equals("pla", ignoreCase = true)) {
-                    values.put(
-                        MediaStore.Audio.Playlists.MIME_TYPE,
-                        "audio/x-mpegurl"
-                    )*/
-                }
+            val values = ContentValues().apply {
+                put(MediaStore.Audio.Playlists.RELATIVE_PATH, path)
+                put(MediaStore.Audio.Playlists.DISPLAY_NAME, playlistname)
+            }
+            if (mymetypebase.equals("m3u", ignoreCase = true)) {
+                values.put(MediaStore.Audio.Playlists.MIME_TYPE, "audio/x-mpegurl")
+            } else if (mymetypebase.equals("m3u8", ignoreCase = true)) {
+                values.put(
+                    MediaStore.Audio.Playlists.MIME_TYPE,
+                    "application/vnd.apple.mpegurl"
+                )
+            } else if (mymetypebase.equals("wpl", ignoreCase = true)) {
+                values.put(
+                    MediaStore.Audio.Playlists.MIME_TYPE,
+                    "application/vnd.ms-wpl"
+                )
+            /*} else if (mymetypebase.equals("pla", ignoreCase = true)) {
+                values.put(
+                    MediaStore.Audio.Playlists.MIME_TYPE,
+                    "audio/x-mpegurl"
+                )*/
+            }
 
-                var os: OutputStream? = null
-                try {
-                    if (contentUri != null) {
-                        if(File(this.getPathFromUri(applicationContext, contentUri)).exists()) {
-                            (application as WifiSyncApp).update(contentUri)
-                            os = contentResolver.openOutputStream(contentUri, "wt")!!
-                        } else {
-                            contentUri = contentResolver.insert(playListCollection, values)
-                            os = contentResolver.openOutputStream(contentUri!!, "wt")!!
-                        }
+            var os: OutputStream? = null
+            try {
+                if (contentUri != null) {
+                    if(File(this.getPathFromUri(applicationContext, contentUri)).exists()) {
+                        (application as WifiSyncApp).update(contentUri)
+                        os = contentResolver.openOutputStream(contentUri, "wt")!!
                     } else {
                         contentUri = contentResolver.insert(playListCollection, values)
+                        if (WifiSyncServiceSettings.debugMode) {
+                            Log.d("receivePlaylist", "insert(uri):${contentUri}")
+                            Log.d("receivePlaylist", "insert(file):${filePath}")
+                        }
                         os = contentResolver.openOutputStream(contentUri!!, "wt")!!
                     }
-
-                    os.use { fs: OutputStream ->
-                        writeString(syncStatusOK)
-                        flushWriter()
-                        val thread = Thread(
-                            ReceiveFileReceiveLoop(
-                                fileLength,
-                                buffer,
-                                readCount,
-                                waitRead,
-                                waitWrite,
-                                socketTextReadBufferLength
-                            )
-                        )
-                        thread.start()
-                        writeReceiveFile(fs, buffer, waitRead, waitWrite, readCount, thread)
-                    }
-                }finally {
-                    os?.close()
+                } else {
+                    contentUri = contentResolver.insert(playListCollection, values)
+                    os = contentResolver.openOutputStream(contentUri!!, "wt")!!
                 }
-            }finally{
-                contentUri = null
+
+                os.use { fs: OutputStream ->
+                    writeString(syncStatusOK)
+                    flushWriter()
+                    var readLength: Long = fileLength
+                    while(readLength > 0){
+                        readCount = readArray(buffer, socketTextReadBufferLength)
+                        fs.write(buffer, 0, readCount)
+                        readLength -= readCount.toLong()
+                    }
+                    /*
+                    val thread = Thread(
+                        ReceiveFileReceiveLoop(
+                            fileLength,
+                            buffer,
+                            readCount,
+                            waitRead,
+                            waitWrite,
+                            socketTextReadBufferLength
+                        )
+                    )
+                    thread.start()
+                    writeReceiveFile(fs, buffer, waitRead, waitWrite, readCount, thread)
+                     */
+                }
+            }finally {
+                os?.close()
             }
             writeString(syncStatusOK)
             flushWriter()
@@ -1161,12 +1173,12 @@ class WifiSyncService : Service() {
             val name = filePath.substring(separatorIndex)
             writeString(name)
             flushWriter()
-            val fileLength = storage!!.getLength(filePath)
-            writeLong(fileLength)
-            flushWriter()
             var status: String = syncStatusOK
             try {
                 storage!!.openReadStream(filePath).use { fs ->
+                    val fileLength = storage!!.getLength(filePath)
+                    writeLong(fileLength)
+                    flushWriter()
                     var readLength = 0
                     val buffer = ByteArray(65536)
                     while(fs.read(buffer, 0, 65536).also {readLength = it} > 0){

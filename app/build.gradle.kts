@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
+
 plugins {
     // Existing plugins
    id("com.android.application")
@@ -53,11 +55,13 @@ android {
     kotlinOptions {
         jvmTarget = "19"
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
-    }
 }
 
+composeCompiler {
+    featureFlags = setOf(
+        ComposeFeatureFlag.StrongSkipping
+    )
+}
 // Javaコンパイル時
 tasks.withType<JavaCompile> {
     options.compilerArgs.plus("-Xlint:unchecked")

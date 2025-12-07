@@ -66,6 +66,9 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
 
     protected fun getMusicFiles() {
         getMusicFilesThread = Thread(Runnable {
+            if (WifiSyncServiceSettings.debugMode) {
+                Log.d("getMusicFiles", "getMusicFiles start.")
+            }
             val sm = this.getSystemService(StorageManager::class.java)
             val svl = sm.storageVolumes
             for (sv in svl) {
@@ -76,6 +79,9 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                     val path = "${sv.directory!!.absolutePath}/Music/"
                     searchFilesInDirectory(File(path))
                 }
+            }
+            if (WifiSyncServiceSettings.debugMode) {
+                Log.d("getMusicFiles", "getMusicFiles end.")
             }
         })
     }
