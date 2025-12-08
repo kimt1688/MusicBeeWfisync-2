@@ -41,6 +41,8 @@ import kim.tkland.musicbeewifisync.ErrorHandler.logError
 import kim.tkland.musicbeewifisync.ErrorHandler.logInfo
 import kim.tkland.musicbeewifisync.WifiSyncService.Companion.syncProgressMessage
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.runInterruptible
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.DataInputStream
@@ -63,6 +65,8 @@ import java.net.Socket
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.URLDecoder
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.jvm.java
 import kotlin.toString
 
@@ -1180,25 +1184,37 @@ class WifiSyncService : Service() {
                     writeLong(fileLength)
                     flushWriter()
                     var readLength = 0
-                    val buffer = ByteArray(65536)
-                    while(fs.read(buffer, 0, 65536).also {readLength = it} > 0){
+                    val buffer = ByteArray(65535)
+                    while(fs.read(buffer, 0, 8192).also {readLength = it} > 0){
                         writeArray(buffer, readLength)
+                        //socketOutputStream!!.write(buffer, 0, readLength)
                     }
+                    flushWriter()
+                    //socketOutputStream!!.flush()
                     fs.close()
                 }
+                writeString(status)
+                flushWriter()
             } catch (ex: Exception) {
                 if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
+                    if (WifiSyncServiceSettings.debugMode) {
+                        logInfo("sendFile", "SocketException")
+                    }
                     throw ex
                 }
-                if (FileNotFoundException::class.java.isAssignableFrom(ex.javaClass)){
+                if (FileNotFoundException::class.java.isAssignableFrom(ex.javaClass)) {
+                    if (WifiSyncServiceSettings.debugMode) {
+                        logInfo("sendFile", "FileNotFoundException")
+                    }
                     writeLong(0)
                     flushWriter()
                 }
                 status = "${syncStatusFAIL} ${ex.message}"
-            } finally {
-                flushWriter()
                 writeString(status)
                 flushWriter()
+                if (WifiSyncServiceSettings.debugMode) {
+                    logInfo("sendFile", "status=$status")
+                }
             }
         }
 

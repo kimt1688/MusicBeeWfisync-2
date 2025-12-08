@@ -123,8 +123,8 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
         var isSyncToPlaycountsEnabled by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_POWERAMP || WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) }
         var isSyncToSkipCountsEnabled by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) }
         var isSyncToRatingEnabled by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_POWERAMP || WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) }
-        var isSyncToPlaylistsEnabled by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_POWERAMP || WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) }
-        //var isSyncToPlaylistsEnabled by remember { mutableStateOf(false) }
+        //var isSyncToPlaylistsEnabled by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_POWERAMP || WifiSyncServiceSettings.reverseSyncPlayer == WifiSyncServiceSettings.PLAYER_GONEMAD) }
+        var isSyncToPlaylistsEnabled by remember { mutableStateOf(false) }
 
         isFullSync.value = true
         appBarTitle.value = getString(R.string.app_name)
@@ -372,8 +372,8 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                                                     isSyncToPlaycountsEnabled = true
                                                     isSyncToSkipCountsEnabled = false
                                                     isSyncToRatingEnabled = true
-                                                    isSyncToPlaylistsEnabled = true
-                                                    //isSyncToPlaylistsEnabled = false
+                                                    //isSyncToPlaylistsEnabled = true
+                                                    isSyncToPlaylistsEnabled = false
                                                     WifiSyncServiceSettings.reverseSyncPlayCounts = isSyncToPlaycounts
                                                     WifiSyncServiceSettings.reverseSyncSkipCounts = false
                                                     WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatings
@@ -387,8 +387,8 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                                                     isSyncToPlaycountsEnabled = true
                                                     isSyncToSkipCountsEnabled = true
                                                     isSyncToRatingEnabled = true
-                                                    isSyncToPlaylistsEnabled = true
-                                                    //isSyncToPlaylistsEnabled = false
+                                                    //isSyncToPlaylistsEnabled = true
+                                                    isSyncToPlaylistsEnabled = false
                                                     WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatings
                                                     WifiSyncServiceSettings.reverseSyncPlayCounts = isSyncToPlaycounts
                                                     WifiSyncServiceSettings.reverseSyncSkipCounts = isSyncToSkipCounts
@@ -435,8 +435,8 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                                                 isSyncToPlaycountsEnabled = true
                                                 isSyncToSkipCountsEnabled = false
                                                 isSyncToRatingEnabled = true
-                                                isSyncToPlaylistsEnabled = true
-                                                //isSyncToPlaylistsEnabled = false
+                                                //isSyncToPlaylistsEnabled = true
+                                                isSyncToPlaylistsEnabled = false
                                                 WifiSyncServiceSettings.reverseSyncPlayCounts = isSyncToPlaycounts
                                                 WifiSyncServiceSettings.reverseSyncSkipCounts = false
                                                 WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatings
@@ -450,8 +450,8 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                                                 isSyncToPlaycountsEnabled = true
                                                 isSyncToSkipCountsEnabled = true
                                                 isSyncToRatingEnabled = true
-                                                isSyncToPlaylistsEnabled = true
-                                                //isSyncToPlaylistsEnabled = false
+                                                //isSyncToPlaylistsEnabled = true
+                                                isSyncToPlaylistsEnabled = false
                                                 WifiSyncServiceSettings.reverseSyncRatings = isSyncToRatings
                                                 WifiSyncServiceSettings.reverseSyncPlayCounts = isSyncToPlaycounts
                                                 WifiSyncServiceSettings.reverseSyncSkipCounts = isSyncToSkipCounts
