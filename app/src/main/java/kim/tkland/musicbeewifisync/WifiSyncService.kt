@@ -1183,18 +1183,15 @@ class WifiSyncService : Service() {
                     val fileLength = storage!!.getLength(filePath)
                     writeLong(fileLength)
                     flushWriter()
-                    var readLength = 0
+                    var readLength = -1
                     val buffer = ByteArray(65535)
-                    while(fs.read(buffer, 0, 8192).also {readLength = it} > 0){
+                    while(fs.read(buffer, 0, buffer.size).also {readLength = it} > 0){
+                        Thread.sleep(50)
                         writeArray(buffer, readLength)
-                        //socketOutputStream!!.write(buffer, 0, readLength)
                     }
                     flushWriter()
-                    //socketOutputStream!!.flush()
                     fs.close()
                 }
-                writeString(status)
-                flushWriter()
             } catch (ex: Exception) {
                 if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
                     if (WifiSyncServiceSettings.debugMode) {
@@ -1210,6 +1207,7 @@ class WifiSyncService : Service() {
                     flushWriter()
                 }
                 status = "${syncStatusFAIL} ${ex.message}"
+            } finally {
                 writeString(status)
                 flushWriter()
                 if (WifiSyncServiceSettings.debugMode) {
