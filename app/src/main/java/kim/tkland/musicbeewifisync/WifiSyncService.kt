@@ -1186,7 +1186,7 @@ class WifiSyncService : Service() {
                     var readLength = -1
                     val buffer = ByteArray(65535)
                     while(fs.read(buffer, 0, buffer.size).also {readLength = it} > 0){
-                        Thread.sleep(50)
+                        Thread.sleep(5)
                         writeArray(buffer, readLength)
                     }
                     flushWriter()

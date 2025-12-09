@@ -158,28 +158,27 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
                 if (stats.exists()) {
                     if (uriStr.isNullOrEmpty()) {
-                        showDialog.value = true
-                        StatsAlertDialog(showDialog = showDialog) {
-                            setContent {
-                                val viewModel: WifiSyncViewModel = viewModel()
-                                getMusicFiles()
-                                viewModel.setValues(
-                                    getMusicFilesThread,
-                                    getString(R.string.progressDialogMessage)
-                                )
-                                runBlocking {
-                                    setContent {
-                                        CreateProgressDialog(viewModel)
-                                    }
-                                }
-                                runBlocking {
-                                    launcher.launch(setLaunchIntent())
-                                    //processGMMPStatsXML()
-                                    setContent {
-                                        FirstSettingView()
-                                    }
-                                }
-                            }
+                        //showDialog.value = true
+                        launcher.launch(setLaunchIntent())
+                    }
+                }
+
+                setContent {
+                    val viewModel: WifiSyncViewModel = viewModel()
+                    getMusicFiles()
+                    viewModel.setValues(
+                        getMusicFilesThread,
+                        getString(R.string.progressDialogMessage)
+                    )
+                    runBlocking {
+                        setContent {
+                            CreateProgressDialog(viewModel)
+                        }
+                    }
+                    runBlocking {
+                        //processGMMPStatsXML()
+                        setContent {
+                            FirstSettingView()
                         }
                     }
                 }
