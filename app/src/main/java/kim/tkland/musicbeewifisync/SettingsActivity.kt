@@ -175,12 +175,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             CreateProgressDialog(viewModel)
                         }
                     }
-                    runBlocking {
-                        //processGMMPStatsXML()
-                        setContent {
-                            FirstSettingView()
-                        }
-                    }
+                    FirstSettingView()
                 }
             } else {
                 OptionSettingView()

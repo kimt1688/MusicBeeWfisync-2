@@ -817,7 +817,7 @@ class WifiSyncService : Service() {
             val waitWrite = AutoResetEvent(true)
             var cursor: Cursor? = null
             if (WifiSyncServiceSettings.debugMode) {
-                Log.i("receiveFile", "Receive: $filePath")
+                logInfo("receiveFile", "Receive: $filePath")
             }
             try {
                 val contentResolver = applicationContext.contentResolver
@@ -871,7 +871,7 @@ class WifiSyncService : Service() {
                         "")
                     if (cursor != null) {
                         if (WifiSyncServiceSettings.debugMode) {
-                            Log.d("receiveFile", "cursor.count:${cursor.count}")
+                            logInfo("receiveFile", "cursor.count:${cursor.count}")
                         }
                         if (cursor.count == 1) {
                             cursor.moveToFirst()
@@ -880,7 +880,7 @@ class WifiSyncService : Service() {
                         }
                     }
                 }catch (ex: Exception) {
-                    Log.d("receiveFile", "${ex.message}(file=$filePath)")
+                    logInfo("receiveFile", "${ex.message}(file=$filePath)")
                 } finally {
                     cursor?.close()
                 }
@@ -893,8 +893,8 @@ class WifiSyncService : Service() {
                         contentUri =
                             applicationContext.contentResolver.insert(audioCollection, values)
                         if (WifiSyncServiceSettings.debugMode) {
-                            Log.d("receiveFile", "insert(uri):${contentUri}")
-                            Log.d("receiveFile", "insert(file):${filePath}")
+                            logInfo("receiveFile", "insert(uri):${contentUri}")
+                            logInfo("receiveFile", "insert(file):${filePath}")
                         }
                         os = contentResolver.openOutputStream(contentUri!!, "wt")!!
                     }
@@ -962,12 +962,12 @@ class WifiSyncService : Service() {
         @SuppressLint("Range")
         private fun receivePlaylist(filePath: String, fileLength: Long, fileDateModified: Long) {
             val playListCollection = MediaStore.Audio.Playlists.getContentUri(MediaStore.getExternalVolumeNames(context).toTypedArray()[WifiSyncServiceSettings.deviceStorageIndex - 1])
-            var playlistname = File(filePath).name
+            val playlistname = File(filePath).name
             val mymetypebase = File(filePath).extension
             val path = File(filePath).parent!!.plus("/")
             var contentUri: Uri? = null
             if (WifiSyncServiceSettings.debugMode) {
-                Log.i("receivePlaylist", "Receive: $filePath")
+                logInfo("receivePlaylist", "Receive: $filePath")
             }
 
             syncProgressMessage.set(
@@ -997,7 +997,7 @@ class WifiSyncService : Service() {
             if (cursor != null) {
                 try {
                     if (WifiSyncServiceSettings.debugMode) {
-                        Log.d("receivePlaylist", "cursor.count:${cursor.count}")
+                        logInfo("receivePlaylist", "cursor.count:${cursor.count}")
                     }
                     if (cursor.count == 1) {
                         cursor.moveToFirst()
@@ -1013,11 +1013,7 @@ class WifiSyncService : Service() {
             }
 
             val buffer = ByteArray(socketTextReadBufferLength)
-            //val buffer = arrayOf(ByteArray(socketTextReadBufferLength), ByteArray(socketTextReadBufferLength))
             var readCount: Int
-            //val readCount = IntArray(2)
-            //val waitRead = AutoResetEvent(false)
-            //val waitWrite = AutoResetEvent(true)  // original
 
             val values = ContentValues().apply {
                 put(MediaStore.Audio.Playlists.RELATIVE_PATH, path)
@@ -1035,11 +1031,6 @@ class WifiSyncService : Service() {
                     MediaStore.Audio.Playlists.MIME_TYPE,
                     "application/vnd.ms-wpl"
                 )
-            /*} else if (mymetypebase.equals("pla", ignoreCase = true)) {
-                values.put(
-                    MediaStore.Audio.Playlists.MIME_TYPE,
-                    "audio/x-mpegurl"
-                )*/
             }
 
             var os: OutputStream? = null
@@ -1051,8 +1042,8 @@ class WifiSyncService : Service() {
                     } else {
                         contentUri = contentResolver.insert(playListCollection, values)
                         if (WifiSyncServiceSettings.debugMode) {
-                            Log.d("receivePlaylist", "insert(uri):${contentUri}")
-                            Log.d("receivePlaylist", "insert(file):${filePath}")
+                            logInfo("receivePlaylist", "insert(uri):${contentUri}")
+                            logInfo("receivePlaylist", "insert(file):${filePath}")
                         }
                         os = contentResolver.openOutputStream(contentUri!!, "wt")!!
                     }
@@ -1070,20 +1061,6 @@ class WifiSyncService : Service() {
                         fs.write(buffer, 0, readCount)
                         readLength -= readCount.toLong()
                     }
-                    /*
-                    val thread = Thread(
-                        ReceiveFileReceiveLoop(
-                            fileLength,
-                            buffer,
-                            readCount,
-                            waitRead,
-                            waitWrite,
-                            socketTextReadBufferLength
-                        )
-                    )
-                    thread.start()
-                    writeReceiveFile(fs, buffer, waitRead, waitWrite, readCount, thread)
-                     */
                 }
             }finally {
                 os?.close()

@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import kim.tkland.musicbeewifisync.ErrorHandler.logInfo
 import java.io.File
 
 abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppCompatActivity() {
@@ -67,7 +68,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
     protected fun getMusicFiles() {
         getMusicFilesThread = Thread(Runnable {
             if (WifiSyncServiceSettings.debugMode) {
-                Log.d("getMusicFiles", "getMusicFiles start.")
+                logInfo("getMusicFiles", "getMusicFiles start.")
             }
             val sm = this.getSystemService(StorageManager::class.java)
             val svl = sm.storageVolumes
@@ -81,7 +82,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                 }
             }
             if (WifiSyncServiceSettings.debugMode) {
-                Log.d("getMusicFiles", "getMusicFiles end.")
+                logInfo("getMusicFiles", "getMusicFiles end.")
             }
         })
     }
@@ -105,6 +106,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                         null,
                         null
                     )
+                    logInfo("getMusicFiles", "scanFile:${f.path}")
                 }
             }
         }
