@@ -42,13 +42,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun MusicBeeWifiSyncTopBar(
     title: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(
         containerColor = colorResource(R.color.colorPrimary),
-        //colorOnContainer = colorResource(white),
         titleContentColor = colorResource(white),
         navigationIconContentColor = colorResource(white),
         actionIconContentColor = colorResource(white),
