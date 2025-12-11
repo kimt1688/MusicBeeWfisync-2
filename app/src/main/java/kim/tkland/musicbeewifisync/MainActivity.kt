@@ -50,6 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 class MainActivity() : WifiSyncStartSyncBaseActivity() {
     var initialReverseSyncPlayer = mutableIntStateOf(2)
     private var serverStatusThread: Thread? = null
+    private var serverStatus = mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // enableEdgeToEdge()
@@ -81,6 +82,8 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
         } else {
             setContent {
                 CustomView()
+                // TODO Server Status check
+                checkServerStatus()
             }
         }
 
@@ -484,9 +487,8 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                 }
 
                 Row(modifier = Modifier.padding(top = 15.dp)) {
-                    val status = checkServerStatus()
                     Text(
-                        text = status,
+                        text = serverStatus.value,
                         color = Color(getColor(R.color.colorError)),
                         fontSize = 20.sp
                     )
@@ -526,8 +528,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
         return true
     }
 
-    private fun checkServerStatus(): String {
-        var returnValue = ""
+    private fun checkServerStatus() {
         serverStatusThread = Thread {
             try {
                 var statusDisplayed = false
@@ -545,7 +546,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                     }
                     if (!statusDisplayed) {
                         runOnUiThread {
-                            returnValue = getString(R.string.errorServerNotFound)
+                            serverStatus.value = getString(R.string.errorServerNotFound)
                         }
                         statusDisplayed = true
                     }
@@ -556,7 +557,6 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
             serverStatusThread = null
         }
         serverStatusThread!!.start()
-        return returnValue
     }
 
     override fun onPreviewButtonClick() {
