@@ -320,7 +320,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     }
 
     @Composable
-    private fun showErrorDialog1(showErrorDialog1: MutableState<Boolean>, newIPAddressState: TextFieldState) {
+    private fun showErrorDialog1(showErrorDialog1: MutableState<Boolean>, newIPAddressState: TextFieldState, isFirst: Boolean) {
         val openAlertDialog = remember { mutableStateOf(showErrorDialog1.value) }
 
         when {
@@ -334,7 +334,11 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             showErrorDialog1.value = false
                             openAlertDialog.value = false
                             setContent {
-                                OptionSettingView(newIPAddressState)
+                                if (isFirst) {
+                                    FirstSettingView(newIPAddressState)
+                                } else {
+                                    OptionSettingView(newIPAddressState)
+                                }
                             }
                         }
                     ) {
@@ -347,7 +351,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     }
 
     @Composable
-    private fun showErrorDialog2(showErrorDialog2: MutableState<Boolean>, newIPAddressState: TextFieldState) {
+    private fun showErrorDialog2(showErrorDialog2: MutableState<Boolean>, newIPAddressState: TextFieldState, isFirst: Boolean) {
         val openAlertDialog = remember { mutableStateOf(showErrorDialog1.value) }
 
         when {
@@ -361,7 +365,11 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             showErrorDialog2.value = false
                             openAlertDialog.value = false
                             setContent {
-                                OptionSettingView(newIPAddressState)
+                                if (isFirst) {
+                                    FirstSettingView(newIPAddressState)
+                                } else {
+                                    OptionSettingView(newIPAddressState)
+                                }
                             }
                         }
                     ) {
@@ -523,11 +531,11 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             runOnUiThread {
                 if (serverIPAddress == null) {
                     setContent {
-                        ShowErrorDialog(showErrorDialog1, true, newIPAddressState)
+                        ShowErrorDialog(showErrorDialog1, true, newIPAddressState, true)
                     }
                 } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
                     setContent {
-                        ShowErrorDialog(showErrorDialog2, true, newIPAddressState)
+                        ShowErrorDialog(showErrorDialog2, true, newIPAddressState, true)
                     }
                 } else {
                     WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
@@ -560,11 +568,11 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             runOnUiThread {
                 if (serverIPAddress.isEmpty()) {
                     setContent {
-                        ShowErrorDialog(showErrorDialog1, true, newIPAddressState)
+                        ShowErrorDialog(showErrorDialog1, true, newIPAddressState, false)
                     }
                 } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
                     setContent {
-                        ShowErrorDialog(showErrorDialog2, true, newIPAddressState)
+                        ShowErrorDialog(showErrorDialog2, true, newIPAddressState, false)
                     }
                 } else {
                     WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
@@ -585,7 +593,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     }
 
     @Composable
-    private fun ShowErrorDialog(dialog: MutableState<Boolean>, v: Boolean, newIPAddressState: TextFieldState) {
+    private fun ShowErrorDialog(dialog: MutableState<Boolean>, v: Boolean, newIPAddressState: TextFieldState, isFirst: Boolean) {
         // A helper to show dialogs. You'll need to manage the state for this.
         // For simplicity, this is just a placeholder.
         // In Compose, you'd update a mutableStateOf<Boolean> to show/hide an AlertDialog.
@@ -598,11 +606,11 @@ class SettingsActivity : WifiSyncBaseActivity("") {
             showDialog -> showDialog.value = v
             showErrorDialog1 -> {
                 dialog.value = v
-                showErrorDialog1(dialog, newIPAddressState)
+                showErrorDialog1(dialog, newIPAddressState, isFirst)
             }
             showErrorDialog2 -> {
                 dialog.value = v
-                showErrorDialog2(dialog, newIPAddressState)
+                showErrorDialog2(dialog, newIPAddressState, isFirst)
             }
         }
     }

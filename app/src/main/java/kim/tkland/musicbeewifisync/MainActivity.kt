@@ -82,7 +82,6 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
         } else {
             setContent {
                 CustomView()
-                // TODO Server Status check
                 checkServerStatus()
             }
         }
