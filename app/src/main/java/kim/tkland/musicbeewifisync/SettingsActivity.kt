@@ -31,6 +31,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -48,6 +51,8 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -64,6 +69,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -119,6 +125,8 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         initialSetup = WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()
 
         setContent {
+            val newIPAddressState = rememberTextFieldState("", TextRange(0))
+
             if (initialSetup) {
                 if (isfirst) {
                     val intent = Intent(ACTION_REQUEST_MANAGE_MEDIA)
@@ -165,6 +173,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
                 setContent {
                     val viewModel: WifiSyncViewModel = viewModel()
+
                     getMusicFiles()
                     viewModel.setValues(
                         getMusicFilesThread,
@@ -175,10 +184,10 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             CreateProgressDialog(viewModel)
                         }
                     }
-                    FirstSettingView()
+                    FirstSettingView(newIPAddressState)
                 }
             } else {
-                OptionSettingView()
+                OptionSettingView(newIPAddressState)
             }
         }
     }
@@ -310,9 +319,65 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         }
     }
 
+    @Composable
+    private fun showErrorDialog1(showErrorDialog1: MutableState<Boolean>, newIPAddressState: TextFieldState) {
+        val openAlertDialog = remember { mutableStateOf(showErrorDialog1.value) }
+
+        when {
+            openAlertDialog.value -> AlertDialog(
+                onDismissRequest = { showErrorDialog1.value = false },
+                title = { Text(getString(R.string.syncErrorHeader)) },
+                text = { Text(getString(R.string.errorServerNotFound)) },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showErrorDialog1.value = false
+                            openAlertDialog.value = false
+                            setContent {
+                                OptionSettingView(newIPAddressState)
+                            }
+                        }
+                    ) {
+                        Text(getString(android.R.string.ok))
+                    }
+                },
+                dismissButton = null
+            )
+        }
+    }
+
+    @Composable
+    private fun showErrorDialog2(showErrorDialog2: MutableState<Boolean>, newIPAddressState: TextFieldState) {
+        val openAlertDialog = remember { mutableStateOf(showErrorDialog1.value) }
+
+        when {
+            openAlertDialog.value -> AlertDialog(
+                onDismissRequest = { showErrorDialog2.value = false },
+                title = { Text(getString(R.string.syncErrorHeader)) },
+                text = { Text(getString(R.string.errorLocateServerNoConfig)) },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showErrorDialog2.value = false
+                            openAlertDialog.value = false
+                            setContent {
+                                OptionSettingView(newIPAddressState)
+                            }
+                        }
+                    ) {
+                        Text(getString(android.R.string.ok))
+                    }
+                },
+                dismissButton = null
+            )
+        }
+    }
+
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun FirstSettingView() {
+    fun FirstSettingView(newIPAddressState: TextFieldState) {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
 
@@ -384,7 +449,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                         ),
                         onClick = {
                             setContent {
-                                PerformBottomBarButtonAction()
+                                PerformBottomBarButtonAction(newIPAddressState)
                             }
                         }
                     ) {
@@ -393,41 +458,6 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 }
             }
         ) { innerPadding ->
-            if (showErrorDialog1.value) {
-                AlertDialog(
-                    onDismissRequest = { showErrorDialog1.value = false },
-                    title = { Text(getString(R.string.syncErrorHeader)) },
-                    text = { Text(getString(R.string.errorServerNotFound)) },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                showErrorDialog1.value = false
-                            }
-                        ) {
-                            Text(getString(android.R.string.ok))
-                        }
-                    },
-                    dismissButton = null
-                )
-            }
-            if (showErrorDialog2.value) {
-                AlertDialog(
-                    onDismissRequest = { showErrorDialog2.value = false },
-                    title = { Text(getString(R.string.syncErrorHeader)) },
-                    text = { Text(getString(R.string.errorLocateServerNoConfig)) },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                showErrorDialog2.value = false
-                            }
-                        ) {
-                            Text(getString(android.R.string.ok))
-                        }
-                    },
-                    dismissButton = null
-                )
-            }
-
             Column(
                 modifier = Modifier
                     .background(Color(getColor(white)))
@@ -481,7 +511,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     }
 
     @Composable
-    private fun PerformBottomBarButtonAction() {
+    private fun PerformBottomBarButtonAction(newIPAddressState: TextFieldState) {
         val context = LocalContext.current
         // Your existing logic for when the bottom bar button is clicked
         // and permissions are granted
@@ -492,9 +522,13 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 WifiSyncService.getMusicBeeServerAddress(context, null)
             runOnUiThread {
                 if (serverIPAddress == null) {
-                    showErrorDialog(showErrorDialog1, true)
+                    setContent {
+                        ShowErrorDialog(showErrorDialog1, true, newIPAddressState)
+                    }
                 } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
-                    showErrorDialog(showErrorDialog2, true)
+                    setContent {
+                        ShowErrorDialog(showErrorDialog2, true, newIPAddressState)
+                    }
                 } else {
                     WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
                     WifiSyncServiceSettings.saveSettings(applicationContext)
@@ -513,7 +547,45 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         }
     }
 
-    private fun showErrorDialog(dialog: MutableState<Boolean>, v: Boolean) {
+    @Composable
+    private fun PerformBottomBarButtonActionOptionView(newIPAddressState: TextFieldState) {
+        val context = LocalContext.current
+        // Your existing logic for when the bottom bar button is clicked
+        // and permissions are granted
+        //WifiSyncServiceSettings.deviceStorageIndex = initialStorage.intValue
+        //WifiSyncServiceSettings.saveSettings(applicationContext)
+        val locateServerThread = Thread {
+            val serverIPAddress =
+                newIPAddressState.toString()
+            runOnUiThread {
+                if (serverIPAddress.isEmpty()) {
+                    setContent {
+                        ShowErrorDialog(showErrorDialog1, true, newIPAddressState)
+                    }
+                } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
+                    setContent {
+                        ShowErrorDialog(showErrorDialog2, true, newIPAddressState)
+                    }
+                } else {
+                    WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
+                    WifiSyncServiceSettings.saveSettings(applicationContext)
+                    val intent = Intent(context, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    startActivity(intent)
+                }
+            }
+        }
+        runBlocking {
+            val deferredResult = async {
+                locateServerThread.start()
+            }
+            deferredResult.await()
+        }
+    }
+
+    @Composable
+    private fun ShowErrorDialog(dialog: MutableState<Boolean>, v: Boolean, newIPAddressState: TextFieldState) {
         // A helper to show dialogs. You'll need to manage the state for this.
         // For simplicity, this is just a placeholder.
         // In Compose, you'd update a mutableStateOf<Boolean> to show/hide an AlertDialog.
@@ -524,14 +596,20 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         // dialogMessageState.value = message
         when (dialog) {
             showDialog -> showDialog.value = v
-            showErrorDialog1 -> showErrorDialog1.value = v
-            showErrorDialog2 -> showErrorDialog2.value = v
+            showErrorDialog1 -> {
+                dialog.value = v
+                showErrorDialog1(dialog, newIPAddressState)
+            }
+            showErrorDialog2 -> {
+                dialog.value = v
+                showErrorDialog2(dialog, newIPAddressState)
+            }
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun OptionSettingView() {
+    fun OptionSettingView(newIPAddressState: TextFieldState) {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
 
@@ -589,6 +667,36 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     scrollBehavior = scrollBehavior,
                 )
             },
+            bottomBar = {
+                Row(
+                    // Or a Compose Row
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(navigationBarPadding),
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(80.dp)
+                            .border(
+                                width = 2.dp, // 枠線の幅
+                                color = Color(getColor(white)), // 枠線の色
+                            ),
+                        shape = RectangleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(getColor(R.color.colorButtonBackground)),
+                            contentColor = Color(getColor(R.color.colorButtonTextEnabled))
+                        ),
+                        onClick = {
+                            setContent {
+                                PerformBottomBarButtonActionOptionView(newIPAddressState)
+                            }
+                        }
+                    ) {
+                        Text(getString(R.string.settingsLocate), fontSize = 24.sp)
+                    }
+                }
+            }
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -616,6 +724,23 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 ) {
                     CheckableRow(
                         text = applicationContext.getString(R.string.settingsDebugMode),
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .padding(start = 15.dp, end = 15.dp, top = 50.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                ) {
+                    TextField(
+                        state = newIPAddressState,
+                        label = { Text(applicationContext.getString(R.string.titleOfIPAddress)) },
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            disabledContainerColor = Color.White
+                        ),
                     )
                 }
             }

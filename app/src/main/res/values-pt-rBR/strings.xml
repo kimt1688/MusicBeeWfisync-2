@@ -102,5 +102,6 @@
     <string name="playlistDeletingMessage">Deleting playlists…</string>
     <string name="syncConfirmHeader">Confirm</string>
     <string name="deletePlaylists0">No playlists deleted.</string>
+    <string name="titleOfIPAddress">IP Address</string>
 
 </resources>

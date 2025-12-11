@@ -106,7 +106,9 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                         null,
                         null
                     )
-                    logInfo("getMusicFiles", "scanFile:${f.path}")
+                    if (WifiSyncServiceSettings.debugMode) {
+                        logInfo("getMusicFiles", "scanFile:${f.path}")
+                    }
                 }
             }
         }

@@ -101,6 +101,8 @@
     <string name="menuAllPlaylistsDeleteConfirm">Do you really want to delete all playlists?</string>
     <string name="playlistDeletingMessage">Deleting playlists…</string>
     <string name="syncConfirmHeader">Confirm</string>
+    <string name="titleOfIPAddress">IP Address</string>
+
 
     <!-- Strings used for fragments for navigation -->
 

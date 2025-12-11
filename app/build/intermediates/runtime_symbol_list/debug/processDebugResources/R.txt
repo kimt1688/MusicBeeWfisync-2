@@ -5836,6 +5836,7 @@ int string syncToSkipcounts 0x7f12018e
 int string syncToUsingPlayer 0x7f12018f
 int string tab 0x7f120190
 int string template_percent 0x7f120191
+int string titleOfIPAddress 0x7f12019e
 int string title_activity_delete_playlists 0x7f120192
 int string title_activity_settings 0x7f120193
 int string title_activity_settings2 0x7f120194

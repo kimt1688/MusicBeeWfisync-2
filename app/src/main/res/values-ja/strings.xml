@@ -101,6 +101,7 @@
     <string name="syncConfirmHeader">確認</string>
     <string name="deletePlaylists0">プレイリストは削除されませんでした</string>
     <string name="deletePlaylists1">1件削除されました</string>
+    <string name="titleOfIPAddress">IPアドレス</string>
 
     <!-- Strings used for fragments for navigation -->
 </resources>
