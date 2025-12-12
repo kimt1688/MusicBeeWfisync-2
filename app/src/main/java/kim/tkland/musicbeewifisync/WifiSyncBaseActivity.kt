@@ -49,7 +49,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
 
     var getMusicFilesThread = Thread()
 
-    var deleteAllPlaylistsThread = Thread()
+    // var deleteAllPlaylistsThread = Thread()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -199,6 +199,7 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
     @Composable
     abstract fun CustomView()
 
+    /*
     protected fun deleteAllPlaylists() {
         deleteAllPlaylistsThread = Thread(Runnable {
             val playListCollection = MediaStore.Audio.Playlists.getContentUri(
@@ -259,4 +260,5 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
             }
         })
     }
+     */
 }

@@ -88,6 +88,7 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
             }
         }
     }
+    /*
     @Composable
     fun ShowAllPlaylistsDialog() {
         if (showDeleteAllPlaylistsDialog.value) {
@@ -146,6 +147,7 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
             )
         }
     }
+     */
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -243,6 +245,7 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
         }
     }
 
+    /*
     fun showDeleteAllPlaylistsDialog() {
         setContent {
             val viewModel: WifiSyncViewModel = viewModel()
@@ -251,6 +254,7 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
         }
 
     }
+     */
 
 
     override fun onDestroy() {

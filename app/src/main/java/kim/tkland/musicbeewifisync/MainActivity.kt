@@ -140,7 +140,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                     expanded,
                     { newValue -> expanded = newValue},
                     { showFullScanDialog() },
-                    { showDeleteAllPlaylistsDialog() },
+                    //{ showDeleteAllPlaylistsDialog() },
                     isFullSync.value)
             },
             bottomBar = {

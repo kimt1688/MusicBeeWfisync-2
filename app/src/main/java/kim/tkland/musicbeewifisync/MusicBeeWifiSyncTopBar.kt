@@ -71,7 +71,7 @@ fun SyncScreenTopBar(
     expanded: Boolean,
     onExpandedChange: (Boolean)-> Unit,
     showFullScanDialog:()-> Unit,
-    showDeleteAllPlaylistsDialog: ()-> Unit,
+    // showDeleteAllPlaylistsDialog: ()-> Unit,
     isFullSync: Boolean)
 {
     val resources = LocalResources.current
@@ -225,6 +225,7 @@ fun SyncScreenTopBar(
                         showFullScanDialog()
                     }
                 )
+                /*
                 DropdownMenuItem(
                     text = { Text(resources.getString(R.string.menuAllPlaylistsDelete)) },
                     onClick = {
@@ -232,6 +233,7 @@ fun SyncScreenTopBar(
                         showDeleteAllPlaylistsDialog()
                     }
                 )
+                 */
                 DropdownMenuItem(
                     text = { Text(resources.getString(R.string.menuWifiSyncLog)) },
                     onClick = {
