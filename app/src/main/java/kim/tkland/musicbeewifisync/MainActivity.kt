@@ -574,6 +574,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                             runOnUiThread {
                                 if (serverStatusThread != null) {
                                     serverStatusThread = null
+                                    serverStatus.value = ""
                                     //findViewById<View>(R.id.syncServerStatus).visibility = View.GONE
                                 }
                             }

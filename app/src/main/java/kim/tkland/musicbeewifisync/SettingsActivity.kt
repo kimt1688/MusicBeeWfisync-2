@@ -564,7 +564,7 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         //WifiSyncServiceSettings.saveSettings(applicationContext)
         val locateServerThread = Thread {
             val serverIPAddress =
-                newIPAddressState.toString()
+                newIPAddressState.text.toString()
             runOnUiThread {
                 if (serverIPAddress.isEmpty()) {
                     setContent {
