@@ -1,53 +1,63 @@
 package kim.tkland.musicbeewifisync
 
+import android.R.attr.top
 import android.R.color.white
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.Icon
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
 
 class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     private var waitResultsThread: Thread? = null
@@ -64,91 +74,89 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         }
         waitResultsThread = Thread {
             try {
-                runOnUiThread {
-                    WifiSyncService.waitSyncResults.waitOne()
-                    val previewToData = WifiSyncService.syncToResults
-                    val previewFromData = WifiSyncService.syncFromResults
-                    if (mainWindow == null) {
-                        // ignore
-                    } else if (previewToData == null || previewFromData == null) {
-                        setContent {
-                            disableProceedSyncButton()
-                        }
-                        var errorMessageId = WifiSyncService.syncErrorMessageId.get()
-                        if (errorMessageId == 0) {
-                            errorMessageId = R.string.errorSyncNonSpecific
-                        }
-                        setContent {
-                            ShowErrorDialog(errorMessageId)
-                        }
+                WifiSyncService.waitSyncResults.waitOne()
+                val previewToData = WifiSyncService.syncToResults
+                val previewFromData = WifiSyncService.syncFromResults
+                if (mainWindow == null) {
+                    // ignore
+                } else if (previewToData == null || previewFromData == null) {
+                    setContent {
+                        disableProceedSyncButton()
+                    }
+                    var errorMessageId = WifiSyncService.syncErrorMessageId.get()
+                    if (errorMessageId == 0) {
+                        errorMessageId = R.string.errorSyncNonSpecific
+                    }
+                    setContent {
+                        ShowErrorDialog(errorMessageId)
+                    }
 
 
-                    } else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
+                } else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
+                    setContent {
+                        disableProceedSyncButton()
+                        ShowErrorMessageView(
+                            getString(R.string.title_activity_sync_preview),
+                            getString(R.string.syncPreviewNoResults),
+                            getColor(R.color.colorError)
+                        )
+                    }
+                } else {
+                    val previewToDataCount = previewToData.size
+                    val previewFromDataCount = previewFromData.size
+                    var okCount = 0
+                    var warningCount = 0
+                    var failedCount = 0
+                    previewToData.let {
+                        for (index in it.indices) {
+                            when (previewToData[index].alert.toInt()) {
+                                0 -> okCount += 1
+                                1 -> warningCount += 1
+                                2, 3 -> failedCount += 1
+                            }
+                        }
+                    }
+                    if (warningCount > 0) {
+                        val warningColor = getColor(R.color.colorWarning)
+                        val warningText = String.format(
+                            getString(R.string.reverseSyncWarnings),
+                        if (warningCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
+                            getString(R.string.reverseSyncFilesWarningN),
+                            warningCount
+                        ))
                         setContent {
-                            disableProceedSyncButton()
                             ShowErrorMessageView(
                                 getString(R.string.title_activity_sync_preview),
-                                getString(R.string.syncPreviewNoResults),
-                                getColor(R.color.colorError)
+                                warningText,
+                                warningColor
                             )
                         }
-                    } else {
-                        val previewToDataCount = previewToData.size
-                        val previewFromDataCount = previewFromData.size
-                        var okCount = 0
-                        var warningCount = 0
-                        var failedCount = 0
-                        previewToData.let {
-                            for (index in it.indices) {
-                                when (previewToData[index].alert.toInt()) {
-                                    0 -> okCount += 1
-                                    1 -> warningCount += 1
-                                    2, 3 -> failedCount += 1
-                                }
-                            }
-                        }
-                        if (warningCount > 0) {
-                            val warningColor = getColor(R.color.colorWarning)
-                            val warningText = String.format(
-                                getString(R.string.reverseSyncWarnings),
-                            if (warningCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
-                                getString(R.string.reverseSyncFilesWarningN),
-                                warningCount
-                            ))
-                            setContent {
-                                ShowErrorMessageView(
-                                    getString(R.string.title_activity_sync_preview),
-                                    warningText,
-                                    warningColor
-                                )
-                            }
-                        } else if (failedCount > 0) {
-                            val failedText = String.format(
-                                getString(R.string.reverseSyncFailed),
-                            if (failedCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
-                                getString(R.string.reverseSyncFilesWarningN),
-                                failedCount
-                            ))
-                            setContent {
-                                ShowErrorMessageView(
-                                    getString(R.string.title_activity_sync_preview),
-                                    failedText,
-                                    getColor(R.color.colorButtonTextEnabled)
-                                )
-                            }
-                        }
-                        if (previewToDataCount > 0 && previewFromDataCount == 0 && okCount == 0 && warningCount == 0) {
-                            setContent {
-                                disableProceedSyncButton()
-                            }
-                        }
+                    } else if (failedCount > 0) {
+                        val failedText = String.format(
+                            getString(R.string.reverseSyncFailed),
+                        if (failedCount == 1) getString(R.string.reverseSyncFilesWarning1) else String.format(
+                            getString(R.string.reverseSyncFilesWarningN),
+                            failedCount
+                        ))
                         setContent {
-                            CustomView(
-                                title = getString(R.string.title_activity_sync_preview),
-                                resultsToData = previewToData,
-                                resultsFromData = previewFromData
+                            ShowErrorMessageView(
+                                getString(R.string.title_activity_sync_preview),
+                                failedText,
+                                getColor(R.color.colorButtonTextEnabled)
                             )
                         }
+                    }
+                    if (previewToDataCount > 0 && previewFromDataCount == 0 && okCount == 0 && warningCount == 0) {
+                        setContent {
+                            disableProceedSyncButton()
+                        }
+                    }
+                    setContent {
+                        CustomView(
+                            title = getString(R.string.title_activity_sync_preview),
+                            resultsToData = previewToData,
+                            resultsFromData = previewFromData
+                        )
                     }
                 }
             } catch (_: InterruptedException) {
@@ -157,11 +165,44 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 ErrorHandler.logError("preview", ex)
             }
         }
-        waitResultsThread!!.start()
+          setContent {
+              ShowWaitResultsView()
+          }
+          waitResultsThread!!.start()
     }
     private fun requireContext(): Context {
         return applicationContext
     }
+
+    @Composable
+    fun ShowWaitResultsView() {
+        var expanded by remember { mutableStateOf(false) }
+
+        Scaffold(
+            topBar = {
+                ResultScreenTopBar(
+                    getString(R.string.title_activity_sync_preview),
+                    expanded,
+                    { newValue -> expanded = newValue },
+                )
+            },
+        ){ innerPadding ->
+            Box(
+                modifier = Modifier.padding(innerPadding)
+                    .padding(top = 120.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+                propagateMinConstraints = false
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.width(64.dp),
+                    color = Color(getColor(R.color.colorAccent)),
+                    trackColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                )
+            }
+        }
+    }
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -185,7 +226,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             },
             bottomBar = {
                 Row( // Or a Compose Row
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(navigationBarPadding)
                 ) {
                     Button(modifier = Modifier
@@ -196,7 +238,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             color = Color(getColor(white)), // 枠線の色
                         ),
                         enabled = isSyncButtonEnabled.value,
-                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        shape = RectangleShape,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(getColor(R.color.colorButtonBackground)),
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
@@ -223,8 +265,10 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 }
             }
         ) { innerPadding ->
-            Text(message,
-                modifier = Modifier.padding(top = 100.dp, start = 20.dp, end = 20.dp)
+            Text(
+                message,
+                modifier = Modifier
+                    .padding(top = 100.dp, start = 20.dp, end = 20.dp)
                     .padding(innerPadding)
                     .padding(statusBarPadding),
                 color = Color(color),
@@ -308,7 +352,8 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
             },
             bottomBar = {
                 Row( // Or a Compose Row
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(navigationBarPadding)
                 ) {
                     Button(modifier = Modifier
@@ -318,7 +363,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                             width = 2.dp, // 枠線の幅
                             color = Color(getColor(white)), // 枠線の色
                         ),
-                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        shape = RectangleShape,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(getColor(R.color.colorButtonBackground)),
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
@@ -416,9 +461,10 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         }
         LazyColumn (
             modifier =
-                Modifier.background(Color(getColor(white)))
-                        .padding(innerPadding)
-                        .padding(top = 3.dp),
+                Modifier
+                    .background(Color(getColor(white)))
+                    .padding(innerPadding)
+                    .padding(top = 3.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {

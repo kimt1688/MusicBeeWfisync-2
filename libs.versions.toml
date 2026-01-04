@@ -1,6 +1,6 @@
 [versions]
-kotlin = "2.1.10"
-androidGradlePlugin = "8.9.1"
+kotlin = "2.3.0"
+androidGradlePlugin = "8.13.2"
 [libraries]
 
 [plugins]

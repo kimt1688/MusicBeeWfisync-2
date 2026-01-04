@@ -68,7 +68,7 @@ import java.io.File
 
 
 class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
-    private var checkCount by mutableStateOf("")
+    private var checkCount = mutableStateOf("")
     private val isListChecked = mutableStateListOf<Boolean>(false)
     private val listFilename = mutableStateListOf<String>("")
     private val listFullPath = mutableStateListOf<String>("")
@@ -355,11 +355,11 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                     modifier = Modifier
                         .padding(top = 5.dp)
                         .fillMaxWidth()
-                ) { Text(text = checkCount, color = Color.Red, fontSize = 16.sp) }
+                ) { Text(text = checkCount.value, color = Color.Red, fontSize = 16.sp) }
                 showPlaylistsSelectedCount(
                     checkCount = "",
                     onCheckCountChange = { newCheckCountValue: String ->
-                        checkCount = newCheckCountValue
+                        checkCount.value = newCheckCountValue
                     }
                 )
                 LazyColumn(
@@ -385,7 +385,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                                                 showPlaylistsSelectedCount(
                                                     checkCount = "",
                                                     onCheckCountChange = { newCheckCountValue: String ->
-                                                        checkCount = newCheckCountValue
+                                                        checkCount.value = newCheckCountValue
                                                     }
                                                 )
                                             }
@@ -408,7 +408,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                                             showPlaylistsSelectedCount(
                                                 "",
                                                 { newCheckCountValue: String ->
-                                                    checkCount =
+                                                    checkCount.value =
                                                         newCheckCountValue // Also update here if showPlaylists modifies it
                                                 })
                                         }

@@ -15,8 +15,8 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 158
-        versionName = "3.1.8"
+        versionCode = 159
+        versionName = "3.1.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         targetSdk = 36
@@ -52,16 +52,16 @@ android {
         //viewBinding = true
         compose = true
     }
-    kotlinOptions {
-        jvmTarget = "19"
-    }
 }
 
+/*
 composeCompiler {
     featureFlags = setOf(
         ComposeFeatureFlag.StrongSkipping
     )
 }
+*/
+
 // Javaコンパイル時
 tasks.withType<JavaCompile> {
     options.compilerArgs.plus("-Xlint:unchecked")
@@ -71,7 +71,12 @@ tasks.withType<JavaCompile> {
 // Kotlinコンパイル時
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions {
-        freeCompilerArgs.set(listOf("-Xnon-local-break-continue"))
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_19)
+        // Keep your existing args
+        freeCompilerArgs.add("-Xnon-local-break-continue")
+
+        // ADD THIS LINE to disable Light Tree and use the standard PSI parser
+        freeCompilerArgs.add("-Xuse-fir-lt=false")
     }
 }
 
