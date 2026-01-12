@@ -4,24 +4,7 @@
             "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-70:/values-ldrtl-v17/values-ldrtl-v17.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\394f8cb73f85d79584647e7f6c8c2ca6\\transformed\\leanback-1.2.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
-                    "from": {
-                        "startLines": "2,3,4",
-                        "startColumns": "4,4,4",
-                        "startOffsets": "55,133,178",
-                        "endColumns": "77,44,46",
-                        "endOffsets": "128,173,220"
-                    },
-                    "to": {
-                        "startLines": "2,5,6",
-                        "startColumns": "4,4,4",
-                        "startOffsets": "55,410,455",
-                        "endColumns": "77,44,46",
-                        "endOffsets": "128,450,497"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\8af008180b4be7ebe89b88fe33cdb845\\transformed\\material-1.13.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\4735c322c97b616bef8caaa152237121\\transformed\\material-1.13.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -35,6 +18,23 @@
                         "startOffsets": "133,269",
                         "endColumns": "135,140",
                         "endOffsets": "264,405"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\0ff28e71f47a31088bb1aa862662b490\\transformed\\leanback-1.2.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
+                    "from": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,133,178",
+                        "endColumns": "77,44,46",
+                        "endOffsets": "128,173,220"
+                    },
+                    "to": {
+                        "startLines": "2,5,6",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,410,455",
+                        "endColumns": "77,44,46",
+                        "endOffsets": "128,450,497"
                     }
                 }
             ]

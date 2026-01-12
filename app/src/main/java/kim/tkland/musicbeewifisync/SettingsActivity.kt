@@ -168,23 +168,22 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     if (uriStr.isNullOrEmpty()) {
                         //showDialog.value = true
                         launcher.launch(setLaunchIntent())
+                        FirstSettingView(newIPAddressState)
                     }
                 }
 
-                setContent {
-                    val viewModel: WifiSyncViewModel = viewModel()
+                val viewModel: WifiSyncViewModel = viewModel()
 
-                    getMusicFiles()
-                    viewModel.setValues(
-                        getMusicFilesThread,
-                        getString(R.string.progressDialogMessage)
-                    )
-                    runBlocking {
-                        setContent {
-                            CreateProgressDialog(viewModel)
-                        }
+                getMusicFiles()
+                viewModel.setValues(
+                    getMusicFilesThread,
+                    getString(R.string.progressDialogMessage)
+                )
+                runBlocking {
+                    setContent {
+                        CreateProgressDialog(viewModel)
+                        FirstSettingView(newIPAddressState)
                     }
-                    FirstSettingView(newIPAddressState)
                 }
             } else {
                 OptionSettingView(newIPAddressState)
