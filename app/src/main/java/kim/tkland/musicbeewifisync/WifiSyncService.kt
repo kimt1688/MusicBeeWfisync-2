@@ -41,8 +41,6 @@ import kim.tkland.musicbeewifisync.ErrorHandler.logError
 import kim.tkland.musicbeewifisync.ErrorHandler.logInfo
 import kim.tkland.musicbeewifisync.WifiSyncService.Companion.syncProgressMessage
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.runInterruptible
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.DataInputStream
@@ -65,8 +63,6 @@ import java.net.Socket
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.URLDecoder
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 import kotlin.jvm.java
 import kotlin.toString
 
@@ -1149,6 +1145,9 @@ class WifiSyncService : Service() {
         @Throws(Exception::class)
         private fun sendFile() {
             val filePath = readString()
+            if (WifiSyncServiceSettings.debugMode) {
+                logInfo("sendFile", "Send: $filePath")
+            }
             readToEndOfCommand()
             val separatorIndex = filePath.lastIndexOf('/') + 1
             val name = filePath.substring(separatorIndex)

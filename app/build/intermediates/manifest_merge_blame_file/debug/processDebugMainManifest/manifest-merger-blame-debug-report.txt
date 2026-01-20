@@ -1,8 +1,8 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 3    package="kim.tkland.musicbeewifisync"
-4    android:versionCode="159"
-5    android:versionName="3.1.9" >
+4    android:versionCode="161"
+5    android:versionName="3.1.11" >
 6
 7    <uses-sdk
 8        android:minSdkVersion="31"
@@ -194,11 +194,11 @@
 104        </provider>
 105
 106        <activity
-106-->[androidx.compose.ui:ui-tooling-android:1.10.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b33b7b3de7ff4acf77564312d73dd683\transformed\ui-tooling\AndroidManifest.xml:23:9-25:39
+106-->[androidx.compose.ui:ui-tooling-android:1.10.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\5aef5ef4a2add2f180150b062eaf4394\transformed\ui-tooling\AndroidManifest.xml:23:9-25:39
 107            android:name="androidx.compose.ui.tooling.PreviewActivity"
-107-->[androidx.compose.ui:ui-tooling-android:1.10.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b33b7b3de7ff4acf77564312d73dd683\transformed\ui-tooling\AndroidManifest.xml:24:13-71
+107-->[androidx.compose.ui:ui-tooling-android:1.10.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\5aef5ef4a2add2f180150b062eaf4394\transformed\ui-tooling\AndroidManifest.xml:24:13-71
 108            android:exported="true" />
-108-->[androidx.compose.ui:ui-tooling-android:1.10.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\b33b7b3de7ff4acf77564312d73dd683\transformed\ui-tooling\AndroidManifest.xml:25:13-36
+108-->[androidx.compose.ui:ui-tooling-android:1.10.1] C:\Users\toshi\.gradle\caches\8.14.3\transforms\5aef5ef4a2add2f180150b062eaf4394\transformed\ui-tooling\AndroidManifest.xml:25:13-36
 109
 110        <receiver
 110-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\toshi\.gradle\caches\8.14.3\transforms\3a9c1d6d7731f9a35f5cad32a24a283c\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
