@@ -1,9 +1,8 @@
-import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
+//import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 
 plugins {
     // Existing plugins
    id("com.android.application")
-   id("kotlin-android")
    alias(libs.plugins.compose.compiler)
 }
 
@@ -15,8 +14,8 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 161
-        versionName = "3.1.11"
+        versionCode = 162
+        versionName = "3.1.12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         targetSdk = 36
@@ -45,8 +44,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_19
-        targetCompatibility = JavaVersion.VERSION_19
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         //viewBinding = true
@@ -71,7 +70,7 @@ tasks.withType<JavaCompile> {
 // Kotlinコンパイル時
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_19)
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
         // Keep your existing args
         freeCompilerArgs.add("-Xnon-local-break-continue")
 
@@ -102,11 +101,9 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.hilt.android)
 
-    implementation(libs.kotlinx.coroutines.core) // Or the latest version
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.compose.material3)
     implementation(libs.accompanist.systemuicontroller)
-    implementation(libs.androidx.compose.material3) // Or the latest version
 
     implementation (libs.androidx.constraintlayout)
     implementation (libs.androidx.appcompat.resources)
@@ -114,20 +111,14 @@ dependencies {
     implementation (libs.androidx.navigation.fragment.ktx)
     implementation (libs.androidx.navigation.ui.ktx)
     implementation (libs.androidx.ui.tooling)
-    implementation (libs.androidx.ui.tooling.preview)
-    implementation (libs.androidx.ui)
-    implementation (libs.kotlin.stdlib)
     implementation (libs.kotlin.reflect)
     implementation (libs.androidx.leanback)
     implementation(project(":app:poweramp_api_lib"))
     implementation(libs.androidx.activity)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.databinding.runtime)
     implementation(libs.androidx.foundation.layout)
-    implementation(libs.androidx.foundation)
     implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.litert.metadata)
 
     //testImplementation (libs.junit)
     //androidTestImplementation (libs.androidx.junit)
@@ -136,16 +127,14 @@ dependencies {
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
     implementation (libs.kotlin.stdlib.jdk7)
     implementation (libs.androidx.activity.ktx)
-    implementation (libs.androidx.fragment.ktx)
+    //implementation (libs.fragment.ktx)
     implementation (libs.androidx.runtime)
     implementation (libs.kotlinx.coroutines.core.jvm)
     implementation (libs.androidx.activity.compose)
     implementation (libs.androidx.preference.ktx)
     implementation (libs.androidx.documentfile)
-    implementation (libs.kotlinx.coroutines.android)
     implementation (platform(libs.compose.bom))
     implementation(libs.androidx.compose.runtime)
-    implementation(libs.androidx.compose.foundation.layout)
     //androidTestImplementation (platform(libs.compose.bom))
     //androidTestImplementation(libs.androidx.ui.test.junit4)
     //debugImplementation(libs.androidx.ui.tooling)

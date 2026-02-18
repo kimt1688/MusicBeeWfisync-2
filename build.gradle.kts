@@ -11,8 +11,8 @@ plugins {
 
 buildscript {
     extra.apply {
-        set("agpversion", "8.13.2")
-        set("kotlinversion", "2.3.0")
+        set("agpversion", "9.0.1")
+        set("kotlinversion", "2.3.10")
     }
     repositories {
         google()

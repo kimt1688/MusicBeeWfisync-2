@@ -1481,7 +1481,8 @@ class WifiSyncService : Service() {
                         }
                         if (ratingChanged || incrementalPlayCount > 0 || incrementalSkipCount > 0) {
                             writeString(latestStatsInfo.fileUrl)
-                            writeByte(if ((!settingsReverseSyncRatings || !ratingChanged)) 0 else latestStatsInfo.rating.toInt())
+                            writeByte(if ((!settingsReverseSyncRatings && !ratingChanged)) 0 else latestStatsInfo.rating.toInt())
+                            //writeByte(if ((!settingsReverseSyncRatings || !ratingChanged)) 0 else latestStatsInfo.rating.toInt())
                             writeLong(if ((!settingsReverseSyncPlayCounts)) 0 else latestStatsInfo.lastPlayedDate)
                             writeInt(if ((!settingsReverseSyncPlayCounts || incrementalPlayCount <= 0)) 0 else incrementalPlayCount)
                             writeInt(if ((!settingsReverseSyncSkipCounts || incrementalSkipCount <= 0)) 0 else incrementalSkipCount)

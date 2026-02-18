@@ -8,7 +8,7 @@ plugins{
 
 android {
     namespace = "com.maxmpz.poweramp"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "29.0.13113456"
 
     defaultConfig {
