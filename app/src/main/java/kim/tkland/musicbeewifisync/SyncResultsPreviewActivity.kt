@@ -1,11 +1,8 @@
 package kim.tkland.musicbeewifisync
 
-import android.R.attr.top
 import android.R.color.white
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -13,7 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -28,7 +24,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -51,24 +46,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 
 
 class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
     private var waitResultsThread: Thread? = null
 
-    private var showDialogState = mutableStateOf(false)
+    // private var showDialogState = mutableStateOf(false)
 
     private var isSyncButtonEnabled = mutableStateOf(true)
 
-      override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        if (WifiSyncService.syncErrorMessageId.get() != 0) {
+            return
+        }
         ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
@@ -87,11 +87,6 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                     if (errorMessageId == 0) {
                         errorMessageId = R.string.errorSyncNonSpecific
                     }
-                    setContent {
-                        ShowErrorDialog(errorMessageId)
-                    }
-
-
                 } else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
                     setContent {
                         disableProceedSyncButton()
@@ -165,10 +160,10 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 ErrorHandler.logError("preview", ex)
             }
         }
-          setContent {
-              ShowWaitResultsView()
-          }
-          waitResultsThread!!.start()
+        setContent {
+            ShowWaitResultsView()
+        }
+        waitResultsThread!!.start()
     }
     private fun requireContext(): Context {
         return applicationContext
@@ -275,56 +270,6 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 fontSize = 20.sp,
             )
         }
-    }
-
-    @Composable
-    fun ShowErrorDialog(errorMessageId: Int) {
-        val confirmButtonComposable: @Composable () -> Unit
-        val dismissButtonComposable: (@Composable () -> Unit)? // Dismiss button is optional
-
-        if (errorMessageId != R.string.errorServerNotFound) {
-            confirmButtonComposable = {
-                Button(onClick = {
-                                                                                                                                                                                                                                                                                                                                    // はいボタンがクリックされたときの処理
-                    showDialogState.value = false
-                }) {
-                    Text(getString(android.R.string.ok))
-                }
-            }
-            dismissButtonComposable = null // No dismiss button in this case
-        } else {
-            dismissButtonComposable = {
-                Button(onClick = { showDialogState.value = false }) {
-                    Text(getString(R.string.syncCancel))
-                }
-            }
-            confirmButtonComposable = {
-                Button(onClick = {
-                    // はいボタンがクリックされたときの処理
-                    WifiSyncService.startSynchronisation(
-                        applicationContext,
-                        0,
-                        true,
-                        false
-                    )
-                    finish()
-                }) {
-                    Text(getString(R.string.syncRetry))
-                }
-            }
-        }
-        AlertDialog(
-            onDismissRequest = { showDialogState.value = false }, // ダイアログの外側をクリックしたときの処理
-            confirmButton = confirmButtonComposable,
-            dismissButton = dismissButtonComposable, // Pass the conditionally defined dismiss button
-            icon = { // Use the dedicated 'icon' parameter
-                Icon(
-                    painter = painterResource(id = android.R.drawable.ic_dialog_alert),
-                    contentDescription = "Error Icon")  /* Provide a content description)*/
-            },
-            title = { Text(getString(R.string.syncErrorHeader)) },
-            text = { Text(getString(errorMessageId)) }
-        )
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

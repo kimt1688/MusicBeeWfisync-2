@@ -4,7 +4,7 @@
             "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-69:/values-v23/values-v23.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\9.2.1\\transforms\\1d46bf03d4f7730b422f66b4e8ec5512\\workspace\\transformed\\appcompat-1.7.1\\res\\values-v23\\values-v23.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\9.5.1\\transforms\\863a4434b1e93240f253f2f75faacb87\\transformed\\appcompat-1.7.1\\res\\values-v23\\values-v23.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,20,34,35,36,39,43,44,45,46",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -15,26 +15,26 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\9.2.1\\transforms\\a2ee752bf31fd786a9e31a9d85bb6fba\\workspace\\transformed\\material-1.13.0\\res\\values-v23\\values-v23.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\9.5.1\\transforms\\6244e5822e1461583c49a525f424370d\\transformed\\material-1.14.0\\res\\values-v23\\values-v23.xml",
                     "from": {
-                        "startLines": "2,5,9,13,16,19,22,25,28,32",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,271,413,574,784,991,1198,1401,1603,1868",
-                        "endLines": "4,8,12,15,18,21,24,27,31,35",
-                        "endColumns": "10,10,10,10,10,10,10,10,10,10",
-                        "endOffsets": "266,408,569,779,986,1193,1396,1598,1863,2136"
+                        "startLines": "2,5,9,13,16,19,22,26",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,271,413,574,784,987,1189,1454",
+                        "endLines": "4,8,12,15,18,21,25,29",
+                        "endColumns": "10,10,10,10,10,10,10,10",
+                        "endOffsets": "266,408,569,779,982,1184,1449,1722"
                     },
                     "to": {
-                        "startLines": "53,56,60,64,67,70,73,76,79,83",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "3382,3598,3740,3901,4111,4318,4525,4728,4930,5195",
-                        "endLines": "55,59,63,66,69,72,75,78,82,86",
-                        "endColumns": "10,10,10,10,10,10,10,10,10,10",
-                        "endOffsets": "3593,3735,3896,4106,4313,4520,4723,4925,5190,5463"
+                        "startLines": "53,56,60,64,67,70,73,77",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "3382,3598,3740,3901,4111,4314,4516,4781",
+                        "endLines": "55,59,63,66,69,72,76,80",
+                        "endColumns": "10,10,10,10,10,10,10,10",
+                        "endOffsets": "3593,3735,3896,4106,4309,4511,4776,5049"
                     }
                 },
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\9.2.1\\transforms\\95b4a8f83ac4c2ae7a6764b5c44c764b\\workspace\\transformed\\cardview-1.0.0\\res\\values-v23\\values-v23.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\9.5.1\\transforms\\b04d98acc0ae0b6d0ac005f1d089ce2b\\transformed\\cardview-1.0.0\\res\\values-v23\\values-v23.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

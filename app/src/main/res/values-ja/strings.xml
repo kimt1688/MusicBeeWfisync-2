@@ -102,6 +102,7 @@
     <string name="deletePlaylists0">プレイリストは削除されませんでした</string>
     <string name="deletePlaylists1">1件削除されました</string>
     <string name="titleOfIPAddress">IPアドレス</string>
+    <string name="checkMBVersion">MusicBee Version 3.7以上が必要です.</string>
 
     <!-- Strings used for fragments for navigation -->
 </resources>

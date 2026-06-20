@@ -63,6 +63,8 @@ import java.net.Socket
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.URLDecoder
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.jvm.java
 import kotlin.toString
 
@@ -193,7 +195,7 @@ class WifiSyncService : Service() {
             try {
                 var anyConnections =
                     tryStartSynchronisation(InetAddress.getByName(settingsDefaultIpAddressValue))
-                if (!anyConnections) {
+                if (syncErrorMessageId.get() != R.string.checkMBVersion && !anyConnections) {
                     if (WifiSyncServiceSettings.debugMode) {
                         logInfo(
                             "worker",
@@ -209,8 +211,6 @@ class WifiSyncService : Service() {
                             break
                         }
                     }
-                }
-                if (!anyConnections) {
                     syncErrorMessageId.set(R.string.errorServerNotFound)
                 }
             } catch (ex: InterruptedException) {
@@ -270,6 +270,13 @@ class WifiSyncService : Service() {
                                                     val hello: String = readString()
                                                     serverLocated =
                                                         hello.startsWith(serverHelloPrefix)
+
+                                                    // TODO : 3.7以上を指定する
+                                                    if (hello.startsWith(serverHelloPrefix + "1.0")) {
+                                                        syncErrorMessageId.set(R.string.checkMBVersion)
+                                                        setPreviewFailed()
+                                                        return false
+                                                    }
                                                     if (WifiSyncServiceSettings.debugMode) {
                                                         logInfo(
                                                             "tryStart",
@@ -2158,25 +2165,38 @@ class WifiSyncService : Service() {
 }
 
 class AutoResetEvent(@field:Volatile private var open: Boolean) {
-    private val monitor = Object()
+    // private val monitor = Object()
+    private val lock = ReentrantLock()
+    private val condition = lock.newCondition()
+
     fun set() {
+        lock.withLock {
+            open = true
+            condition.signalAll()
+        }
+        /*
         synchronized(monitor) {
             open = true
             monitor.notifyAll()
         }
+         */
     }
 
     fun reset() {
-        open = false
+        lock.withLock {
+            open = false
+        }
     }
 
     @Throws(InterruptedException::class)
     fun waitOne() {
-        synchronized(monitor) {
+        lock.withLock {
+        //synchronized(monitor) {
             while (!open) {
-                monitor.wait()
+                condition.await()
             }
-            reset()
+            open = false
+            //reset()
         }
     }
 }

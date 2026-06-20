@@ -1,5 +1,6 @@
 package kim.tkland.musicbeewifisync
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -68,6 +69,7 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
         // スレッドをブロックせずにコルーチンの完了を待つ
         job.join()
     }
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         if (intent.getBooleanExtra("playlistSync", false)) {
             syncPreview = true

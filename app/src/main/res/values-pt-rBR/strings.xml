@@ -103,5 +103,6 @@
     <string name="syncConfirmHeader">Confirm</string>
     <string name="deletePlaylists0">No playlists deleted.</string>
     <string name="titleOfIPAddress">IP Address</string>
+    <string name="checkMBVersion">É necessário o MusicBee versão 3.7 ou superior.</string>
 
 </resources>

@@ -66,6 +66,9 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        if(WifiSyncService.syncErrorMessageId.get() != 0) {
+            return
+        }
         WifiSyncService.resultsActivityReady.set()
 
         // OnBackPressedDispatcher を取得

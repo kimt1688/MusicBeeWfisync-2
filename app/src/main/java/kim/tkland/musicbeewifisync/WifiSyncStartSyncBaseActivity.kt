@@ -3,7 +3,6 @@ package kim.tkland.musicbeewifisync
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -29,12 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
     protected var WifiSyncStartSyncBaseActivity.showProgress: Boolean
@@ -58,7 +52,8 @@ abstract class WifiSyncStartSyncBaseActivity() : WifiSyncBaseActivity("") {
         super.onCreate(savedInstanceState)
 
         setContent {
-            if (showDialog.value) {
+            //if (showDialog.value) {
+            if (WifiSyncService.syncErrorMessageId.get() != 0) {
                 AlertDialog(
                     onDismissRequest = {
                     }, // ダイアログの外側をクリックしたときの処理
