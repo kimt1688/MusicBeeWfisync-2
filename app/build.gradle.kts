@@ -9,7 +9,7 @@ plugins {
 android {
     37.also { compileSdk = it }
     namespace = "kim.tkland.musicbeewifisync"
-    ndkVersion = "29.0.14033849"
+    ndkVersion = "27.0.12077973"
 
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
@@ -93,7 +93,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.foundation)
-    implementation(libs.litert.metadata)
+    // implementation(libs.litert.metadata)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.ui.graphics)

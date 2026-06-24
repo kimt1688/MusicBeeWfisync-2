@@ -5,17 +5,45 @@ import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import android.provider.MediaStore
 import android.util.Log
 import dagger.hilt.android.HiltAndroidApp
-import java.util.concurrent.atomic.AtomicReference
 
 @HiltAndroidApp
 class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
     @JvmField
     var currentActivity: Activity? = null
+
+    private val pendingDeleteUris = mutableSetOf<Uri>()
+    private val pendingUpdateUris = mutableSetOf<Uri>()
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+
+    private val deleteRunnable = Runnable {
+        val list = synchronized(pendingDeleteUris) {
+            val l = pendingDeleteUris.toList()
+            pendingDeleteUris.clear()
+            l
+        }
+        if (list.isNotEmpty()) {
+            deleteUris(list)
+        }
+    }
+
+    private val updateRunnable = Runnable {
+        val list = synchronized(pendingUpdateUris) {
+            val l = pendingUpdateUris.toList()
+            pendingUpdateUris.clear()
+            l
+        }
+        if (list.isNotEmpty()) {
+            updateUris(list)
+        }
+    }
+
     override fun onCreate() {
         StrictMode.setVmPolicy(VmPolicy.Builder()
             .detectUnsafeIntentLaunch()
@@ -25,20 +53,34 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
         registerActivityLifecycleCallbacks(this)
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        currentActivity = activity
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+
+    override fun onActivityDestroyed(activity: Activity) {
+        if (currentActivity === activity) {
+            currentActivity = null
+        }
     }
 
-    override fun onActivityDestroyed(activity: Activity) {}
     override fun onActivityStarted(activity: Activity) {}
     override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-    override fun onActivityPaused(activity: Activity) {}
-    override fun onActivityResumed(activity: Activity) {}
+    override fun onActivityPaused(activity: Activity) {
+        if (currentActivity === activity) {
+            currentActivity = null
+        }
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+        currentActivity = activity
+    }
 
     fun deleteUris(uris: List<Uri>) {
         if (uris.isEmpty()) return
-        val activity = currentActivity ?: return
+        val activity = currentActivity
+        if (activity == null) {
+            Log.w("WifiSyncApp", "deleteUris: No active activity to handle request")
+            return
+        }
         Log.d("WifiSyncApp", "deleteUris(${uris.size} items)")
 
         activity.runOnUiThread {
@@ -53,6 +95,8 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
                     0,
                     null
                 )
+            } catch (e: android.content.IntentSender.SendIntentException) {
+                Log.e("WifiSyncApp", "SendIntentException in deleteUris", e)
             } catch (e: Exception) {
                 Log.e("WifiSyncApp", "Error in deleteUris", e)
             }
@@ -60,38 +104,35 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
     }
 
     fun delete(uri: Uri) {
-        val activity = currentActivity ?: return
-        Log.d("WifiSyncApp", "delete(uri):$uri")
-        val list = listOf(uri)
-
-        activity.runOnUiThread {
-            try {
-                val pendingIntent = MediaStore.createDeleteRequest(activity.contentResolver, list)
-                activity.startIntentSenderForResult(
-                    pendingIntent.intentSender,
-                    777,
-                    null,
-                    0,
-                    0,
-                    0,
-                    null
-                )
-            } catch (e: Exception) {
-                Log.e("WifiSyncApp", "Error in delete", e)
-            }
+        synchronized(pendingDeleteUris) {
+            pendingDeleteUris.add(uri)
         }
+        mainHandler.removeCallbacks(deleteRunnable)
+        mainHandler.postDelayed(deleteRunnable, 200)
     }
 
     fun update(uri: Uri) {
-        val activity = currentActivity ?: return
-        if (WifiSyncServiceSettings.debugMode) {
-            Log.d("WifiSyncApp", "update(uri):$uri")
+        synchronized(pendingUpdateUris) {
+            pendingUpdateUris.add(uri)
         }
-        val list = listOf(uri)
+        mainHandler.removeCallbacks(updateRunnable)
+        mainHandler.postDelayed(updateRunnable, 200)
+    }
+
+    fun updateUris(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+        val activity = currentActivity
+        if (activity == null) {
+            Log.w("WifiSyncApp", "updateUris: No active activity to handle request")
+            return
+        }
+        if (WifiSyncServiceSettings.debugMode) {
+            Log.d("WifiSyncApp", "updateUris(${uris.size} items)")
+        }
 
         activity.runOnUiThread {
             try {
-                val pendingIntent = MediaStore.createWriteRequest(activity.contentResolver, list)
+                val pendingIntent = MediaStore.createWriteRequest(activity.contentResolver, uris)
                 activity.startIntentSenderForResult(
                     pendingIntent.intentSender,
                     999,
@@ -101,8 +142,10 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
                     0,
                     null
                 )
+            } catch (e: android.content.IntentSender.SendIntentException) {
+                Log.e("WifiSyncApp", "SendIntentException in updateUris", e)
             } catch (e: Exception) {
-                Log.e("WifiSyncApp", "Error in update", e)
+                Log.e("WifiSyncApp", "Error in updateUris", e)
             }
         }
     }

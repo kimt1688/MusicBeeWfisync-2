@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalContext
 
 class WifiSyncSyncButtons(
     val onPreviewButtonClick: () -> Unit,
@@ -33,7 +33,8 @@ class WifiSyncSyncButtons(
 
         val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
         val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
-        val resources = LocalResources.current
+        val context = LocalContext.current
+        val resources = context.resources
 
         Row(
             // Or a Compose Row
