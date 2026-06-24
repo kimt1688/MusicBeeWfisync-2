@@ -36,56 +36,74 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
     override fun onActivityPaused(activity: Activity) {}
     override fun onActivityResumed(activity: Activity) {}
 
+    fun deleteUris(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+        val activity = currentActivity ?: return
+        Log.d("WifiSyncApp", "deleteUris(${uris.size} items)")
+
+        activity.runOnUiThread {
+            try {
+                val pendingIntent = MediaStore.createDeleteRequest(activity.contentResolver, uris)
+                activity.startIntentSenderForResult(
+                    pendingIntent.intentSender,
+                    555,
+                    null,
+                    0,
+                    0,
+                    0,
+                    null
+                )
+            } catch (e: Exception) {
+                Log.e("WifiSyncApp", "Error in deleteUris", e)
+            }
+        }
+    }
+
     fun delete(uri: Uri) {
-        // WARNING: if the URI isn't a MediaStore Uri and specifically
-        // only for media files (images, videos, audio) then the request
-        // will throw an IllegalArgumentException, with the message:
-        // 'All requested items must be referenced by specific ID'
+        val activity = currentActivity ?: return
+        Log.d("WifiSyncApp", "delete(uri):$uri")
+        val list = listOf(uri)
 
-        // No need to handle 'onActivityResult' callback, when the system returns
-        // from the user permission prompt the files will be already deleted.
-        // Multiple 'owned' and 'not-owned' files can be combined in the
-        // same batch request. The system will automatically delete them
-        // using the same prompt dialog, making the experience homogeneous.
-
-        val activity : AtomicReference<Activity> = AtomicReference(this.currentActivity)
-        Log.d("WifiSyncApp", "delete(uri):${uri}")
-        val list: MutableList<Uri> = ArrayList()
-        list.add(uri)
-
-        val pendingIntent =
-            MediaStore.createDeleteRequest(activity.get().contentResolver, list)
-        activity.get().startIntentSenderForResult(
-            pendingIntent.intentSender,
-            777,
-            null,
-            0,
-            0,
-            0,
-            null
-        )
-        Thread.sleep(500)
+        activity.runOnUiThread {
+            try {
+                val pendingIntent = MediaStore.createDeleteRequest(activity.contentResolver, list)
+                activity.startIntentSenderForResult(
+                    pendingIntent.intentSender,
+                    777,
+                    null,
+                    0,
+                    0,
+                    0,
+                    null
+                )
+            } catch (e: Exception) {
+                Log.e("WifiSyncApp", "Error in delete", e)
+            }
+        }
     }
 
     fun update(uri: Uri) {
-        val activity : AtomicReference<Activity> = AtomicReference(this.currentActivity)
+        val activity = currentActivity ?: return
         if (WifiSyncServiceSettings.debugMode) {
-            Log.d("WifiSyncApp", "update(uri):${uri}")
+            Log.d("WifiSyncApp", "update(uri):$uri")
         }
-        val list: MutableList<Uri?> = ArrayList()
-        list.add(uri)
+        val list = listOf(uri)
 
-        val pendingIntent =
-            MediaStore.createWriteRequest(activity.get().contentResolver, list)
-        activity.get().startIntentSenderForResult(
-            pendingIntent.intentSender,
-            999,
-            null,
-            0,
-            0,
-            0,
-            null
-        )
-        Thread.sleep(300)
+        activity.runOnUiThread {
+            try {
+                val pendingIntent = MediaStore.createWriteRequest(activity.contentResolver, list)
+                activity.startIntentSenderForResult(
+                    pendingIntent.intentSender,
+                    999,
+                    null,
+                    0,
+                    0,
+                    0,
+                    null
+                )
+            } catch (e: Exception) {
+                Log.e("WifiSyncApp", "Error in update", e)
+            }
+        }
     }
 }

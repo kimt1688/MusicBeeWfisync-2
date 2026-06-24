@@ -1,6 +1,3 @@
-import com.android.build.api.dsl.Packaging
-
-
 plugins{
     id("com.android.library")
     alias(libs.plugins.compose.compiler)
@@ -8,7 +5,7 @@ plugins{
 
 android {
     namespace = "com.maxmpz.poweramp"
-    compileSdk = 36
+    compileSdk = 37
     ndkVersion = "29.0.13113456"
 
     defaultConfig {

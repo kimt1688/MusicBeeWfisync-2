@@ -9,12 +9,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -36,17 +39,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
+import kotlin.time.Duration.Companion.milliseconds
 
 class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
     private var checkCount by mutableStateOf("")
 
-    private val isListChecked = mutableStateListOf<Boolean>(false)
-    private val listFilename = mutableStateListOf<String>("")
+    private val isListChecked = mutableStateListOf<Boolean>()
+    private val listFilename = mutableStateListOf<String>()
     private var PlaylistSyncActivity.showProgress: Boolean
         get() = viewModel.showDialog.value
         set(value) {}
@@ -57,18 +60,8 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
     val isOpenDialog = mutableStateOf(false)
     var isSyncPlaylistsDeleteFiles = mutableStateOf(WifiSyncServiceSettings.syncDeleteUnselectedFiles)
 
-    suspend fun doAsyncWork() {
-        val job = CoroutineScope(Dispatchers.Default).launch {
-            // バックグラウンドで時間のかかる処理
-            playlistLoaderThread?.start()
-            Log.d("PlaylistSyncActivity.loadPlaylist", "Thread started")
-            playlistLoaderThread?.join()
-            Log.d("PlaylistSyncActivity.loadPlaylist", "Thread finished")
-        }
+    private var isLoading by mutableStateOf(true)
 
-        // スレッドをブロックせずにコルーチンの完了を待つ
-        job.join()
-    }
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         if (intent.getBooleanExtra("playlistSync", false)) {
@@ -80,42 +73,35 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
 
         setContent {
             // Playlistのロード
-            isListChecked.clear()
-            listFilename.clear()
-            if (selectedPlaylists == null) {
-                loadPlaylists(
-                    isListChecked,
-                    onIsListCheckChange = { isChecked -> isListChecked.add(isChecked) },
-                    listFilename,
-                    onListFilenameChange = { newFilename: String ->
-                        listFilename.add(
-                            newFilename
-                        )
-                    },
-                    "",
-                    onCheckCountChange = { newCheckCountValue: String ->
-                        checkCount =
-                            newCheckCountValue // Also update here if showPlaylists modifies it
+            LaunchedEffect(Unit) {
+                if (selectedPlaylists == null || selectedPlaylists!!.isEmpty()) {
+                    isLoading = true
+                    loadPlaylistsAsync()
+                    isLoading = false
+                } else {
+                    isListChecked.clear()
+                    listFilename.clear()
+                    selectedPlaylists?.forEach {
+                        isListChecked.add(it.checked)
+                        listFilename.add(it.filename)
                     }
-                )
-                lifecycleScope.launch {
-                    doAsyncWork()
+                    showPlaylistsSelectedCount("", { checkCount = it })
+                    isLoading = false
                 }
-                // ここでスレッドを待ちたい！！！
-                //playlistLoaderThread?.join()
-            } else {
-                showPlaylists(
-                    isListChecked,
-                    onIsListCheckChange = { isChecked -> isListChecked.add(isChecked) },
-                    listFilename,
-                    onListFilenameChange = { newFilename: String -> listFilename.add(newFilename) },
-                    "",
-                    onCheckCountChange = { newCheckCountValue: String ->
-                        checkCount =
-                            newCheckCountValue // Also update here if showPlaylists modifies it
-                    })
             }
-            CustomView()
+
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                CustomView()
+            }
         }
     }
 
@@ -299,82 +285,68 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
         }
     }
 
-    private fun loadPlaylists(
-        isListChecked: MutableList<Boolean>,
-        onIsListCheckChange: (Boolean) -> Unit,
-        listFilename: MutableList<String>,
-        onListFilenameChange: (String) -> Unit,
-        checkCount: String,
-        onCheckCountChange: (String) -> Unit
-    ) {
-        playlistLoaderThread = Thread(Runnable {
-
-        while (true) {
-            try {
-                val values = ArrayList<FileSelectedInfo>()
-                val lookup = CaseInsensitiveMap()
-                for (playlistName in WifiSyncServiceSettings.syncCustomPlaylistNames) {
-                    lookup[playlistName] = null
-                }
-                for (playlistName in WifiSyncService.musicBeePlaylists) {
-                    values.add(
-                        FileSelectedInfo(
-                            playlistName,
-                            lookup.containsKey(playlistName)
-                        )
-                    )
-                    onIsListCheckChange(lookup.containsKey(playlistName))
-                    onListFilenameChange(playlistName)
-                }
-                selectedPlaylists = values
-                runOnUiThread {
-                    if (!playlistLoaderThread!!.isInterrupted) {
-                        showPlaylistsSelectedCount(
-                            checkCount = checkCount,
-                            onCheckCountChange = onCheckCountChange
-                        )
+    private suspend fun loadPlaylistsAsync() {
+        withContext(Dispatchers.IO) {
+            var attempt = 0
+            while (attempt < 5) {
+                attempt++
+                try {
+                    Log.d("PlaylistSyncActivity", "Loading playlists, attempt $attempt")
+                    
+                    // NetworkOnMainThreadExceptionを確実に回避するため、明示的なスレッドを使用
+                    var playlistsResult: ArrayList<String>? = null
+                    var exception: Exception? = null
+                    val thread = Thread {
+                        try {
+                            playlistsResult = WifiSyncService.musicBeePlaylists
+                        } catch (e: Exception) {
+                            exception = e
+                        }
                     }
-                }
-                return@Runnable
-            } catch (ex: InterruptedException) {
-                throw ex
-            } catch (ex: SocketTimeoutException) {
-                //showPlaylistRetrievalError()
-                Thread.sleep(2500)
-            } catch (ex: Exception) {
-                ErrorHandler.logError("loadPlaylists", ex)
-                //showPlaylistRetrievalError()
-                return@Runnable
-            }
-        }
-      })
-    }
+                    thread.start()
+                    thread.join()
 
+                    if (exception != null) throw exception
+                    val playlists = playlistsResult ?: ArrayList()
 
-    private fun showPlaylists(
-        isListChecked: MutableList<Boolean>,
-        onIsListCheckChange: (Boolean) -> Unit,
-        listFilename: MutableList<String>,
-        onListFilenameChange: (String) -> Unit,
-        checkCount: String,
-        onCheckCountChange: (String) -> Unit
-    ) {
-
-        if (mainWindow != null) {
-            try {
-                if (selectedPlaylists != null) {
-                    for (i in 0 until selectedPlaylists!!.size) {
-                        onIsListCheckChange(selectedPlaylists!![i].checked)
-                        onListFilenameChange(selectedPlaylists!![i].filename)
+                    if (playlists.isEmpty()) {
+                        Log.d("PlaylistSyncActivity", "Playlists empty, retrying in 2s...")
+                        delay(2000.milliseconds)
+                        continue
                     }
+
+                    // メインスレッド（UI）の更新
+                    withContext(Dispatchers.Main) {
+                        isListChecked.clear()
+                        listFilename.clear()
+                        val values = ArrayList<FileSelectedInfo>()
+                        val lookup = CaseInsensitiveMap()
+                        for (playlistName in WifiSyncServiceSettings.syncCustomPlaylistNames) {
+                            lookup[playlistName] = null
+                        }
+                        for (playlistName in playlists) {
+                            val isChecked = lookup.containsKey(playlistName)
+                            values.add(FileSelectedInfo(playlistName, isChecked))
+                            isListChecked.add(isChecked)
+                            listFilename.add(playlistName)
+                        }
+                        selectedPlaylists = values
+                        showPlaylistsSelectedCount("", { checkCount = it })
+                    }
+                    Log.d("PlaylistSyncActivity", "Playlists loaded successfully: ${playlists.size} items")
+                    return@withContext
+                } catch (ex: SocketTimeoutException) {
+                    Log.w("PlaylistSyncActivity", "Socket timeout on attempt $attempt, retrying...")
+                    delay(2500.milliseconds)
+                } catch (ex: Exception) {
+                    Log.e("PlaylistSyncActivity", "Error on attempt $attempt", ex)
+                    if (attempt < 3) {
+                        delay(2000.milliseconds)
+                        continue
+                    }
+                    ErrorHandler.logError("loadPlaylists", ex)
+                    return@withContext
                 }
-                showPlaylistsSelectedCount(
-                    checkCount = checkCount,
-                    { newCheckCountValue: String ->
-                        checkCount
-                    })
-            } catch (ex: Exception) {
-                ErrorHandler.logError("showPlaylists", ex)
             }
         }
     }
@@ -430,7 +402,7 @@ class PlaylistSyncActivity : WifiSyncStartSyncBaseActivity() {
         }
     }
 
-    private inner class FileSelectedInfo internal constructor(
+    private class FileSelectedInfo(
         val filename: String,
         var checked: Boolean
     )

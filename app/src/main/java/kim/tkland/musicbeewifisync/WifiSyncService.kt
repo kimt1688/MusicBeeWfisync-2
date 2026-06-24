@@ -2409,7 +2409,10 @@ internal class FileStorageAccess(
             }
         } else {
             val file = File(fileUrl)
-            (context as WifiSyncApp).delete(filePathToUri(filePath))
+            val uri = filePathToUri(filePath)
+            if (uri != null) {
+                (context as WifiSyncApp).delete(uri)
+            }
             if (file.delete()) {
                 scanFile(filePath, 0, 0, ACTION_DELETE)
                 return true
@@ -2419,7 +2422,7 @@ internal class FileStorageAccess(
         }
     }
 
-    fun filePathToUri(filePath: String): Uri {
+    fun filePathToUri(filePath: String): Uri? {
         var id: Long = 0
         val cr = context.applicationContext.contentResolver
 
@@ -2436,7 +2439,9 @@ internal class FileStorageAccess(
             filePath.substring(0, filePath.lastIndexOf('/') + 1),
         )
 
-        Log.d("filePathToUri()", "selectionArgs:${selectionArgs[0]}, ${selectionArgs[1]}")
+        if(WifiSyncServiceSettings.debugMode) {
+            Log.i("filePathToUri()", "selectionArgs:${selectionArgs[0]}, ${selectionArgs[1]}")
+        }
 
         val cursor = cr.query(
             uri, projection,
@@ -2450,6 +2455,9 @@ internal class FileStorageAccess(
                     val idIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
                     id = cursor.getString(idIndex).toLong()
                 } while (cursor.moveToNext())
+            } else {
+                cursor.close()
+                return null
             }
             cursor.close()
         }

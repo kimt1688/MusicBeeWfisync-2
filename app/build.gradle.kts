@@ -7,15 +7,15 @@ plugins {
 }
 
 android {
-    compileSdk = 37
+    37.also { compileSdk = it }
     namespace = "kim.tkland.musicbeewifisync"
     ndkVersion = "29.0.14033849"
 
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 164
-        versionName = "3.1.14"
+        versionCode = 165
+        versionName = "3.1.15"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         targetSdk = 36
@@ -48,7 +48,7 @@ android {
         //viewBinding = true
         compose = true
     }
-    compileSdkExtension = 18
+    // compileSdkExtension = 18
 }
 
 /*
@@ -100,7 +100,7 @@ dependencies {
     implementation(libs.hilt.android)
 
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.androidx.compose.material3)
+    ///implementation(libs.androidx.compose.material3)
     implementation(libs.accompanist.systemuicontroller)
 
     implementation (libs.androidx.constraintlayout)
@@ -132,7 +132,7 @@ dependencies {
     implementation (libs.androidx.preference.ktx)
     implementation (libs.androidx.documentfile)
     implementation (platform(libs.compose.bom))
-    implementation(libs.androidx.compose.runtime)
+    ///implementation(libs.androidx.compose.runtime)
     //androidTestImplementation (platform(libs.compose.bom))
     //androidTestImplementation(libs.androidx.ui.test.junit4)
     //debugImplementation(libs.androidx.ui.tooling)
