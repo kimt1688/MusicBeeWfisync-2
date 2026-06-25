@@ -47,6 +47,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
 
 class MainActivity() : WifiSyncStartSyncBaseActivity() {
     var initialReverseSyncPlayer = mutableIntStateOf(2)
@@ -164,7 +165,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                             contentDescription = "Header"
                         )
                         Text(
-                            text = context.getString(R.string.syncFromPrompt),
+                            text = stringResource(R.string.syncFromPrompt),
                             fontSize = 16.sp
                         )
                     }
@@ -209,7 +210,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                             contentDescription = "ReverseSync"
                         )
                         Text(
-                            text = context.getString(R.string.syncToPrompt), fontSize = 16.sp
+                            text = stringResource(R.string.syncToPrompt), fontSize = 16.sp
                         )
                     }
                 }
@@ -348,7 +349,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                 item {
                     Row() {
                         Text(
-                            text = context.getString(R.string.syncToUsingPlayer),
+                            text = stringResource(R.string.syncToUsingPlayer),
                             fontSize = 16.sp
                         )
                     }
@@ -544,11 +545,13 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
     }
 
     private fun isConfigOK(): Boolean {
+        /* 修正: サーバー状態確認スレッドが走っていても同期は開始できるようにする
         if (serverStatusThread != null) {
             configErrorMessage.value = getString(R.string.errorServerNotFound)
             showDialog.value = true
             return false
         }
+        */
 
         val anyReverseSync =
             (WifiSyncServiceSettings.reverseSyncPlayer == 1 || WifiSyncServiceSettings.reverseSyncPlayer == 2) &&

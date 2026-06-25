@@ -31,8 +31,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CheckboxDefaults.colors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -43,6 +45,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults.verticalArrangement
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,6 +60,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -87,6 +91,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     private var deleteConfirmationDialogMessage: String = ""
 
     private var isLoading by mutableStateOf(true)
+    private var pendingUrisToDelete = mutableListOf<Uri>()
 
     suspend fun doAsyncWork() {
         val job = CoroutineScope(Dispatchers.Default).launch {
@@ -111,11 +116,13 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
         resultLauncher = registerForActivityResult(
             ActivityResultContracts.StartIntentSenderForResult()
         ) { result ->
-            // ここに結果の処理コードを記述
             if (result.resultCode == RESULT_OK) {
                 Log.d("DeletePlaylistActivity", "Result OK")
+                processNextDeleteChunk()
             } else {
-                Log.d("DeletePlaylistActivity", "Result NOT OK")
+                Log.d("DeletePlaylistActivity", "Result NOT OK or Cancelled")
+                pendingUrisToDelete.clear()
+                finishDeletion()
             }
         }
         // Playlistのロード
@@ -487,6 +494,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                     do {
                         selectedPlaylists?.add(
                             FileSelectedInfo(
+                                cursor.getLong(0),
                                 cursor.getString(2),
                                 false
                             )
@@ -507,68 +515,154 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
         })
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun DeletePlaylists() {
         val context = LocalContext.current
-        if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+        
+        // ローカルステートでローディングを管理
+        var localLoading by remember { mutableStateOf(true) }
+
+        if (localLoading) {
+            Scaffold(
+                topBar = {
+                    CenterAlignedTopAppBar(
+                        title = {
+                            Box(
+                            ) {
+                                Text(
+                                    text = appBarTitle.value,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = colorResource(R.color.colorPrimary),
+                            titleContentColor = colorResource(white),
+                            navigationIconContentColor = colorResource(white),
+                            actionIconContentColor = colorResource(white),
+                            scrolledContainerColor = colorResource(white)
+                        ),
+                    )
+                }
+            )
+            { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White)
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Color.Red,
+                        strokeWidth = 4.dp
+                    )
+                }
             }
         }
 
         LaunchedEffect(Unit) {
             val allUrisToDelete = mutableListOf<Uri>()
             
-            // 重い処理（クエリやファイル解析）をバックグラウンドスレッドで実行
             kotlinx.coroutines.withContext(Dispatchers.IO) {
-                count.intValue = 0
                 val selected = selectedPlaylists ?: return@withContext
                 val loopStartIndex = selected.size - 1
 
                 for (i in loopStartIndex downTo 0) {
                     if (selected[i].checked) {
-                        val id = filePathToId(listFullPath[i])
-                        val uri = filePathToUri(listFullPath[i])
-                        val file = File(getAbsolutePathFromId(id))
-                        
-                        // プレイリスト内のトラックのURIを取得してリストに追加
-                        if (file.extension.equals("m3u", false) || file.extension.equals("m3u8", false)) {
-                            allUrisToDelete.addAll(getM3UPlaylistTrackUris(file))
-                        } else {
-                            allUrisToDelete.addAll(getPlaylistTrackUris(context, id))
+                        try {
+                            val id = selected[i].id
+                            if (id > 0) {
+                                val volumeName = getVolumeName(context)
+                                val uri = ContentUris.withAppendedId(MediaStore.Audio.Playlists.getContentUri(volumeName), id)
+                                val absolutePath = getAbsolutePathFromId(id)
+                                
+                                if (absolutePath.isNotEmpty()) {
+                                    val file = File(absolutePath)
+                                    if (file.exists()) {
+                                        if (file.extension.equals("m3u", false) || file.extension.equals("m3u8", false)) {
+                                            allUrisToDelete.addAll(getM3UPlaylistTrackUris(file))
+                                        } else {
+                                            allUrisToDelete.addAll(getPlaylistTrackUris(context, id))
+                                        }
+                                    }
+                                }
+                                allUrisToDelete.add(uri)
+                            }
+                        } catch (e: Exception) {
+                            Log.e("DeletePlaylistActivity", "Error gathering URIs for index $i", e)
                         }
-
-                        // プレイリスト自体のURIを追加
-                        allUrisToDelete.add(uri)
-
-                        // UI用リストから削除（Composeのステート更新）
-                        // 注意: Dispatchers.IOから直接UIステートを変更しても、mutableStateListOfならスレッドセーフに扱われることが多いですが、
-                        // 安全のためメインスレッドに戻して操作する方がベターな場合もあります。
-                        // 今回はシンプルにするためここで行います。
-                        selectedPlaylists?.removeAt(i)
-                        listFilename.removeAt(i)
-                        listFullPath.removeAt(i)
-                        isListChecked.removeAt(i)
-
-                        count.intValue++
                     }
                 }
             }
 
-            // まとめて削除リクエスト（これはWifiSyncApp側でrunOnUiThreadされるので安全）
             if (allUrisToDelete.isNotEmpty()) {
-                deleteUri(allUrisToDelete)
-            }
+                // 重複を削除して無効なUri（IDが0のものなど）を除外
+                val distinctUris = allUrisToDelete.distinct().filter { !it.toString().endsWith("/") }
 
-            isLoading = false
-            // 削除完了後に元のビューに戻す
-            setContent { CustomView() }
+                if (distinctUris.isNotEmpty()) {
+                    pendingUrisToDelete = distinctUris.toMutableList()
+                    processNextDeleteChunk()
+                } else {
+                    finishDeletion()
+                }
+            } else {
+                Log.d("DeletePlaylistActivity", "No URIs to delete")
+                finishDeletion()
+            }
         }
+    }
+
+    private fun processNextDeleteChunk() {
+        if (pendingUrisToDelete.isEmpty()) {
+            finishDeletion()
+            return
+        }
+
+        val chunkSize = 2000
+        val chunk = if (pendingUrisToDelete.size > chunkSize) {
+            val c = pendingUrisToDelete.take(chunkSize)
+            pendingUrisToDelete = pendingUrisToDelete.drop(chunkSize).toMutableList()
+            c
+        } else {
+            val c = pendingUrisToDelete.toList()
+            pendingUrisToDelete.clear()
+            c
+        }
+
+        try {
+            Log.d("DeletePlaylistActivity", "Requesting delete for ${chunk.size} URIs. Remaining: ${pendingUrisToDelete.size}")
+            val pendingIntent = MediaStore.createDeleteRequest(contentResolver, chunk)
+            val intentSenderRequest = IntentSenderRequest.Builder(pendingIntent.intentSender).build()
+            resultLauncher.launch(intentSenderRequest)
+        } catch (e: Exception) {
+            Log.e("DeletePlaylistActivity", "Error creating delete request", e)
+            pendingUrisToDelete.clear()
+            finishDeletion()
+        }
+    }
+
+    private fun finishDeletion() {
+        isLoading = false
+        // 削除成功時にリストをリロード
+        isListChecked.clear()
+        listFilename.clear()
+        listFullPath.clear()
+        selectedPlaylists = null
+        loadPlaylists(
+            isListChecked,
+            { isChecked -> isListChecked.add(isChecked) },
+            listFilename,
+            { newFilename -> listFilename.add(newFilename) },
+            listFullPath,
+            { newFullPath -> listFullPath.add(newFullPath) }
+        )
+        lifecycleScope.launch {
+            doAsyncWork()
+        }
+        setContent { CustomView() }
     }
 
     // トラックのURIをリストアップするだけのヘルパーメソッド
@@ -577,7 +671,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
         try {
             playlist.forEachLine { line ->
                 if (!line.startsWith("#") && !line.endsWith(".m3u", true) && !line.endsWith(".m3u8", true)) {
-                    uriList.add(filePathToSongUri(line.substring(1)))
+                    filePathToSongUri(line.substring(1))?.let { uriList.add(it) }
                 }
             }
         } catch (e: Exception) {
@@ -599,7 +693,10 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                 val audioIdIndex = cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists.Members.AUDIO_ID)
                 val collection = MediaStore.Audio.Media.getContentUri(volumeName)
                 while (cursor.moveToNext()) {
-                    uriList.add(ContentUris.withAppendedId(collection, cursor.getLong(audioIdIndex)))
+                    val audioId = cursor.getLong(audioIdIndex)
+                    if (audioId > 0) {
+                        uriList.add(ContentUris.withAppendedId(collection, audioId))
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -609,7 +706,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     }
 
     fun deleteUri(uriList: List<Uri>) {
-        (application as WifiSyncApp).deleteUris(uriList)
+        (application as WifiSyncApp).deleteUrisImmediate(uriList)
     }
 
 
@@ -627,13 +724,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
         return result
     }
 
-    fun filePathToUri(filePath: String): Uri {
-        val volumeName = getVolumeName(this)
-        val id = filePathToId(filePath)
-        return ContentUris.withAppendedId(MediaStore.Audio.Playlists.getContentUri(volumeName), id)
-    }
-
-    fun filePathToSongUri(filePath: String): Uri {
+    fun filePathToSongUri(filePath: String): Uri? {
         val volumeName = getVolumeName(this)
         val collection = MediaStore.Audio.Media.getContentUri(volumeName)
 
@@ -653,26 +744,8 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
         }
         Log.i("filePathToSongUri", "filePath: $filePath, id: $id")
 
+        if (id == 0L) return null
         return ContentUris.withAppendedId(collection, id)
-    }
-
-    fun filePathToId(filePath: String): Long {
-        val volumeName = getVolumeName(this)
-        val collection = MediaStore.Audio.Playlists.getContentUri(volumeName)
-        val projection = arrayOf(MediaStore.Audio.Playlists._ID)
-        val displayName = filePath.substring(filePath.lastIndexOf('/') + 1)
-        val relativePath = filePath.substring(0, filePath.lastIndexOf('/') + 1)
-
-        val selection = "${MediaStore.Audio.Playlists.DISPLAY_NAME} = ? AND ${MediaStore.Audio.Playlists.RELATIVE_PATH} = ?"
-        val selectionArgs = arrayOf(displayName, relativePath)
-
-        var id: Long = 0
-        contentResolver.query(collection, projection, selection, selectionArgs, null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists._ID))
-            }
-        }
-        return id
     }
 
     private fun showPlaylistsSelectedCount(
@@ -703,6 +776,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     }
 
     private inner class FileSelectedInfo internal constructor(
+        val id: Long,
         val filename: String,
         var checked: Boolean
     )

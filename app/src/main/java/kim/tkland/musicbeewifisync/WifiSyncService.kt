@@ -191,6 +191,12 @@ class WifiSyncService : Service() {
         private var socketStreamReader: DataInputStream? = null
         private var socketOutputStream: OutputStream? = null
         private var socketStreamWriter: DataOutputStream? = null
+
+        // 再利用バッファ
+        private val fileBuffer = arrayOf(ByteArray(socketReadBufferLength), ByteArray(socketReadBufferLength))
+        private val playlistBuffer = ByteArray(socketTextReadBufferLength)
+        private val textBuffer = ByteArray(0xFFFF)
+
         override fun run() {
             try {
                 var anyConnections =
@@ -479,22 +485,17 @@ class WifiSyncService : Service() {
         }
 
         @Throws(SocketException::class)
-        private fun readToEndOfCommand() = try {
-            while (socketStreamReader!!.read() != 0x1B/* ESC */){}
-        } catch (ex: Exception) {
-            throw SocketException(ex.toString())
+        private fun readToEndOfCommand() {
+            try {
+                while (true) {
+                    val b = socketStreamReader!!.read()
+                    if (b == 0x1B/* ESC */ || b == -1) break
+                }
+            } catch (ex: Exception) {
+                throw SocketException(ex.toString())
+            }
         }
 
-        @Suppress("REDUNDANT_MODIFIER_IN_GETTER")
-        @get:Throws(SocketException::class)
-        private val availableData: Int
-            private get() {
-                try {
-                    return socketInputStream!!.available()
-                } catch (ex: Exception) {
-                    throw SocketException(ex.toString())
-                }
-            }
 
         @Throws(SocketException::class)
         private fun flushWriter() {
@@ -509,20 +510,18 @@ class WifiSyncService : Service() {
        private fun readString(): String {
            var returnLength = 0
            try {
-               val buffer = ByteArray(size = 0xFFFF.toInt())
-               while (socketStreamReader!!.available() == 0) {}
-               returnLength = socketStreamReader!!.readUnsignedShort().toInt()
-               if ((returnLength > 0xFFFF.toInt()) || (returnLength <= 0)) {
+               // DataInputStream.readUnsignedShort() はデータが届くまでスレッドをブロックして待機するため、
+               // available() によるビジーウェイト・ループは不要です。
+               returnLength = socketStreamReader!!.readUnsignedShort()
+               if ((returnLength > 0xFFFF) || (returnLength <= 0)) {
                    return ""
                }
-               this.socketStreamReader!!.readFully(buffer, 0, returnLength)
-               return String(buffer, 0, returnLength, Charsets.UTF_8)
+               // 毎回ByteArrayを確保するのをやめ、メンバ変数のtextBufferを再利用してメモリ負荷を軽減します。
+               this.socketStreamReader!!.readFully(textBuffer, 0, returnLength)
+               return String(textBuffer, 0, returnLength, Charsets.UTF_8)
            } catch (eof: EOFException) {
-               logInfo("readString()", "returnLength = $returnLength")
-               logInfo("readString()", eof.stackTraceToString())
                return ""
            } catch (_: IndexOutOfBoundsException) {
-               Log.d("readString()", "IndexOutOfBoundsException, returnLength = $returnLength")
                return ""
            } catch (ex: Exception) {
                logInfo("readString()", ex.stackTraceToString())
@@ -644,8 +643,7 @@ class WifiSyncService : Service() {
         @Throws(SocketException::class)
         private fun readArray(buffer: ByteArray, count: Int): Int {
             return try {
-                socketInputStream!!.read(buffer, 0, count)
-                // socketStreamReader!!.read(buffer, 0, count)
+                socketStreamReader!!.read(buffer, 0, count)
             } catch (ex: Exception) {
                 throw SocketException(ex.toString())
             }
@@ -654,7 +652,7 @@ class WifiSyncService : Service() {
         @Throws(SocketException::class)
         private fun writeArray(buffer: ByteArray, count: Int) {
             try {
-                socketOutputStream!!.write(buffer, 0, count)
+                socketStreamWriter!!.write(buffer, 0, count)
             } catch (ex: Exception) {
                 throw SocketException(ex.toString())
             }
@@ -814,10 +812,8 @@ class WifiSyncService : Service() {
             var os: OutputStream? = null
             syncPercentCompleted.set(readShort().toInt())
             readToEndOfCommand()
-            val buffer = arrayOf(ByteArray(socketReadBufferLength), ByteArray(socketReadBufferLength))
-            val readCount = IntArray(2)
-            val waitRead = AutoResetEvent(false)
-            val waitWrite = AutoResetEvent(true)
+            
+            var totalReadFromSocket: Long = 0
             var cursor: Cursor? = null
             if (WifiSyncServiceSettings.debugMode) {
                 logInfo("receiveFile", "Receive: $filePath")
@@ -890,8 +886,14 @@ class WifiSyncService : Service() {
 
                 try {
                     if (contentUri != null) {
-                        (application as WifiSyncApp).update(contentUri)
-                        os = contentResolver.openOutputStream(contentUri, "wt")!!
+                        try {
+                            os = contentResolver.openOutputStream(contentUri, "wt")!!
+                        } catch (e: Exception) {
+                            if (e is android.app.RecoverableSecurityException || e.cause is android.app.RecoverableSecurityException || e is SecurityException) {
+                                (application as WifiSyncApp).update(contentUri)
+                            }
+                            throw e
+                        }
                     } else {
                         contentUri =
                             applicationContext.contentResolver.insert(audioCollection, values)
@@ -901,23 +903,24 @@ class WifiSyncService : Service() {
                         }
                         os = contentResolver.openOutputStream(contentUri!!, "wt")!!
                     }
-                    os.use{fs: OutputStream? ->
-                        writeString(syncStatusOK)
-                        flushWriter()
-                        val thread = Thread(
-                            ReceiveFileReceiveLoop(
-                                fileLength,
-                                buffer,
-                                readCount,
-                                waitRead,
-                                waitWrite,
-                                socketReadBufferLength
-                            )
-                        )
-                        thread.start()
-                        writeReceiveFile(fs!!, buffer, waitRead, waitWrite, readCount, thread)
+                    
+                    writeString(syncStatusOK)
+                    flushWriter()
+
+                    os.use { fs ->
+                        var remaining = fileLength
+                        val buffer = fileBuffer[0]
+                        while (remaining > 0) {
+                            val toRead = if (remaining < buffer.size) remaining.toInt() else buffer.size
+                            val read = readArray(buffer, toRead)
+                            if (read < 0) throw EOFException("Unexpected EOF during file receive")
+                            totalReadFromSocket += read
+                            fs.write(buffer, 0, read)
+                            remaining -= read
+                        }
+                        fs.flush()
                     }
-                }finally {
+                } finally {
                     os?.close()
                 }
                 writeString(syncStatusOK)
@@ -925,6 +928,21 @@ class WifiSyncService : Service() {
             } catch (ex: Exception) {
                 try {
                     logError("receiveFile", ex, "file=$filePath")
+                    
+                    // 残りのデータをスキップしてプロトコルの同期を保つ
+                    var remainingToSkip = fileLength - totalReadFromSocket
+                    val buffer = fileBuffer[0]
+                    while (remainingToSkip > 0) {
+                        val toRead = if (remainingToSkip < buffer.size) remainingToSkip.toInt() else buffer.size
+                        val read = try {
+                            readArray(buffer, toRead)
+                        } catch (e: Exception) {
+                            -1
+                        }
+                        if (read <= 0) break
+                        remainingToSkip -= read
+                    }
+
                     if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
                         throw ex
                     }
@@ -935,20 +953,6 @@ class WifiSyncService : Service() {
                             ex.toString()
                         )
                     )
-                    while (true) {
-                        Thread.sleep(100)
-                        var skipBytes = availableData
-                        if (skipBytes <= 0) {
-                            break
-                        }
-                        while (skipBytes > 0) {
-                            readArray(
-                                buffer[0],
-                                if ((skipBytes >= socketReadBufferLength)) socketReadBufferLength else skipBytes
-                            )
-                            skipBytes -= socketReadBufferLength
-                        }
-                    }
                     writeString("$syncStatusFAIL $ex")
                     flushWriter()
 
@@ -1015,9 +1019,6 @@ class WifiSyncService : Service() {
                 cursor.close()
             }
 
-            val buffer = ByteArray(socketTextReadBufferLength)
-            var readCount: Int
-
             val values = ContentValues().apply {
                 put(MediaStore.Audio.Playlists.RELATIVE_PATH, path)
                 put(MediaStore.Audio.Playlists.DISPLAY_NAME, playlistname)
@@ -1039,9 +1040,16 @@ class WifiSyncService : Service() {
             var os: OutputStream? = null
             try {
                 if (contentUri != null) {
-                    if(File(this.getPathFromUri(applicationContext, contentUri)).exists()) {
-                        (application as WifiSyncApp).update(contentUri)
-                        os = contentResolver.openOutputStream(contentUri, "wt")!!
+                    val pathFromUri = this.getPathFromUri(applicationContext, contentUri)
+                    if(pathFromUri != null && File(pathFromUri).exists()) {
+                        try {
+                            os = contentResolver.openOutputStream(contentUri, "wt")!!
+                        } catch (e: Exception) {
+                            if (e is android.app.RecoverableSecurityException || e.cause is android.app.RecoverableSecurityException || e is SecurityException) {
+                                (application as WifiSyncApp).update(contentUri)
+                            }
+                            throw e
+                        }
                     } else {
                         contentUri = contentResolver.insert(playListCollection, values)
                         if (WifiSyncServiceSettings.debugMode) {
@@ -1060,94 +1068,24 @@ class WifiSyncService : Service() {
                     flushWriter()
                     var readLength: Long = fileLength
                     while(readLength > 0){
-                        readCount = readArray(buffer, socketTextReadBufferLength)
-                        fs.write(buffer, 0, readCount)
-                        readLength -= readCount.toLong()
+                        val readNum = readArray(playlistBuffer, socketTextReadBufferLength)
+                        if (readNum <= 0) break
+                        fs.write(playlistBuffer, 0, readNum)
+                        readLength -= readNum.toLong()
                     }
                 }
-            }finally {
+            } catch (e: Exception) {
+                Log.e("receivePlaylist", "Error writing playlist", e)
+                writeString("$syncStatusFAIL $e")
+                flushWriter()
+                return
+            } finally {
                 os?.close()
             }
             writeString(syncStatusOK)
             flushWriter()
         }
 
-        private fun writeReceiveFile(
-                fs: OutputStream,
-                buffer: Array<ByteArray>,
-                waitRead: AutoResetEvent,
-                waitWrite: AutoResetEvent,
-                readCount: IntArray,
-                thread: Thread
-            )
-        {
-            try {
-                var bytesRead = 0
-                var bufferIndex = 0
-                while (true) {
-                    waitRead.waitOne()
-                    bytesRead = readCount[bufferIndex]
-                    if (bytesRead < 0) {
-                        throw SocketException("Error reading file")
-                    } else if (bytesRead == 0) {
-                        break
-                    }
-                    fs.write(buffer[bufferIndex], 0, bytesRead)
-                    waitWrite.set()
-                    bufferIndex = if ((bufferIndex == 1)) 0 else 1
-                }
-            } catch (_: InterruptedException) {
-                Thread.currentThread().interrupt()
-                writeString(syncStatusCANCEL)
-                flushWriter()
-            } finally {
-                fs.flush()
-                thread.interrupt()
-            }
-        }
-
-        private inner class ReceiveFileReceiveLoop(
-            private val fileLength: Long,
-            private val buffer: Array<ByteArray>,
-            private val readCount: IntArray,
-            private val waitRead: AutoResetEvent,
-            private val waitWrite: AutoResetEvent,
-            private val initReadLength: Int
-        ) : Runnable {
-            override fun run() {
-                var readLength = initReadLength
-                var bytesRead: Int
-                var remainingBytes = fileLength
-                var bufferIndex = 0
-                while (true) {
-                    try {
-                        if (remainingBytes <= 0) {
-                            bytesRead = 0
-                        } else {
-                            if (remainingBytes < initReadLength) {
-                                readLength = remainingBytes.toInt()
-                            }
-                            bytesRead = readArray(buffer[bufferIndex], readLength)
-                        }
-                    } catch (ex: Exception) {
-                        bytesRead = -1
-                        logError("receiveLoop", ex)
-                    }
-                    try {
-                        waitWrite.waitOne()
-                    } catch (_: InterruptedException) {
-                        bytesRead = -1
-                    }
-                    readCount[bufferIndex] = bytesRead
-                    waitRead.set()
-                    if (bytesRead <= 0) {
-                        break
-                    }
-                    remainingBytes -= bytesRead.toLong()
-                    bufferIndex = if ((bufferIndex == 1)) 0 else 1
-                }
-            }
-        }
 
         @Throws(Exception::class)
         private fun sendFile() {
@@ -1975,10 +1913,10 @@ class WifiSyncService : Service() {
         var syncFromResults: ArrayList<SyncResultsInfo>? = null
         val waitSyncResults = AutoResetEvent(false)
         //private const val socketConnectTimeout = 0
-        private const val socketConnectTimeout = 10000000
+        private const val socketConnectTimeout = 30000
         //private const val socketConnectTimeout = 100
         //private const val socketReadTimeout = 0
-        private const val socketReadTimeout = 30000000
+        private const val socketReadTimeout = 60000
         //private const val socketReadTimeout = 300
         private const val socketTextReadBufferLength = 16384
         private const val socketReadBufferLength = 262144
@@ -2191,12 +2129,10 @@ class AutoResetEvent(@field:Volatile private var open: Boolean) {
     @Throws(InterruptedException::class)
     fun waitOne() {
         lock.withLock {
-        //synchronized(monitor) {
             while (!open) {
                 condition.await()
             }
             open = false
-            //reset()
         }
     }
 }

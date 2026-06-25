@@ -74,7 +74,19 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
         currentActivity = activity
     }
 
-    fun deleteUris(uris: List<Uri>) {
+    fun delete(uri: Uri) {
+        synchronized(pendingDeleteUris) {
+            pendingDeleteUris.add(uri)
+        }
+        mainHandler.removeCallbacks(deleteRunnable)
+        mainHandler.postDelayed(deleteRunnable, 300)
+    }
+
+    fun deleteUrisImmediate(uris: List<Uri>) {
+        deleteUris(uris)
+    }
+
+    private fun deleteUris(uris: List<Uri>) {
         if (uris.isEmpty()) return
         val activity = currentActivity
         if (activity == null) {
@@ -84,31 +96,25 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
         Log.d("WifiSyncApp", "deleteUris(${uris.size} items)")
 
         activity.runOnUiThread {
-            try {
-                val pendingIntent = MediaStore.createDeleteRequest(activity.contentResolver, uris)
-                activity.startIntentSenderForResult(
-                    pendingIntent.intentSender,
-                    555,
-                    null,
-                    0,
-                    0,
-                    0,
-                    null
-                )
-            } catch (e: android.content.IntentSender.SendIntentException) {
-                Log.e("WifiSyncApp", "SendIntentException in deleteUris", e)
-            } catch (e: Exception) {
-                Log.e("WifiSyncApp", "Error in deleteUris", e)
+            uris.chunked(2000).forEach { chunk ->
+                try {
+                    val pendingIntent = MediaStore.createDeleteRequest(activity.contentResolver, chunk)
+                    activity.startIntentSenderForResult(
+                        pendingIntent.intentSender,
+                        555,
+                        null,
+                        0,
+                        0,
+                        0,
+                        null
+                    )
+                } catch (e: android.content.IntentSender.SendIntentException) {
+                    Log.e("WifiSyncApp", "SendIntentException in deleteUris", e)
+                } catch (e: Exception) {
+                    Log.e("WifiSyncApp", "Error in deleteUris", e)
+                }
             }
         }
-    }
-
-    fun delete(uri: Uri) {
-        synchronized(pendingDeleteUris) {
-            pendingDeleteUris.add(uri)
-        }
-        mainHandler.removeCallbacks(deleteRunnable)
-        mainHandler.postDelayed(deleteRunnable, 200)
     }
 
     fun update(uri: Uri) {
@@ -116,10 +122,18 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
             pendingUpdateUris.add(uri)
         }
         mainHandler.removeCallbacks(updateRunnable)
-        mainHandler.postDelayed(updateRunnable, 200)
+        // 連続呼び出しが止まってから少し待って実行
+        mainHandler.postDelayed(updateRunnable, 300)
     }
 
-    fun updateUris(uris: List<Uri>) {
+    /**
+     * リストを直接渡して即時更新リクエストを行う
+     */
+    fun updateUrisImmediate(uris: List<Uri>) {
+        updateUris(uris)
+    }
+
+    private fun updateUris(uris: List<Uri>) {
         if (uris.isEmpty()) return
         val activity = currentActivity
         if (activity == null) {
@@ -131,21 +145,23 @@ class WifiSyncApp : Application(), ActivityLifecycleCallbacks {
         }
 
         activity.runOnUiThread {
-            try {
-                val pendingIntent = MediaStore.createWriteRequest(activity.contentResolver, uris)
-                activity.startIntentSenderForResult(
-                    pendingIntent.intentSender,
-                    999,
-                    null,
-                    0,
-                    0,
-                    0,
-                    null
-                )
-            } catch (e: android.content.IntentSender.SendIntentException) {
-                Log.e("WifiSyncApp", "SendIntentException in updateUris", e)
-            } catch (e: Exception) {
-                Log.e("WifiSyncApp", "Error in updateUris", e)
+            uris.chunked(2000).forEach { chunk ->
+                try {
+                    val pendingIntent = MediaStore.createWriteRequest(activity.contentResolver, chunk)
+                    activity.startIntentSenderForResult(
+                        pendingIntent.intentSender,
+                        999,
+                        null,
+                        0,
+                        0,
+                        0,
+                        null
+                    )
+                } catch (e: android.content.IntentSender.SendIntentException) {
+                    Log.e("WifiSyncApp", "SendIntentException in updateUris", e)
+                } catch (e: Exception) {
+                    Log.e("WifiSyncApp", "Error in updateUris", e)
+                }
             }
         }
     }
