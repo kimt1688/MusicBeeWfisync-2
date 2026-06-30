@@ -1,12 +1,15 @@
 package kim.tkland.musicbeewifisync
 
+import android.Manifest
 import android.R.color.white
 import android.app.Application
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -72,6 +75,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.InputStreamReader
+import java.io.BufferedReader
 
 
 class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
@@ -449,9 +454,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     }
 
     private fun getVolumeName(context: Context): String {
-        val volumes = MediaStore.getExternalVolumeNames(context).toTypedArray()
-        val index = WifiSyncServiceSettings.deviceStorageIndex - 1
-        return if (index in volumes.indices) volumes[index] else MediaStore.VOLUME_EXTERNAL_PRIMARY
+        return WifiSyncService.getVolumeName(context)
     }
 
     private fun loadPlaylists(
@@ -492,15 +495,21 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                         return@Runnable
                     }
                     do {
+                        val id = cursor.getLong(0)
+                        val relativePath = cursor.getString(1)
+                        val displayName = cursor.getString(2)
+                        val fullPath = relativePath + displayName
+                        
                         selectedPlaylists?.add(
                             FileSelectedInfo(
-                                cursor.getLong(0),
-                                cursor.getString(2),
+                                id,
+                                displayName,
+                                fullPath,
                                 false
                             )
                         )
-                        onListFilenameChange(cursor.getString(2))
-                        onListFullPathChange(cursor.getString(1) + cursor.getString(2))
+                        onListFilenameChange(displayName)
+                        onListFullPathChange(fullPath)
                         onIsListCheckChange(false)
                     } while (cursor.moveToNext())
                     cursor.close()
@@ -564,6 +573,19 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
         }
 
         LaunchedEffect(Unit) {
+            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Manifest.permission.READ_MEDIA_AUDIO
+            } else {
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            }
+
+            if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                Log.w("DeletePlaylistActivity", "Permission not granted: $permission")
+                localLoading = false
+                finishDeletion()
+                return@LaunchedEffect
+            }
+
             val allUrisToDelete = mutableListOf<Uri>()
             
             kotlinx.coroutines.withContext(Dispatchers.IO) {
@@ -577,17 +599,12 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
                             if (id > 0) {
                                 val volumeName = getVolumeName(context)
                                 val uri = ContentUris.withAppendedId(MediaStore.Audio.Playlists.getContentUri(volumeName), id)
-                                val absolutePath = getAbsolutePathFromId(id)
                                 
-                                if (absolutePath.isNotEmpty()) {
-                                    val file = File(absolutePath)
-                                    if (file.exists()) {
-                                        if (file.extension.equals("m3u", false) || file.extension.equals("m3u8", false)) {
-                                            allUrisToDelete.addAll(getM3UPlaylistTrackUris(file))
-                                        } else {
-                                            allUrisToDelete.addAll(getPlaylistTrackUris(context, id))
-                                        }
-                                    }
+                                val fileName = selected[i].filename
+                                if (fileName.endsWith(".m3u", true) || fileName.endsWith(".m3u8", true)) {
+                                    allUrisToDelete.addAll(getM3UPlaylistTrackUris(context, uri))
+                                } else {
+                                    allUrisToDelete.addAll(getPlaylistTrackUris(context, id))
                                 }
                                 allUrisToDelete.add(uri)
                             }
@@ -621,20 +638,47 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
             return
         }
 
+        // Group by volume to avoid SecurityException/IllegalArgumentException for multi-volume requests
+        val firstUri = pendingUrisToDelete.first()
+        val volumeName = try { 
+            MediaStore.getVolumeName(firstUri) 
+        } catch (e: Exception) { 
+            "external" 
+        }
+        
+        val sameVolumeUris = pendingUrisToDelete.filter { uri ->
+            try { MediaStore.getVolumeName(uri) == volumeName } catch (e: Exception) { true } 
+        }
+        
         val chunkSize = 2000
-        val chunk = if (pendingUrisToDelete.size > chunkSize) {
-            val c = pendingUrisToDelete.take(chunkSize)
-            pendingUrisToDelete = pendingUrisToDelete.drop(chunkSize).toMutableList()
-            c
+        val chunk = if (sameVolumeUris.size > chunkSize) {
+            sameVolumeUris.take(chunkSize)
         } else {
-            val c = pendingUrisToDelete.toList()
-            pendingUrisToDelete.clear()
-            c
+            sameVolumeUris
         }
 
+        // Remove the processed chunk from the global pending list
+        pendingUrisToDelete.removeAll { chunk.contains(it) }
+
         try {
-            Log.d("DeletePlaylistActivity", "Requesting delete for ${chunk.size} URIs. Remaining: ${pendingUrisToDelete.size}")
-            val pendingIntent = MediaStore.createDeleteRequest(contentResolver, chunk)
+            Log.d("DeletePlaylistActivity", "Requesting delete for ${chunk.size} URIs on volume $volumeName. Remaining: ${pendingUrisToDelete.size}")
+            
+            // On Android 11+ createDeleteRequest requires media items (audio, video, images, playlists).
+            // Files collection items might throw IllegalArgumentException: All requested items must be Media items
+            val mediaUris = chunk.filter { uri ->
+                val path = uri.path ?: return@filter false
+                path.contains("/audio/") || path.contains("/video/") ||
+                path.contains("/images/") || path.contains("/playlists/") ||
+                !path.contains("/file/")
+            }
+
+            if (mediaUris.isEmpty()) {
+                Log.w("DeletePlaylistActivity", "No valid media URIs in chunk")
+                processNextDeleteChunk() // Skip this chunk if no valid media URIs
+                return
+            }
+
+            val pendingIntent = MediaStore.createDeleteRequest(contentResolver, mediaUris)
             val intentSenderRequest = IntentSenderRequest.Builder(pendingIntent.intentSender).build()
             resultLauncher.launch(intentSenderRequest)
         } catch (e: Exception) {
@@ -666,16 +710,23 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     }
 
     // トラックのURIをリストアップするだけのヘルパーメソッド
-    private fun getM3UPlaylistTrackUris(playlist: File): List<Uri> {
+    private fun getM3UPlaylistTrackUris(context: Context, playlistUri: Uri): List<Uri> {
         val uriList = mutableListOf<Uri>()
         try {
-            playlist.forEachLine { line ->
-                if (!line.startsWith("#") && !line.endsWith(".m3u", true) && !line.endsWith(".m3u8", true)) {
-                    filePathToSongUri(line.substring(1))?.let { uriList.add(it) }
+            context.contentResolver.openInputStream(playlistUri)?.use { inputStream ->
+                BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                    reader.forEachLine { line ->
+                        if (!line.startsWith("#") && line.isNotBlank()) {
+                            // M3Uファイル内のパスから曲のURIを取得
+                            // MusicBeeのM3Uは通常絶対パス（/Music/Artist/...）
+                            val path = if (line.startsWith("/")) line.substring(1) else line
+                            filePathToSongUri(path)?.let { uriList.add(it) }
+                        }
+                    }
                 }
             }
         } catch (e: Exception) {
-            Log.e("DeletePlaylistActivity", "Error reading M3U file", e)
+            Log.e("DeletePlaylistActivity", "Error reading M3U from Uri", e)
         }
         return uriList
     }
@@ -710,39 +761,48 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     }
 
 
-    fun getAbsolutePathFromId(id: Long): String {
-        var result = ""
-        val volumeName = getVolumeName(this)
-        val collection = MediaStore.Audio.Playlists.getContentUri(volumeName)
-        val projection = arrayOf(MediaStore.Audio.Playlists.DATA)
-
-        contentResolver.query(collection, projection, "${MediaStore.Audio.Playlists._ID} = ?", arrayOf(id.toString()), null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                result = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists.DATA))
-            }
-        }
-        return result
-    }
-
     fun filePathToSongUri(filePath: String): Uri? {
         val volumeName = getVolumeName(this)
+        
+        // Use Audio collection instead of Files to ensure createDeleteRequest treats it as a Media item
         val collection = MediaStore.Audio.Media.getContentUri(volumeName)
 
         val projection = arrayOf(MediaStore.Audio.Media._ID)
-        val displayName = filePath.substring(filePath.lastIndexOf('/') + 1)
-        val relativePath = filePath.substring(0, filePath.lastIndexOf('/') + 1)
+        val separatorIndex = filePath.lastIndexOf('/') + 1
+        val displayName = filePath.substring(separatorIndex)
+        val relativePath = filePath.substring(0, separatorIndex)
 
-        val selection = "${MediaStore.Audio.Media.DISPLAY_NAME} = ? AND ${MediaStore.Audio.Media.RELATIVE_PATH} = ?"
-        val selectionArgs = arrayOf(displayName, relativePath)
+        val selection = "UPPER(${MediaStore.Audio.Media.DISPLAY_NAME}) = ? AND UPPER(${MediaStore.Audio.Media.RELATIVE_PATH}) = ?"
+        val selectionArgs = arrayOf(displayName.uppercase(), relativePath.uppercase())
 
         var id: Long = 0
-        contentResolver.query(collection, projection, selection, selectionArgs, null)?.use { cursor ->
-            Log.i("filePathToSongUri", "cursor.count: ${cursor.count}")
-            if (cursor.moveToFirst()) {
-                id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
+        try {
+            contentResolver.query(collection, projection, selection, selectionArgs, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("filePathToSongUri", "Error querying Audio collection", e)
+        }
+
+        // Fallback to Files collection if not found in Audio, but be aware it might cause issues with createDeleteRequest
+        if (id == 0L) {
+            val fileCollection = MediaStore.Files.getContentUri(volumeName)
+            try {
+                contentResolver.query(fileCollection, projection, selection, selectionArgs, null)?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID))
+                        Log.i("filePathToSongUri", "Found in Files collection instead of Audio: $filePath")
+                        return ContentUris.withAppendedId(fileCollection, id)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("filePathToSongUri", "Error querying Files collection", e)
             }
         }
-        Log.i("filePathToSongUri", "filePath: $filePath, id: $id")
+
+        Log.i("filePathToSongUri", "filePath: $filePath, id: $id, volume: $volumeName")
 
         if (id == 0L) return null
         return ContentUris.withAppendedId(collection, id)
@@ -778,6 +838,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     private inner class FileSelectedInfo internal constructor(
         val id: Long,
         val filename: String,
+        val fullPath: String,
         var checked: Boolean
     )
 

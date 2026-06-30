@@ -1,6 +1,7 @@
 package kim.tkland.musicbeewifisync
 
 import android.R.color.white
+import android.app.Activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -97,6 +98,13 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
             )
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 999) { // MediaStore.createWriteRequest
+            (application as WifiSyncApp).signalPermissionResult()
+        }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

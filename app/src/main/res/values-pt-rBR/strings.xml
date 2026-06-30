@@ -41,8 +41,8 @@
     <string name="syncPlaylists0">Nenhuma playlist selecionada</string>
     <string name="syncPlaylists1">1 playlist selecionada</string>
     <string name="syncPlaylistsN">%d playlists selecionadas</string>
-    <string name="deletePlaylists1">1 playlist deleted</string>
-    <string name="deletePlaylistsN">%d playlists deleted.</string>
+    <string name="deletePlaylists1">1 lista de reprodução foi excluída</string>
+    <string name="deletePlaylistsN">%d playlists excluídas.</string>
     <string name="syncPlaylistsDeleteUnselected">apagar arquivos fora das playlists escolhidas</string>
     <string name="syncStop">Parar</string>
     <string name="syncCancel">Cancelar</string>
@@ -69,7 +69,7 @@
     <string name="reverseSyncFilesWarning1">1 arquivo</string>
     <string name="reverseSyncFilesWarningN">%d arquivos</string>
     <string name="logCopyClipboard">Copiar para a área de transferência</string>
-    <string name="logClear">Clear error log</string>
+    <string name="logClear">Limpar o registro de erros</string>
     <string name="errorNone">Sem erros.</string>
     <string name="errorServerNotFound">Servidor não encontrado. Verifique se o Musicbee está rodando e o firewall não está bloqueando o Musicbee.</string>
     <string name="errorConfigNotMatched">O Musicbee não pôde conferir o nome do dispositivo com a configuração atual.</string>
@@ -88,21 +88,21 @@
     <string name="menuWifiFullSync">Sincronização Total</string>
     <string name="menuWifiPlaylistSync">Sincronização de Playlists</string>
     <string name="settingsLocateServerInfo4">Passo 3. (Opcional) Defina o IP do PC executando MusicBee se detecção automática falhar:</string>
-    <string name="statsSelect">Select Stats</string>
-    <string name="statsSelectMessage">Select GoneMAD\'s stats.xml file.</string>
+    <string name="statsSelect">Estatísticas selecionadas</string>
+    <string name="statsSelectMessage">Selecione o arquivo stats.xml do GoneMAD.</string>
     <string name="errorInvalidIp">Este não é um endereço IP válido</string>
-    <string name="mimeTypeError">MIME Type Error</string>
-    <string name="mimeTypeErrorMessage">Álbum artwork should be set to embedded.</string>
-    <string name="menuFullScanFiles">regist MediaStore</string>
+    <string name="mimeTypeError">Erro de tipo MIME</string>
+    <string name="mimeTypeErrorMessage">A capa do álbum deve ser definida como incorporada.</string>
+    <string name="menuFullScanFiles">Registrar no MediaStore</string>
     <string name="progressDialogTitle">MusicBee Wifi Sync</string>
-    <string name="alertDialogMessage">Register files modified by Wired Sync in the MediaStore</string>
-    <string name="progressDialogMessage">Registering files modified by Wired Sync in the MediaStore…</string>
-    <string name="menuAllPlaylistsDelete">Delete All Playlists in Device</string>
-    <string name="menuAllPlaylistsDeleteConfirm">Really want to delete all playlists?</string>
-    <string name="playlistDeletingMessage">Deleting playlists…</string>
-    <string name="syncConfirmHeader">Confirm</string>
-    <string name="deletePlaylists0">No playlists deleted.</string>
-    <string name="titleOfIPAddress">IP Address</string>
+    <string name="alertDialogMessage">Arquivos de registro modificados pelo Wired Sync no MediaStore</string>
+    <string name="progressDialogMessage">Registrando arquivos modificados pelo Wired Sync no MediaStore…</string>
+    <string name="menuAllPlaylistsDelete">Excluir todas as listas de reprodução do dispositivo</string>
+    <string name="menuAllPlaylistsDeleteConfirm">Tem certeza de que deseja excluir todas as listas de reprodução?</string>
+    <string name="playlistDeletingMessage">Excluindo listas de reprodução…</string>
+    <string name="syncConfirmHeader">Confirmar</string>
+    <string name="deletePlaylists0">Nenhuma lista de reprodução foi excluída.</string>
+    <string name="titleOfIPAddress">Endereço IP</string>
     <string name="checkMBVersion">É necessário o MusicBee versão 3.7 ou superior.</string>
 
 </resources>

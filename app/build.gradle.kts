@@ -14,8 +14,8 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 166
-        versionName = "3.1.16"
+        versionCode = 167
+        versionName = "3.1.17"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         targetSdk = 36
@@ -125,6 +125,7 @@ dependencies {
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
     implementation (libs.kotlin.stdlib.jdk7)
     implementation (libs.androidx.activity.ktx)
+    implementation (libs.androidx.fragment.ktx)
     //implementation (libs.fragment.ktx)
     implementation (libs.androidx.runtime)
     implementation (libs.kotlinx.coroutines.core.jvm)

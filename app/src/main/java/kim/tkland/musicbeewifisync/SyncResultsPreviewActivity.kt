@@ -164,6 +164,13 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         }
         waitResultsThread!!.start()
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 999) { // MediaStore.createWriteRequest
+            (application as WifiSyncApp).signalPermissionResult()
+        }
+    }
     private fun requireContext(): Context {
         return applicationContext
     }

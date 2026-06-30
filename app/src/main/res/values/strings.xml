@@ -93,9 +93,9 @@
     <string name="statsSelectMessage">Select GoneMAD\'s stats.xml file.</string>
     <string name="mimeTypeError">MIME Type Error</string>
     <string name="mimeTypeErrorMessage">Album artwork should be set to embedded.</string>
-    <string name="menuFullScanFiles">register MediaStore</string>
+    <string name="menuFullScanFiles">regist MediaStore</string>
     <string name="progressDialogTitle">MusicBee Wifi Sync</string>
-    <string name="alertDialogMessage">Register files modified by Wired Sync in the MediaStore</string>
+    <string name="alertDialogMessage">Regist files modified by Wired Sync in the MediaStore</string>
     <string name="progressDialogMessage">Registering files modified by Wired Sync in the MediaStore…</string>
     <string name="menuAllPlaylistsDelete">Delete All Playlists in Device</string>
     <string name="menuAllPlaylistsDeleteConfirm">Do you really want to delete all playlists?</string>
