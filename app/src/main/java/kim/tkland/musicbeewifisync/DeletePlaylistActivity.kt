@@ -520,6 +520,7 @@ class DeletePlaylistActivity : WifiSyncStartSyncBaseActivity() {
     }
 
     private fun finishDeletion() {
+        Log.d("DeletePlaylistActivity", "finishDeletion: resetting isDeleting to false")
         isDeleting = false
         loadPlaylistsAsync()
     }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -117,9 +118,9 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
     @Composable
     fun CreateProgressDialog(vm: WifiSyncViewModel) {
         val msg by vm.msg.collectAsState()
-        var isThreadStarted by remember  { mutableStateOf(false) }
+        val showDialog by vm.showDialog.collectAsState()
 
-        if (vm.showDialog.collectAsState().value) {
+        if (showDialog) {
             Dialog(
                 onDismissRequest = { },
                 properties = DialogProperties(
@@ -151,43 +152,39 @@ abstract class WifiSyncBaseActivity(private val myStringParam: String) : AppComp
                         Column() {
                             Text(
                                 text = msg,
-                                modifier = Modifier.padding(start = 20.dp, top = 16.dp)
+                                modifier = Modifier.padding(start = 20.dp, top = 16.dp),
+                                color = Color.Black
                             )
                         }
                     }
                     Row(
-                        modifier = Modifier.padding(top = 150.dp),
+                        modifier = Modifier
+                            .padding(top = 150.dp, end = 10.dp)
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.End
+                        Button(
+                            onClick = {
+                                vm.cancelProcess()
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(getColor(R.color.colorButtonBackground)),
+                                contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
+                            )
                         ) {
-                            Button(
-                                onClick = {
-                                    // showDialog = false
-                                    vm.cancelProcess()
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(getColor(R.color.colorButtonBackground)),
-                                    contentColor = Color(getColor(R.color.colorButtonTextEnabled)),
-                                )
-                            ) { /* Handle confirm action */
-                                Text(getString(android.R.string.cancel)) // Or use a string resource
-                            }
+                            Text(getString(android.R.string.cancel))
                         }
                     }
                 }
             }
+
+            // ダイアログが表示されている間に非同期処理を開始する
+            LaunchedEffect(showDialog) {
+                if (showDialog) {
+                    vm.doAsyncWork()
+                }
+            }
         }
-        if (isThreadStarted) {
-            return
-        }
-        LaunchedEffect(Unit) {
-            isThreadStarted = true
-            vm.doAsyncWork()
-            isThreadStarted = false
-        }
-        // setContent { CustomView() }
     }
 
     @SuppressLint("InflateParams", "ViewModelConstructorInComposable")

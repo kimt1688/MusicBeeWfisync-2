@@ -1,7 +1,6 @@
 package kim.tkland.musicbeewifisync
 
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class WifiSyncViewModel : ViewModel() {
@@ -18,44 +17,50 @@ class WifiSyncViewModel : ViewModel() {
     private val _msg = MutableStateFlow("")
     val msg: StateFlow<String> = _msg
     
-    var thread: Thread? = null
+    private var thread: Thread? = null
 
-    // 起動時にダイアログを表示し、スレッド処理を開始する
-    @Composable
-    fun StartThreadAndShowDialog(thread: Thread, message: String) {
-        _msg.value = message // メッセージを更新
-        this.thread = thread
-
-        if (thread.isAlive) return
-
-        viewModelScope.launch {
-            doAsyncWork()
-        }
-    }
-
+    /**
+     * スレッドとメッセージを設定し、ダイアログの表示フラグを立てる。
+     * 実際の処理開始は doAsyncWork() で行われる。
+     */
     fun setValues(thread: Thread, message: String) {
-        _msg.value = message // メッセージを更新
+        _msg.value = message
         this.thread = thread
+        _showDialog.value = true // ダイアログを表示状態にする
     }
 
+    /**
+     * バックグラウンドスレッドの実行と完了待ちを行う。
+     * CreateProgressDialog内のLaunchedEffectなどから呼び出されることを想定。
+     */
     suspend fun doAsyncWork() {
-        val job = CoroutineScope(Dispatchers.IO).launch {
-            // バックグラウンドで時間のかかる処理
-            _showDialog.value = true
-            if (thread?.state == Thread.State.NEW) {
-                thread?.start()
-            }
-            Log.d("WifiSyncViewModel", "Thread started")
-            thread?.join()
-            Log.d("WifiSyncViewModel", "Thread finished")
-            _showDialog.value = false // ダイアログを閉じる
+        if (thread == null) {
+            Log.w("WifiSyncViewModel", "doAsyncWork called but thread is null")
+            _showDialog.value = false
+            return
         }
 
-        // スレッドをブロックせずにコルーチンの完了を待つ
-        job.join()
+        withContext(Dispatchers.IO) {
+            try {
+                if (thread?.state == Thread.State.NEW) {
+                    Log.d("WifiSyncViewModel", "Starting thread: ${thread?.name}")
+                    thread?.start()
+                }
+                
+                Log.d("WifiSyncViewModel", "Waiting for thread: ${thread?.name}")
+                thread?.join()
+                Log.d("WifiSyncViewModel", "Thread finished: ${thread?.name}")
+            } catch (e: Exception) {
+                Log.e("WifiSyncViewModel", "Error in doAsyncWork", e)
+            } finally {
+                // 処理が終わったらダイアログを閉じる
+                _showDialog.value = false
+            }
+        }
     }
 
     fun cancelProcess() {
+        Log.d("WifiSyncViewModel", "Cancelling process")
         thread?.interrupt()
         _showDialog.value = false
     }
