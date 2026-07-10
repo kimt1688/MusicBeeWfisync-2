@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     var showEndOfSyncInfoDialog = mutableStateOf(false)
@@ -253,7 +254,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
                 loading = false
                 break
             }
-            delay(300)
+            delay(300.milliseconds)
         }
     }
     Column(
