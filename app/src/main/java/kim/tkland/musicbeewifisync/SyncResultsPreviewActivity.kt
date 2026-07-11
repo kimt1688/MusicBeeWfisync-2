@@ -79,12 +79,17 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
                 if (mainWindow == null) {
                     // ignore
                 } else if (previewToData == null || previewFromData == null) {
-                    setContent {
-                        disableProceedSyncButton()
-                    }
                     var errorMessageId = WifiSyncService.syncErrorMessageId.get()
                     if (errorMessageId == 0) {
                         errorMessageId = R.string.errorSyncNonSpecific
+                    }
+                    setContent {
+                        disableProceedSyncButton()
+                        ShowErrorMessageView(
+                            getString(R.string.title_activity_sync_preview),
+                            getString(errorMessageId),
+                            getColor(R.color.colorError)
+                        )
                     }
                 } else if (previewToData.isEmpty() && previewFromData.isEmpty()) {
                     setContent {

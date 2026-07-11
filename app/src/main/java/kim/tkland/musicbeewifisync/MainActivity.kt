@@ -572,6 +572,10 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
             try {
                 var statusDisplayed = false
                 while (true) {
+                    if (WifiSyncService.syncIsRunning.get()) {
+                        Thread.sleep(5000)
+                        continue
+                    }
                     if (WifiSyncService.ServerPinger.ping()) {
                         if (statusDisplayed) {
                             runOnUiThread {

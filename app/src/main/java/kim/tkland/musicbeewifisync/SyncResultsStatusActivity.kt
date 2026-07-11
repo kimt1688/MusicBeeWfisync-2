@@ -67,9 +67,6 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        if(WifiSyncService.syncErrorMessageId.get() != 0) {
-            return
-        }
         WifiSyncService.resultsActivityReady.set()
 
         // OnBackPressedDispatcher を取得
@@ -155,6 +152,7 @@ class SyncResultsStatusActivity : SyncResultsBaseActivity() {
                                 intent.setClass(context, WifiSyncService::class.java)
                                 intent.action = getString(R.string.actionSyncAbort)
                                 startService(intent)
+                                WifiSyncService.syncIsRunning.set(false)
                                 WifiSyncService.syncPercentCompleted.set(-1)
                                 WifiSyncServiceSettings.saveSettings(context)
                                 WifiSyncService.syncErrorMessageId.set(R.string.syncCancelled)
@@ -233,24 +231,37 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
     var showEndOfSyncInfo by remember { mutableStateOf(false) }
     var isErrorEnd by remember { mutableStateOf(false) }
     var compMessage by remember { mutableStateOf("") }
+    var errorId by remember { mutableStateOf<Int?>(null) }
 
     val animatedSyncProgress by animateFloatAsState(
         targetValue = rawTargetSyncProgress,
         label = "syncProgressAnimation" // Optional but good for debugging
     )
 
+    LaunchedEffect(showEndOfSyncInfo) {
+        if (showEndOfSyncInfo && errorId == null) {
+            errorId = WifiSyncService.syncErrorMessageId.getAndSet(0)
+        }
+    }
+
     LaunchedEffect(Unit) {
         while (true) {
-            if (WifiSyncService.syncPercentCompleted.get() != -1) {
-                rawTargetSyncProgress = WifiSyncService.syncPercentCompleted.get() / 100f
+            val isRunning = WifiSyncService.syncIsRunning.get()
+            val progress = WifiSyncService.syncPercentCompleted.get()
+            if (isRunning && progress != -1) {
+                rawTargetSyncProgress = progress / 100f
                 onCurrentSyncMessageChange(WifiSyncService.syncProgressMessage.get())
                 showEndOfSyncInfo = false
-                onButtonTextChange(getString(R.string.syncStop))
+                if (buttonText != getString(R.string.syncStop)) {
+                    onButtonTextChange(getString(R.string.syncStop))
+                }
             } else {
-                rawTargetSyncProgress = 1f // Or whatever the final state should be
-                onCurrentSyncMessageChange("Sync finished") // Or a message from WifiSyncService
+                rawTargetSyncProgress = if (progress == -1) 1f else progress / 100f
+                onCurrentSyncMessageChange(WifiSyncService.syncProgressMessage.get())
                 showEndOfSyncInfo = true
-                onButtonTextChange(getString(R.string.syncMore))
+                if (buttonText != getString(R.string.syncMore)) {
+                    onButtonTextChange(getString(R.string.syncMore))
+                }
                 loading = false
                 break
             }
@@ -307,9 +318,9 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
         }
     }
     if (showEndOfSyncInfo) {
-        onCurrentSyncMessageChange("")
         compMessage = getString(R.string.syncCompleted)
-        if (WifiSyncService.syncErrorMessageId.get() == 0 && !isErrorEnd) {
+        val currentErrorId = errorId ?: 0
+        if (currentErrorId == 0 && !isErrorEnd) {
             // 正常系のメッセージ表示、データのクリアを行う
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -340,8 +351,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
             }
         } else {
             isErrorEnd = true
-            //ShowEndOfSyncInformation(innerPadding, statusBarPadding, compMessage, onDismiss = { showEndOfSyncDialog = false})
-            ShowEndOfSyncInformation(innerPadding, statusBarPadding, compMessage, onCompleteTextChange = {compMessage = it})
+            ShowEndOfSyncInformation(innerPadding, statusBarPadding, compMessage, currentErrorId, onCompleteTextChange = {compMessage = it})
         }
     }
 }
@@ -353,8 +363,7 @@ fun ShowSyncStatusComposable(innerPadding: PaddingValues,
     }
 
     @Composable
-    private fun ShowEndOfSyncInformation(innerPadding: PaddingValues, statusBarPadding: PaddingValues, compMessage: String, onCompleteTextChange: (String) -> Unit) {
-        val errorMessageId = WifiSyncService.syncErrorMessageId.getAndSet(0)
+    private fun ShowEndOfSyncInformation(innerPadding: PaddingValues, statusBarPadding: PaddingValues, compMessage: String, errorMessageId: Int, onCompleteTextChange: (String) -> Unit) {
         WifiSyncServiceSettings.saveSettings(this)
         var errorMessage = ""
         if (errorMessageId == 0 || errorMessageId == R.string.syncCompletedFail) {

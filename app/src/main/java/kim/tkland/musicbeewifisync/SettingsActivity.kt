@@ -78,13 +78,11 @@ import java.io.File
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 
 class SettingsActivity : WifiSyncBaseActivity("") {
     private var initialSetup = false
     private var isfirst = true
-    var showDialog = mutableStateOf(false)
     var showErrorDialog1 = mutableStateOf(false)
     var showErrorDialog2 = mutableStateOf(false)
     var initialStorage = mutableIntStateOf(value = 1)
@@ -121,11 +119,13 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        WifiSyncServiceSettings.loadSettings(this)
 
         initialSetup = WifiSyncServiceSettings.defaultIpAddressValue.isEmpty()
 
         setContent {
-            val newIPAddressState = rememberTextFieldState("", TextRange(0))
+            val currentIP = WifiSyncServiceSettings.defaultIpAddressValue
+            val newIPAddressState = rememberTextFieldState(currentIP, TextRange(currentIP.length))
 
             if (initialSetup) {
                 if (isfirst) {
@@ -319,18 +319,18 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     }
 
     @Composable
-    private fun showErrorDialog1(showErrorDialog1: MutableState<Boolean>, newIPAddressState: TextFieldState, isFirst: Boolean) {
-        val openAlertDialog = remember { mutableStateOf(showErrorDialog1.value) }
+    private fun ShowServerNotFoundDialog(showErrorState: MutableState<Boolean>, newIPAddressState: TextFieldState, isFirst: Boolean) {
+        val openAlertDialog = remember { mutableStateOf(showErrorState.value) }
 
         when {
             openAlertDialog.value -> AlertDialog(
-                onDismissRequest = { showErrorDialog1.value = false },
+                onDismissRequest = { showErrorState.value = false },
                 title = { Text(getString(R.string.syncErrorHeader)) },
                 text = { Text(getString(R.string.errorServerNotFound)) },
                 confirmButton = {
                     Button(
                         onClick = {
-                            showErrorDialog1.value = false
+                            showErrorState.value = false
                             openAlertDialog.value = false
                             setContent {
                                 if (isFirst) {
@@ -350,18 +350,18 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     }
 
     @Composable
-    private fun showErrorDialog2(showErrorDialog2: MutableState<Boolean>, newIPAddressState: TextFieldState, isFirst: Boolean) {
-        val openAlertDialog = remember { mutableStateOf(showErrorDialog1.value) }
+    private fun ShowNoConfigMatchedDialog(showErrorState: MutableState<Boolean>, newIPAddressState: TextFieldState, isFirst: Boolean) {
+        val openAlertDialog = remember { mutableStateOf(showErrorState.value) }
 
         when {
             openAlertDialog.value -> AlertDialog(
-                onDismissRequest = { showErrorDialog2.value = false },
+                onDismissRequest = { showErrorState.value = false },
                 title = { Text(getString(R.string.syncErrorHeader)) },
                 text = { Text(getString(R.string.errorLocateServerNoConfig)) },
                 confirmButton = {
                     Button(
                         onClick = {
-                            showErrorDialog2.value = false
+                            showErrorState.value = false
                             openAlertDialog.value = false
                             setContent {
                                 if (isFirst) {
@@ -455,9 +455,29 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
                         ),
                         onClick = {
-                            setContent {
-                                PerformBottomBarButtonAction(newIPAddressState)
+                            // Locate Server automatically
+                            WifiSyncServiceSettings.deviceStorageIndex = initialStorage.intValue
+                            WifiSyncServiceSettings.saveSettings(applicationContext)
+                            
+                            // We can use a simple thread or Coroutine for this
+                            val locateServerThread = Thread {
+                                val serverIPAddress = WifiSyncService.getMusicBeeServerAddress(context, null)
+                                runOnUiThread {
+                                    if (serverIPAddress == null) {
+                                        showErrorDialog1.value = true
+                                    } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
+                                        showErrorDialog2.value = true
+                                    } else {
+                                        WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
+                                        WifiSyncServiceSettings.saveSettings(applicationContext)
+                                        val intent = Intent(context, MainActivity::class.java)
+                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        startActivity(intent)
+                                        finish()
+                                    }
+                                }
                             }
+                            locateServerThread.start()
                         }
                     ) {
                         Text(getString(R.string.settingsLocate), fontSize = 24.sp)
@@ -465,6 +485,12 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 }
             }
         ) { innerPadding ->
+            if (showErrorDialog1.value) {
+                ShowServerNotFoundDialog(showErrorDialog1, newIPAddressState, true)
+            }
+            if (showErrorDialog2.value) {
+                ShowNoConfigMatchedDialog(showErrorDialog2, newIPAddressState, true)
+            }
             Column(
                 modifier = Modifier
                     .background(Color(getColor(white)))
@@ -517,108 +543,12 @@ class SettingsActivity : WifiSyncBaseActivity("") {
         }
     }
 
-    @Composable
-    private fun PerformBottomBarButtonAction(newIPAddressState: TextFieldState) {
-        val context = LocalContext.current
-        // Your existing logic for when the bottom bar button is clicked
-        // and permissions are granted
-        WifiSyncServiceSettings.deviceStorageIndex = initialStorage.intValue
-        WifiSyncServiceSettings.saveSettings(applicationContext)
-        val locateServerThread = Thread {
-            val serverIPAddress =
-                WifiSyncService.getMusicBeeServerAddress(context, null)
-            runOnUiThread {
-                if (serverIPAddress == null) {
-                    setContent {
-                        ShowErrorDialog(showErrorDialog1, true, newIPAddressState, true)
-                    }
-                } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
-                    setContent {
-                        ShowErrorDialog(showErrorDialog2, true, newIPAddressState, true)
-                    }
-                } else {
-                    WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
-                    WifiSyncServiceSettings.saveSettings(applicationContext)
-                    val intent = Intent(context, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    startActivity(intent)
-                }
-            }
-        }
-        runBlocking {
-            val deferredResult = async {
-                locateServerThread.start()
-            }
-            deferredResult.await()
-        }
-    }
-
-    @Composable
-    private fun PerformBottomBarButtonActionOptionView(newIPAddressState: TextFieldState) {
-        val context = LocalContext.current
-        // Your existing logic for when the bottom bar button is clicked
-        // and permissions are granted
-        //WifiSyncServiceSettings.deviceStorageIndex = initialStorage.intValue
-        //WifiSyncServiceSettings.saveSettings(applicationContext)
-        val locateServerThread = Thread {
-            val serverIPAddress =
-                newIPAddressState.text.toString()
-            runOnUiThread {
-                if (serverIPAddress.isEmpty()) {
-                    setContent {
-                        ShowErrorDialog(showErrorDialog1, true, newIPAddressState, false)
-                    }
-                } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
-                    setContent {
-                        ShowErrorDialog(showErrorDialog2, true, newIPAddressState, false)
-                    }
-                } else {
-                    WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
-                    WifiSyncServiceSettings.saveSettings(applicationContext)
-                    val intent = Intent(context, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    startActivity(intent)
-                }
-            }
-        }
-        runBlocking {
-            val deferredResult = async {
-                locateServerThread.start()
-            }
-            deferredResult.await()
-        }
-    }
-
-    @Composable
-    private fun ShowErrorDialog(dialog: MutableState<Boolean>, v: Boolean, newIPAddressState: TextFieldState, isFirst: Boolean) {
-        // A helper to show dialogs. You'll need to manage the state for this.
-        // For simplicity, this is just a placeholder.
-        // In Compose, you'd update a mutableStateOf<Boolean> to show/hide an AlertDialog.
-        //Log.e("SettingsActivity", "$title: $message")
-        // Example:
-        // showDialogState.value = true
-        // dialogTitleState.value = title
-        // dialogMessageState.value = message
-        when (dialog) {
-            showDialog -> showDialog.value = v
-            showErrorDialog1 -> {
-                dialog.value = v
-                showErrorDialog1(dialog, newIPAddressState, isFirst)
-            }
-            showErrorDialog2 -> {
-                dialog.value = v
-                showErrorDialog2(dialog, newIPAddressState, isFirst)
-            }
-        }
-    }
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun OptionSettingView(newIPAddressState: TextFieldState) {
         val topAppBarState = rememberTopAppBarState()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+        val context = LocalContext.current
 
         var initialStorage by remember { mutableIntStateOf(value = WifiSyncServiceSettings.deviceStorageIndex) }
 
@@ -695,8 +625,16 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
                         ),
                         onClick = {
-                            setContent {
-                                PerformBottomBarButtonActionOptionView(newIPAddressState)
+                            val serverIPAddress = newIPAddressState.text.toString()
+                            if (serverIPAddress.isEmpty()) {
+                                showErrorDialog1.value = true
+                            } else {
+                                WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
+                                WifiSyncServiceSettings.saveSettings(applicationContext)
+                                val intent = Intent(context, MainActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
+                                finish()
                             }
                         }
                     ) {
@@ -705,6 +643,12 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 }
             }
         ) { innerPadding ->
+            if (showErrorDialog1.value) {
+                ShowServerNotFoundDialog(showErrorDialog1, newIPAddressState, false)
+            }
+            if (showErrorDialog2.value) {
+                ShowNoConfigMatchedDialog(showErrorDialog2, newIPAddressState, false)
+            }
             Column(
                 modifier = Modifier
                     .background(Color(getColor(white)))

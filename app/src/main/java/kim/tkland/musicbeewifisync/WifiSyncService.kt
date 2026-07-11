@@ -46,6 +46,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.io.InvalidObjectException
 import java.io.OutputStream
@@ -130,6 +131,7 @@ class WifiSyncService : Service() {
     private var settingsReverseSyncRatings = false
     private var settingsReverseSyncSkipCounts = true
     private var settingsReverseSyncPlayCounts = true
+    private var syncWorker: SynchronisationWorker? = null
     private var syncWorkerThread: Thread? = null
     private var storage: FileStorageAccess? = null
 
@@ -214,11 +216,13 @@ class WifiSyncService : Service() {
                 settingsSyncCustomPlaylistNames = intent.getStringArrayListExtra(
                     intentNameSyncCustomPlaylistNames
                 )
-                syncWorkerThread = Thread(SynchronisationWorker(this))
+                syncWorker = SynchronisationWorker(this)
+                syncWorkerThread = Thread(syncWorker)
                 syncWorkerThread!!.start()
             } else if ((action == getString(R.string.actionSyncAbort))) {
                 syncIsRunning.set(false)
                 syncPercentCompleted.set(-1)
+                syncWorker?.abort()
                 if (syncWorkerThread != null) {
                     syncWorkerThread!!.interrupt()
                 }
@@ -241,6 +245,21 @@ class WifiSyncService : Service() {
         private val playlistBuffer = ByteArray(socketTextReadBufferLength)
         private val textBuffer = ByteArray(0xFFFF)
 
+        fun abort() {
+            try {
+                clientSocket?.shutdownInput()
+            } catch (_: Exception) {
+            }
+            try {
+                clientSocket?.shutdownOutput()
+            } catch (_: Exception) {
+            }
+            try {
+                clientSocket?.close()
+            } catch (_: Exception) {
+            }
+        }
+
         override fun run() {
             try {
                 var anyConnections =
@@ -255,42 +274,75 @@ class WifiSyncService : Service() {
                     val candidateAddresses =
                         findCandidateIpAddresses(IpAddressProviderImpl(context, null))
                     for (candidate: CandidateIpAddress in candidateAddresses) {
+                        if (!syncIsRunning.get()) throw InterruptedException()
                         if (tryStartSynchronisation(candidate.address)) {
                             anyConnections = true
                             WifiSyncServiceSettings.defaultIpAddressValue = candidate.toString()
                             break
                         }
                     }
-                    syncErrorMessageId.set(R.string.errorServerNotFound)
+                    if (!anyConnections && syncIsRunning.get()) {
+                        syncErrorMessageId.set(R.string.errorServerNotFound)
+                    }
                 }
             } catch (ex: InterruptedException) {
                 if (WifiSyncServiceSettings.debugMode) {
                     logError("worker", ex)
                 }
+                if (syncWorker == this && syncErrorMessageId.get() == 0) {
+                    syncErrorMessageId.set(R.string.syncCancelled)
+                }
+                setPreviewFailed()
             } catch (ex: Exception) {
                 logError("worker", ex)
-                syncErrorMessageId.set(R.string.errorServerNotFound)
+                if (syncWorker == this) {
+                    if (syncIsRunning.get()) {
+                        syncErrorMessageId.set(R.string.errorServerNotFound)
+                    } else if (syncErrorMessageId.get() == 0) {
+                        syncErrorMessageId.set(R.string.syncCancelled)
+                    }
+                }
+                setPreviewFailed()
+            } finally {
+                synchronized(this@WifiSyncService) {
+                    if (syncWorker == this) {
+                        syncPercentCompleted.set(-1)
+                        syncIsRunning.set(false)
+                        syncWorker = null
+                        syncWorkerThread = null
+                        stopForeground(STOP_FOREGROUND_REMOVE)
+                        stopSelf()
+                    }
+                }
             }
-            syncPercentCompleted.set(-1)
-            syncIsRunning.set(false)
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
         }
 
         @Throws(InterruptedException::class)
         private fun tryStartSynchronisation(address: InetAddress): Boolean {
             var serverLocated = false
+            var retryCount = 0
             try {
-                loop@ while (true) {
+                loop@ while (retryCount < 3) {
+                    if (!syncIsRunning.get()) throw InterruptedException()
                     if (WifiSyncServiceSettings.debugMode) {
-                        logInfo("tryStart", "connecting $address")
+                        logInfo("tryStart", "connecting $address (attempt ${retryCount + 1})")
                     }
+                    retryCount++
                     Socket().use { clientSocket ->
                         this.clientSocket = clientSocket
-                        clientSocket.connect(
-                            InetSocketAddress(address, serverPort),
-                            socketConnectTimeout
-                        )
+                        try {
+                            clientSocket.connect(
+                                InetSocketAddress(address, serverPort),
+                                socketConnectTimeout
+                            )
+                        } catch (e: IOException) {
+                            if (WifiSyncServiceSettings.debugMode) {
+                                logInfo("tryStart", "Connect failed: ${e.message}")
+                            }
+                            if (!syncIsRunning.get()) throw InterruptedException()
+                            continue@loop
+                        }
+
                         if (WifiSyncServiceSettings.debugMode) {
                             logInfo("tryStart", "connected")
                         }
@@ -298,132 +350,107 @@ class WifiSyncService : Service() {
                         clientSocket.sendBufferSize = 65536
                         clientSocket.setPerformancePreferences(0, 0, 1)
                         clientSocket.tcpNoDelay = true
+                        clientSocket.soTimeout = socketReadTimeout
+
                         clientSocket.getInputStream().use { socketInputStream ->
-                            BufferedInputStream(
-                                socketInputStream,
-                                8192
-                            ).use { bufferedSocketInputStream ->
-                                DataInputStream((bufferedSocketInputStream)).use { socketStreamReader ->
+                            BufferedInputStream(socketInputStream, 8192).use { bufferedInputStream ->
+                                DataInputStream(bufferedInputStream).use { socketStreamReader ->
                                     clientSocket.getOutputStream().use { socketOutputStream ->
-                                        BufferedOutputStream(
-                                            socketOutputStream,
-                                            65536
-                                        ).use { bufferedSocketOutputStream ->
-                                            DataOutputStream(bufferedSocketOutputStream).use { socketStreamWriter ->
+                                        BufferedOutputStream(socketOutputStream, 65536).use { bufferedOutputStream ->
+                                            DataOutputStream(bufferedOutputStream).use { socketStreamWriter ->
                                                 this.socketInputStream = socketInputStream
                                                 this.socketStreamReader = socketStreamReader
                                                 this.socketOutputStream = socketOutputStream
                                                 this.socketStreamWriter = socketStreamWriter
-                                                var failedSyncFilesCount = 0
                                                 try {
-                                                    clientSocket.soTimeout = socketReadTimeout
+                                                    // Use readString() which calls readUTF() with error handling
                                                     val hello: String = readString()
-                                                    serverLocated =
-                                                        hello.startsWith(serverHelloPrefix)
+                                                    serverLocated = hello.startsWith(serverHelloPrefix)
 
-                                                    // TODO : 3.7以上を指定する
                                                     if (hello.startsWith(serverHelloPrefix + "1.0")) {
                                                         syncErrorMessageId.set(R.string.checkMBVersion)
                                                         setPreviewFailed()
                                                         return false
                                                     }
-                                                    if (WifiSyncServiceSettings.debugMode) {
-                                                        logInfo(
-                                                            "tryStart",
-                                                            "hello=$serverLocated,fromMB=$settingsSyncFromMusicBee,custfiles=$settingsSyncCustomFiles,preview=$settingsSyncPreview,dev=$settingsDeviceName,$settingsDeviceStorageIndex"
-                                                        )
-                                                    }
+                                                    
                                                     if (!serverLocated) {
+                                                        if (WifiSyncServiceSettings.debugMode) {
+                                                            logInfo("tryStart", "Invalid hello: $hello")
+                                                        }
                                                         return false
                                                     }
+
                                                     writeString(clientHelloVersion)
-                                                    writeString(if ((settingsSyncCustomFiles)) commandSyncToDevice else commandSyncDevice)
-                                                    writeByte(if ((!settingsSyncPreview)) 0 else 1)
-                                                    writeString(settingsDeviceName)
+                                                    writeString(if (settingsSyncCustomFiles) commandSyncToDevice else commandSyncDevice)
+                                                    writeByte(if (!settingsSyncPreview) 0 else 1)
+                                                    writeString(settingsDeviceName ?: "")
                                                     writeByte(settingsDeviceStorageIndex)
+                                                    
                                                     if (!settingsSyncCustomFiles) {
-                                                        writeString(if ((settingsSyncFromMusicBee)) "F" else "T")
+                                                        writeString(if (settingsSyncFromMusicBee) "F" else "T")
                                                         writeString("F")
                                                         writeString("0")
                                                     } else {
                                                         writeString("T")
-                                                        writeString(if ((!settingsSyncDeleteUnselectedFiles)) "F" else "T")
+                                                        writeString(if (!settingsSyncDeleteUnselectedFiles) "F" else "T")
                                                         writeString(settingsSyncCustomPlaylistNames!!.size.toString())
-                                                        for (playlistName: String? in settingsSyncCustomPlaylistNames!!) {
-                                                            writeString(playlistName)
+                                                        for (playlistName in settingsSyncCustomPlaylistNames!!) {
+                                                            writeString(playlistName ?: "")
                                                         }
                                                     }
                                                     writeString(syncEndOfData)
                                                     flushWriter()
-                                                    val storageProfileMatched: Boolean =
-                                                        (readByte().toInt() != 0)
+                                                    
+                                                    val storageProfileMatched = (readByte().toInt() != 0)
                                                     readToEndOfCommand()
-                                                    // TODO:
+                                                    
                                                     if (!storageProfileMatched) {
                                                         syncErrorMessageId.set(R.string.errorConfigNotMatched)
                                                         setPreviewFailed()
                                                         return true
                                                     } else {
-                                                        val sdCard: File? =
-                                                            FileStorageAccess.getSdCardFromIndex(
-                                                                applicationContext,
-                                                                settingsDeviceStorageIndex
-                                                            )
+                                                        val sdCard = FileStorageAccess.getSdCardFromIndex(
+                                                            applicationContext,
+                                                            settingsDeviceStorageIndex
+                                                        )
                                                         if (sdCard == null) {
-                                                            if (WifiSyncServiceSettings.debugMode) {
-                                                                logInfo(
-                                                                    "tryStart",
-                                                                    "SD Card not found"
-                                                                )
-                                                            }
                                                             writeString(syncStatusFAIL)
                                                             flushWriter()
                                                             syncErrorMessageId.set(R.string.errorSdCardNotFound)
                                                             return true
                                                         }
                                                         storage = FileStorageAccess(
-                                                            //application,
                                                             applicationContext,
                                                             sdCard.path,
                                                             settingsAccessPermissionsUri
                                                         )
                                                     }
                                                     writeString("MOUNTED")
-                                                    failedSyncFilesCount = syncFailedFiles.size
+                                                    flushWriter()
+                                                    
                                                     syncDevice()
+                                                    return true
                                                 } catch (ex: InterruptedException) {
-                                                    if (WifiSyncServiceSettings.debugMode) {
-                                                        logError("tryStart", ex)
-                                                    }
-                                                    if (storage != null) {
-                                                        storage!!.waitScanFiles()
-                                                    }
                                                     throw ex
-                                                } catch (_: SocketException) {
+                                                } catch (e: IOException) {
+                                                    if (WifiSyncServiceSettings.debugMode) {
+                                                        logInfo("tryStart", "Handshake error: ${e.message}")
+                                                    }
                                                     if (storage != null) {
                                                         storage!!.waitScanFiles()
                                                     }
-                                                    /*
-                                                    socketFailRetryAttempts++
-                                                    if (syncFailedFiles.size > failedSyncFilesCount) {
-                                                        syncFailedFiles.removeAt(
-                                                            failedSyncFilesCount
-                                                        )
-                                                    }
-                                                    // TODO:pending
-                                                     */
                                                     continue@loop
-                                                    //return false
-                                                } catch (ex: NullPointerException) {
-                                                    logError("tryStart", ex.stackTraceToString())
-                                                } catch (_: Exception) {
+                                                } catch (ex: Exception) {
+                                                    logError("tryStart", ex)
                                                     if (storage != null) {
                                                         storage!!.waitScanFiles()
                                                     }
-                                                    syncErrorMessageId.set(R.string.errorSyncNonSpecific)
+                                                    if (syncIsRunning.get()) {
+                                                        syncErrorMessageId.set(R.string.errorSyncNonSpecific)
+                                                    }
                                                     setPreviewFailed()
+                                                    return true
                                                 }
-                                                return true
                                             }
                                         }
                                     }
@@ -433,27 +460,9 @@ class WifiSyncService : Service() {
                     }
                 }
             } catch (ex: InterruptedException) {
-                if (WifiSyncServiceSettings.debugMode) {
-                    logError("tryStart", ex)
-                }
-                //flushWriter()
-                //clientSocket?.shutdownInput()
-                //clientSocket?.shutdownOutput()
-                clientSocket?.close()
-                throw SocketException(ex.toString())
-            } catch (ex: SocketTimeoutException) {
-                if (WifiSyncServiceSettings.debugMode) {
-                    logError("tryStart", ex)
-                }
-                syncErrorMessageId.set(R.string.errorServerNotFound)
-                setPreviewFailed()
-            } catch (ex: NullPointerException) {
-                logError("tryStart", ex.stackTraceToString())
-                syncErrorMessageId.set(R.string.errorSyncNonSpecific)
-                setPreviewFailed()
+                throw ex
             } catch (ex: Exception) {
                 logError("tryStart", ex)
-                syncErrorMessageId.set(R.string.errorSyncNonSpecific)
                 setPreviewFailed()
             }
             return serverLocated
@@ -550,74 +559,25 @@ class WifiSyncService : Service() {
             }
         }
 
-       @Throws(SocketException::class)
+       @Throws(IOException::class)
        private fun readString(): String {
-           var returnLength = 0
            try {
-               // DataInputStream.readUnsignedShort() はデータが届くまでスレッドをブロックして待機するため、
-               // available() によるビジーウェイト・ループは不要です。
-               returnLength = socketStreamReader!!.readUnsignedShort()
-               if ((returnLength > 0xFFFF) || (returnLength <= 0)) {
-                   return ""
-               }
-               // 毎回ByteArrayを確保するのをやめ、メンバ変数のtextBufferを再利用してメモリ負荷を軽減します。
-               this.socketStreamReader!!.readFully(textBuffer, 0, returnLength)
-               return String(textBuffer, 0, returnLength, Charsets.UTF_8)
+               return socketStreamReader!!.readUTF()
            } catch (eof: EOFException) {
-               return ""
-           } catch (_: IndexOutOfBoundsException) {
                return ""
            } catch (ex: Exception) {
                logInfo("readString()", ex.stackTraceToString())
-               throw SocketException(ex.toString())
+               throw IOException(ex.toString())
            }
         }
 
-        /*
-        @OptIn(ExperimentalStdlibApi::class)
-        @Throws(SocketException::class)
-        private fun readString(): String {
-            var retval: String = ""
-            try {
-                retval = socketStreamReader!!.readUTF()
-                //logInfo("readString()", retval)
-                // return socketStreamReader!!.readUTF()
-            } catch (udfe: UTFDataFormatException) {
-                // TODO
-                logInfo("readString()", udfe.stackTraceToString())
-                throw SocketException(udfe.toString())
-
-            } catch (ex: Exception) {
-                logInfo("readString()", ex.stackTraceToString())
-                throw SocketException(ex.toString())
-            }
-            return retval
-        }
-         */
-
         /* writeUTF()のバグ回避バージョン */
-        @Throws(SocketException::class)
+        @Throws(IOException::class)
         private fun writeString(value: String?) {
             try {
-                var length : Int
-                var ary: ByteArray
-                if (value == null) {
-                    length = 0
-                    ary = ByteArray(1){0.toByte()}
-                } else {
-                    ary = value.toByteArray(Charsets.UTF_8)
-                    length = ary.size
-                }
-                if (length > 0xFFFF.toInt()) {
-                    throw UTFDataFormatException("writeString() value String length too long.")
-                }
-                socketStreamWriter!!.writeShort(length)
-                for (i in 0 until length) {
-                    socketStreamWriter!!.write(ary[i].toInt())
-                }
-                // socketStreamWriter!!.writeUTF(value)
+                socketStreamWriter!!.writeUTF(value ?: "")
             } catch (ex: Exception) {
-                throw SocketException(ex.toString())
+                throw IOException(ex.toString())
             }
         }
 
@@ -766,7 +726,7 @@ class WifiSyncService : Service() {
                     writeString(syncStatusOK)
                 } catch (ex: Exception) {
                     logError("getFiles", ex, "path=$folderPath")
-                    if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
+                    if (ex is SocketException || ex is InterruptedException) {
                         throw ex
                     }
                     writeString(syncEndOfData)
@@ -822,6 +782,7 @@ class WifiSyncService : Service() {
                         cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED)
                     cursor.moveToFirst()
                     do {
+                        if (!syncIsRunning.get()) throw InterruptedException()
                         val url: String = cursor.getString(urlColumnIndex)
                         if (!url.startsWith(folderUrl, true)) {
                             continue
@@ -851,7 +812,10 @@ class WifiSyncService : Service() {
             val fileDateModified = readLong()
             var contentUri: Uri? = null
             var os: OutputStream? = null
-            syncPercentCompleted.set(readShort().toInt())
+            val progress = readShort().toInt()
+            if (syncIsRunning.get()) {
+                syncPercentCompleted.set(progress)
+            }
             readToEndOfCommand()
             
             var totalReadFromSocket: Long = 0
@@ -1002,6 +966,7 @@ class WifiSyncService : Service() {
                         var remaining = fileLength
                         val buffer = fileBuffer[0]
                         while (remaining > 0) {
+                            if (!syncIsRunning.get()) throw InterruptedException()
                             val toRead = if (remaining < buffer.size) remaining.toInt() else buffer.size
                             val read = readArray(buffer, toRead)
                             if (read < 0) throw EOFException("Unexpected EOF during file receive")
@@ -1020,10 +985,12 @@ class WifiSyncService : Service() {
                 try {
                     logError("receiveFile", ex, "file=$filePath")
                     
-                    // 残りのデータをスキップしてプロトコルの同期を保つ
-                    skipSocketData(fileLength, totalReadFromSocket)
+                    if (ex !is InterruptedException && ex !is SocketException) {
+                        // 残りのデータをスキップしてプロトコルの同期を保つ
+                        skipSocketData(fileLength, totalReadFromSocket)
+                    }
 
-                    if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
+                    if (ex is SocketException || ex is InterruptedException) {
                         throw ex
                     }
                     syncFailedFiles.add(
@@ -1038,7 +1005,11 @@ class WifiSyncService : Service() {
 
                 } finally {
                     try {
-                        storage!!.deleteFile(filePath)
+                        if (contentUri != null) {
+                            applicationContext.contentResolver.delete(contentUri!!, null, null)
+                        } else {
+                            storage!!.deleteFile(filePath)
+                        }
                     } catch (deleteException: Exception) {
                         Log.d("receiveFile", deleteException.message!!)
                     }
@@ -1196,6 +1167,7 @@ class WifiSyncService : Service() {
                     flushWriter()
                     var remaining = fileLength
                     while(remaining > 0){
+                        if (!syncIsRunning.get()) throw InterruptedException()
                         val toRead = if (remaining < playlistBuffer.size) remaining.toInt() else playlistBuffer.size
                         val readNum = readArray(playlistBuffer, toRead)
                         if (readNum <= 0) break
@@ -1207,9 +1179,11 @@ class WifiSyncService : Service() {
             } catch (e: Exception) {
                 logError("receivePlaylist", e, "file=$filePath")
                 
-                skipSocketData(fileLength, totalReadFromSocket)
+                if (e !is InterruptedException && e !is SocketException) {
+                    skipSocketData(fileLength, totalReadFromSocket)
+                }
 
-                if (SocketException::class.java.isAssignableFrom(e.javaClass)) {
+                if (e is SocketException || e is InterruptedException) {
                     throw e
                 }
                 writeString("$syncStatusFAIL $e")
@@ -1217,6 +1191,11 @@ class WifiSyncService : Service() {
                 return
             } finally {
                 os?.close()
+                if (syncIsRunning.get() == false && contentUri != null) {
+                    try {
+                        applicationContext.contentResolver.delete(contentUri!!, null, null)
+                    } catch (_: Exception) {}
+                }
             }
             writeString(syncStatusOK)
             flushWriter()
@@ -1287,6 +1266,7 @@ class WifiSyncService : Service() {
                     var readLength = -1
                     val buffer = ByteArray(65535)
                     while(fs.read(buffer, 0, buffer.size).also {readLength = it} > 0){
+                        if (!syncIsRunning.get()) throw InterruptedException()
                         Thread.sleep(5)
                         writeArray(buffer, readLength)
                     }
@@ -1320,7 +1300,10 @@ class WifiSyncService : Service() {
         @Throws(Exception::class)
         private fun showDeleteConfirmation() {
             val deleteCount = readInt()
-            syncPercentCompleted.set(readShort().toInt())
+            val progress = readShort().toInt()
+            if (syncIsRunning.get()) {
+                syncPercentCompleted.set(progress)
+            }
             readToEndOfCommand()
 
             if (showOkCancelDialog(
@@ -1339,7 +1322,10 @@ class WifiSyncService : Service() {
 
         @Throws(Exception::class)
         private fun deleteFiles() {
-            syncPercentCompleted.set(readShort().toInt())
+            val progress = readShort().toInt()
+            if (syncIsRunning.get()) {
+                syncPercentCompleted.set(progress)
+            }
             readToEndOfCommand()
             
             val paths = ArrayList<String>()
@@ -1378,6 +1364,7 @@ class WifiSyncService : Service() {
                 logInfo("deleteFiles", "Starting deletion for ${paths.size} files on volume: $volumeName")
 
                 for (path in paths) {
+                    if (!syncIsRunning.get()) throw InterruptedException()
                     syncProgressMessage.set(String.format(getString(R.string.syncFileActionDelete), path))
 
                     val separatorIndex = path.lastIndexOf('/') + 1
@@ -1445,6 +1432,7 @@ class WifiSyncService : Service() {
                 if (ownedUris.isNotEmpty()) {
                     logInfo("deleteFiles", "Deleting ${ownedUris.size} owned files silently")
                     for (uri in ownedUris) {
+                        if (!syncIsRunning.get()) throw InterruptedException()
                         try {
                             contentResolver.delete(uri, null, null)
                         } catch (e: Exception) {
@@ -1459,6 +1447,7 @@ class WifiSyncService : Service() {
                     val chunks = unownedUris.chunked(2000)
                     logInfo("deleteFiles", "Processing ${unownedUris.size} unowned URIs in ${chunks.size} batches")
                     for (chunk in chunks) {
+                        if (!syncIsRunning.get()) throw InterruptedException()
                         waitPermissionEvent.reset()
                         (application as WifiSyncApp).deleteUrisImmediate(chunk)
                         try {
@@ -1489,10 +1478,14 @@ class WifiSyncService : Service() {
 
         @Throws(Exception::class)
         private fun deleteFolders() {
-            syncPercentCompleted.set(readShort().toInt())
+            val progress = readShort().toInt()
+            if (syncIsRunning.get()) {
+                syncPercentCompleted.set(progress)
+            }
             readToEndOfCommand()
             var status: String = syncStatusOK
             while (true) {
+                if (!syncIsRunning.get()) throw InterruptedException()
                 val folderPath = readString()
                 if (folderPath.isEmpty()) {
                     break
@@ -1574,6 +1567,7 @@ class WifiSyncService : Service() {
                     logInfo("sendPlaylists", "count=" + files!!.size)
                 }
                 for (info: FileInfo in files!!) {
+                    if (!syncIsRunning.get()) throw InterruptedException()
                     writeString(storage!!.getDecodedUrl(info.filename))
                     writeLong(info.dateModified)
                     if (WifiSyncServiceSettings.debugMode) {
@@ -1584,7 +1578,7 @@ class WifiSyncService : Service() {
                 writeString(syncStatusOK)
             } catch (ex: Exception) {
                 logError("sendPlaylists", ex)
-                if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
+                if (ex is SocketException || ex is InterruptedException) {
                     throw ex
                 }
                 setPreviewFailed()
@@ -1663,6 +1657,7 @@ class WifiSyncService : Service() {
                     writeString("$syncStatusFAIL Unable to retrieve stats")
                 } else {
                     for (latestStatsInfo: FileStatsInfo in latestStats) {
+                        if (!syncIsRunning.get()) throw InterruptedException()
                         var incrementalPlayCount: Int
                         var incrementalSkipCount = 0
                         var ratingChanged: Boolean
@@ -1749,7 +1744,7 @@ class WifiSyncService : Service() {
                 }
             } catch (ex: Exception) {
                 Log.d("sendStats", ex.message!!)
-                if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
+                if (ex is SocketException || ex is InterruptedException) {
                     throw ex
                 }
                 setPreviewFailed()
@@ -2000,6 +1995,7 @@ class WifiSyncService : Service() {
                 try {
                     readToEndOfCommand()
                     while (true) {
+                        if (!syncIsRunning.get()) throw InterruptedException()
                         val action = readString()
                         if (action.isEmpty()) {
                             break
@@ -2012,7 +2008,7 @@ class WifiSyncService : Service() {
                     status = syncStatusOK
                 } catch (ex: Exception) {
                     logError("getPreview", ex)
-                    if (SocketException::class.java.isAssignableFrom(ex.javaClass)) {
+                    if (ex is SocketException || ex is InterruptedException) {
                         throw ex
                     }
                     syncErrorMessageId.set(R.string.errorSyncNonSpecific)
@@ -3042,7 +3038,6 @@ internal object WifiSyncServiceSettings {
     var permissionsUpgraded = false
     val gmmpStatsFile = "/storage/emulated/0/gmmp/stats.xml"
     fun loadSettings(context: Context) {
-        defaultIpAddressValue = ""
         try {
             val settingsFile = File(context.filesDir, "MusicBeeWifiSyncSettings.dat")
             if (settingsFile.exists()) {
