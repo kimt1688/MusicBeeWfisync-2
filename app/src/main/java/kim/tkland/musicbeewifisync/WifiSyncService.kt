@@ -1361,7 +1361,14 @@ class WifiSyncService : Service() {
                 val videoCollection = MediaStore.Video.Media.getContentUri(volumeName)
                 val imagesCollection = MediaStore.Images.Media.getContentUri(volumeName)
 
-                logInfo("deleteFiles", "Starting deletion for ${paths.size} files on volume: $volumeName")
+                if (WifiSyncServiceSettings.debugMode) {
+                    logInfo("deleteFiles", "Starting deletion for ${paths.size} files on volume: $volumeName")
+                }
+
+                class MediaStoreInfo(val id: Long, val owner: String?, val mediaType: Int)
+                var cachedRelPath: String? = null
+                var folderResults: Map<String, MediaStoreInfo>? = null
+                val pathsToScan = ArrayList<String>()
 
                 for (path in paths) {
                     if (!syncIsRunning.get()) throw InterruptedException()
@@ -1369,68 +1376,80 @@ class WifiSyncService : Service() {
 
                     val separatorIndex = path.lastIndexOf('/') + 1
                     val relPath = path.take(separatorIndex)
-                    val name = path.substring(separatorIndex)
+                    val nameUpper = path.substring(separatorIndex).uppercase()
 
-                    val cursor_path = relPath.uppercase()
-                    val cursor_name = name.uppercase()
+                    if (relPath != cachedRelPath) {
+                        cachedRelPath = relPath
+                        val results = HashMap<String, MediaStoreInfo>()
+                        try {
+                            contentResolver.query(
+                                filesCollection,
+                                arrayOf(
+                                    MediaStore.Files.FileColumns._ID,
+                                    MediaStore.Files.FileColumns.OWNER_PACKAGE_NAME,
+                                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+                                    MediaStore.Files.FileColumns.DISPLAY_NAME
+                                ),
+                                "UPPER(${MediaStore.Files.FileColumns.RELATIVE_PATH}) = ?",
+                                arrayOf(relPath.uppercase()),
+                                null
+                            )?.use { cursor ->
+                                val idCol = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)
+                                val ownerCol = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.OWNER_PACKAGE_NAME)
+                                val typeCol = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE)
+                                val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)
+                                while (cursor.moveToNext()) {
+                                    results[cursor.getString(nameCol).uppercase()] = MediaStoreInfo(
+                                        cursor.getLong(idCol),
+                                        cursor.getString(ownerCol),
+                                        cursor.getInt(typeCol)
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
+                            logError("deleteFiles", e, "Query failed for $relPath")
+                        }
+                        folderResults = results
+                    }
 
-                    val cursor = contentResolver.query(
-                        filesCollection,
-                        arrayOf(
-                            MediaStore.Files.FileColumns._ID,
-                            MediaStore.Files.FileColumns.OWNER_PACKAGE_NAME,
-                            MediaStore.Files.FileColumns.MEDIA_TYPE
-                        ),
-                        "UPPER(${MediaStore.Files.FileColumns.RELATIVE_PATH}) = ? AND UPPER(${MediaStore.Files.FileColumns.DISPLAY_NAME}) = ?",
-                        arrayOf(cursor_path, cursor_name),
-                        null
-                    )
-
-                    if (cursor != null && cursor.moveToFirst()) {
-                        val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID))
-                        val owner = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.OWNER_PACKAGE_NAME))
-                        val mediaType = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE))
-
-                        // Construct the most specific URI possible. MediaStore.createDeleteRequest requires specific collection URIs
-                        // and may fail if generic MediaStore.Files URIs are used.
-                        val uri = when (mediaType) {
-                            MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> ContentUris.withAppendedId(audioCollection, id)
-                            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> ContentUris.withAppendedId(videoCollection, id)
-                            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> ContentUris.withAppendedId(imagesCollection, id)
-                            else -> ContentUris.withAppendedId(filesCollection, id)
+                    val info = folderResults?.get(nameUpper)
+                    if (info != null) {
+                        val uri = when (info.mediaType) {
+                            MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> ContentUris.withAppendedId(audioCollection, info.id)
+                            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> ContentUris.withAppendedId(videoCollection, info.id)
+                            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> ContentUris.withAppendedId(imagesCollection, info.id)
+                            else -> ContentUris.withAppendedId(filesCollection, info.id)
                         }
 
-                        logInfo("deleteFiles", "Found MediaStore record for $path (ID: $id, Owner: $owner, MediaType: $mediaType)")
-
-                        if (owner == context.packageName) {
+                        if (info.owner == context.packageName) {
                             ownedUris.add(uri)
-                        } else {
-                            // Only add to unownedUris if it's a media type that MediaStore.createDeleteRequest supports (API 30+)
-                            if (mediaType != MediaStore.Files.FileColumns.MEDIA_TYPE_NONE) {
-                                unownedUris.add(uri)
-                            } else {
-                                logInfo("deleteFiles", "Unowned file $path is not a media item, cannot request delete via MediaStore")
-                            }
+                        } else if (info.mediaType != MediaStore.Files.FileColumns.MEDIA_TYPE_NONE) {
+                            unownedUris.add(uri)
+                        } else if (WifiSyncServiceSettings.debugMode) {
+                            logInfo("deleteFiles", "Unowned file $path is not a media item, skipping MediaStore delete")
                         }
                     } else {
-                        logInfo("deleteFiles", "Could NOT find URI for $path - trying direct delete")
+                        if (WifiSyncServiceSettings.debugMode) {
+                            logInfo("deleteFiles", "Could NOT find URI for $path - trying direct delete")
+                        }
                         try {
-                            val file = File(storage!!.getFileUrl(path))
-                            if (file.exists()) {
-                                if (file.delete()) {
+                            val fileUrl = storage!!.getFileUrl(path)
+                            val file = File(fileUrl)
+                            if (file.exists() && file.delete()) {
+                                if (WifiSyncServiceSettings.debugMode) {
                                     logInfo("deleteFiles", "Direct delete successful for $path")
-                                } else {
-                                    logInfo("deleteFiles", "Direct delete FAILED for $path")
                                 }
+                                pathsToScan.add(path)
                             }
                         } catch (_: Exception) {}
                     }
-                    cursor?.close()
                 }
                 
                 // Silent delete for owned files
                 if (ownedUris.isNotEmpty()) {
-                    logInfo("deleteFiles", "Deleting ${ownedUris.size} owned files silently")
+                    if (WifiSyncServiceSettings.debugMode) {
+                        logInfo("deleteFiles", "Deleting ${ownedUris.size} owned files silently")
+                    }
                     for (uri in ownedUris) {
                         if (!syncIsRunning.get()) throw InterruptedException()
                         try {
@@ -1445,35 +1464,40 @@ class WifiSyncService : Service() {
                 // Batch delete for unowned files (shows dialog)
                 if (unownedUris.isNotEmpty()) {
                     val chunks = unownedUris.chunked(2000)
-                    logInfo("deleteFiles", "Processing ${unownedUris.size} unowned URIs in ${chunks.size} batches")
+                    if (WifiSyncServiceSettings.debugMode) {
+                        logInfo("deleteFiles", "Processing ${unownedUris.size} unowned URIs in ${chunks.size} batches")
+                    }
                     for (chunk in chunks) {
                         if (!syncIsRunning.get()) throw InterruptedException()
                         waitPermissionEvent.reset()
                         (application as WifiSyncApp).deleteUrisImmediate(chunk)
                         try {
-                            // Important: wait for the system dialog result
-                            logInfo("deleteFiles", "Waiting for user confirmation for chunk of ${chunk.size}...")
                             waitPermissionEvent.waitOne(120000)
-                            logInfo("deleteFiles", "Received confirmation (or timeout)")
-                            // Small sleep to let the system cleanup
                             Thread.sleep(500)
                         } catch (e: Exception) {
-                            logInfo("deleteFiles", "Interrupted during unowned delete: $e")
                             break
                         }
                     }
                 }
                 
-                // Final scan to update UI and MediaStore
-                logInfo("deleteFiles", "Performing final scans to refresh MediaStore")
-                for (path in paths) {
-                    try {
-                        storage!!.scanFile(path, 0, 0, FileStorageAccess.ACTION_DELETE)
-                    } catch (_: Exception) {}
+                // Final scan only for files that were direct-deleted
+                if (pathsToScan.isNotEmpty()) {
+                    if (WifiSyncServiceSettings.debugMode) {
+                        logInfo("deleteFiles", "Performing final scans for ${pathsToScan.size} direct-deleted files")
+                    }
+                    for (path in pathsToScan) {
+                        try {
+                            storage!!.scanFile(path, 0, 0, FileStorageAccess.ACTION_DELETE)
+                        } catch (_: Exception) {}
+                    }
                 }
+                
                 storage!!.waitScanFiles()
-                logInfo("deleteFiles", "Deletion process completed")
+                if (WifiSyncServiceSettings.debugMode) {
+                    logInfo("deleteFiles", "Deletion process completed")
+                }
             }
+
         }
 
         @Throws(Exception::class)
