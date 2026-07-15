@@ -133,7 +133,6 @@ class WifiSyncService : Service() {
     private var settingsReverseSyncPlayCounts = true
     private var syncWorker: SynchronisationWorker? = null
     private var syncWorkerThread: Thread? = null
-    private var storage: FileStorageAccess? = null
 
     override fun onCreate() {
         val channel = NotificationChannel(
@@ -179,6 +178,8 @@ class WifiSyncService : Service() {
                 logInfo("command", "action=$action")
             }
             if ((action == getString(R.string.actionSyncStart))) {
+                syncWorker?.abort()
+                syncWorkerThread?.interrupt()
                 syncIsRunning.set(true)
                 syncPercentCompleted.set(0)
                 syncProgressMessage.set("")
@@ -234,6 +235,9 @@ class WifiSyncService : Service() {
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     private inner class SynchronisationWorker(private val context: Context) :
         Runnable {
+        @Volatile
+        private var isCancelled = false
+        private var storage: FileStorageAccess? = null
         private var clientSocket: Socket? = null
         private var socketInputStream: InputStream? = null
         private var socketStreamReader: DataInputStream? = null
@@ -246,25 +250,33 @@ class WifiSyncService : Service() {
         private val textBuffer = ByteArray(0xFFFF)
 
         fun abort() {
+            isCancelled = true
             try {
-                clientSocket?.shutdownInput()
-            } catch (_: Exception) {
-            }
-            try {
-                clientSocket?.shutdownOutput()
-            } catch (_: Exception) {
-            }
-            try {
-                clientSocket?.close()
+                // ストリームを閉じてブロックを解除
+                try { socketStreamReader?.close() } catch (_: Exception) {}
+                try { socketStreamWriter?.close() } catch (_: Exception) {}
+                
+                clientSocket?.let {
+                    if (!it.isClosed) {
+                        try {
+                            // RSTを送出して強制終了（サーバー側が早く気づくようにする）
+                            it.setSoLinger(true, 0)
+                        } catch (_: Exception) {}
+                        it.close()
+                    }
+                }
             } catch (_: Exception) {
             }
         }
 
         override fun run() {
             try {
+                // 前回の同期処理が完全に終了するのを少し待つ
+                Thread.sleep(1000)
+                
                 var anyConnections =
                     tryStartSynchronisation(InetAddress.getByName(settingsDefaultIpAddressValue))
-                if (syncErrorMessageId.get() != R.string.checkMBVersion && !anyConnections) {
+                if (!isCancelled && syncErrorMessageId.get() != R.string.checkMBVersion && !anyConnections) {
                     if (WifiSyncServiceSettings.debugMode) {
                         logInfo(
                             "worker",
@@ -274,14 +286,14 @@ class WifiSyncService : Service() {
                     val candidateAddresses =
                         findCandidateIpAddresses(IpAddressProviderImpl(context, null))
                     for (candidate: CandidateIpAddress in candidateAddresses) {
-                        if (!syncIsRunning.get()) throw InterruptedException()
+                        if (isCancelled) throw InterruptedException()
                         if (tryStartSynchronisation(candidate.address)) {
                             anyConnections = true
                             WifiSyncServiceSettings.defaultIpAddressValue = candidate.toString()
                             break
                         }
                     }
-                    if (!anyConnections && syncIsRunning.get()) {
+                    if (!anyConnections && !isCancelled) {
                         syncErrorMessageId.set(R.string.errorServerNotFound)
                     }
                 }
@@ -296,7 +308,7 @@ class WifiSyncService : Service() {
             } catch (ex: Exception) {
                 logError("worker", ex)
                 if (syncWorker == this) {
-                    if (syncIsRunning.get()) {
+                    if (!isCancelled) {
                         syncErrorMessageId.set(R.string.errorServerNotFound)
                     } else if (syncErrorMessageId.get() == 0) {
                         syncErrorMessageId.set(R.string.syncCancelled)
@@ -323,7 +335,11 @@ class WifiSyncService : Service() {
             var retryCount = 0
             try {
                 loop@ while (retryCount < 3) {
-                    if (!syncIsRunning.get()) throw InterruptedException()
+                    if (isCancelled) throw InterruptedException()
+                    if (retryCount > 0) {
+                        Thread.sleep(1500) // サーバー側のクリーンアップを待つためのディレイ
+                    }
+                    if (isCancelled) throw InterruptedException()
                     if (WifiSyncServiceSettings.debugMode) {
                         logInfo("tryStart", "connecting $address (attempt ${retryCount + 1})")
                     }
@@ -339,7 +355,7 @@ class WifiSyncService : Service() {
                             if (WifiSyncServiceSettings.debugMode) {
                                 logInfo("tryStart", "Connect failed: ${e.message}")
                             }
-                            if (!syncIsRunning.get()) throw InterruptedException()
+                            if (isCancelled) throw InterruptedException()
                             continue@loop
                         }
 
@@ -350,7 +366,7 @@ class WifiSyncService : Service() {
                         clientSocket.sendBufferSize = 65536
                         clientSocket.setPerformancePreferences(0, 0, 1)
                         clientSocket.tcpNoDelay = true
-                        clientSocket.soTimeout = socketReadTimeout
+                        clientSocket.soTimeout = 10000 // ハンドシェイク時はタイムアウトを短く設定
 
                         clientSocket.getInputStream().use { socketInputStream ->
                             BufferedInputStream(socketInputStream, 8192).use { bufferedInputStream ->
@@ -365,6 +381,10 @@ class WifiSyncService : Service() {
                                                 try {
                                                     // Use readString() which calls readUTF() with error handling
                                                     val hello: String = readString()
+                                                    
+                                                    // ハンドシェイク成功後に本来のタイムアウト値に戻す
+                                                    clientSocket.soTimeout = socketReadTimeout
+
                                                     serverLocated = hello.startsWith(serverHelloPrefix)
 
                                                     if (hello.startsWith(serverHelloPrefix + "1.0")) {
@@ -445,11 +465,11 @@ class WifiSyncService : Service() {
                                                     if (storage != null) {
                                                         storage!!.waitScanFiles()
                                                     }
-                                                    if (syncIsRunning.get()) {
+                                                    if (!isCancelled) {
                                                         syncErrorMessageId.set(R.string.errorSyncNonSpecific)
                                                     }
                                                     setPreviewFailed()
-                                                    return true
+                                                    return false
                                                 }
                                             }
                                         }
@@ -504,9 +524,9 @@ class WifiSyncService : Service() {
                         logInfo("syncDevice", "command=$command")
                     }
                 }
-                if (Thread.interrupted()) {
+                if (isCancelled || Thread.interrupted()) {
                     if (WifiSyncServiceSettings.debugMode) {
-                        logInfo("syncDevice", "interrupted")
+                        logInfo("syncDevice", "interrupted or cancelled")
                     }
                     throw InterruptedException()
                 }
@@ -782,7 +802,7 @@ class WifiSyncService : Service() {
                         cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED)
                     cursor.moveToFirst()
                     do {
-                        if (!syncIsRunning.get()) throw InterruptedException()
+                        if (isCancelled) throw InterruptedException()
                         val url: String = cursor.getString(urlColumnIndex)
                         if (!url.startsWith(folderUrl, true)) {
                             continue
@@ -813,7 +833,7 @@ class WifiSyncService : Service() {
             var contentUri: Uri? = null
             var os: OutputStream? = null
             val progress = readShort().toInt()
-            if (syncIsRunning.get()) {
+            if (!isCancelled) {
                 syncPercentCompleted.set(progress)
             }
             readToEndOfCommand()
@@ -966,7 +986,7 @@ class WifiSyncService : Service() {
                         var remaining = fileLength
                         val buffer = fileBuffer[0]
                         while (remaining > 0) {
-                            if (!syncIsRunning.get()) throw InterruptedException()
+                            if (isCancelled) throw InterruptedException()
                             val toRead = if (remaining < buffer.size) remaining.toInt() else buffer.size
                             val read = readArray(buffer, toRead)
                             if (read < 0) throw EOFException("Unexpected EOF during file receive")
@@ -1011,7 +1031,7 @@ class WifiSyncService : Service() {
                             storage!!.deleteFile(filePath)
                         }
                     } catch (deleteException: Exception) {
-                        Log.d("receiveFile", deleteException.message!!)
+                        Log.d("receiveFile", deleteException.message ?: "unknown error")
                     }
                 }
             }
@@ -1167,7 +1187,7 @@ class WifiSyncService : Service() {
                     flushWriter()
                     var remaining = fileLength
                     while(remaining > 0){
-                        if (!syncIsRunning.get()) throw InterruptedException()
+                        if (isCancelled) throw InterruptedException()
                         val toRead = if (remaining < playlistBuffer.size) remaining.toInt() else playlistBuffer.size
                         val readNum = readArray(playlistBuffer, toRead)
                         if (readNum <= 0) break
@@ -1191,7 +1211,7 @@ class WifiSyncService : Service() {
                 return
             } finally {
                 os?.close()
-                if (syncIsRunning.get() == false && contentUri != null) {
+                if (isCancelled && contentUri != null) {
                     try {
                         applicationContext.contentResolver.delete(contentUri!!, null, null)
                     } catch (_: Exception) {}
@@ -1266,7 +1286,7 @@ class WifiSyncService : Service() {
                     var readLength = -1
                     val buffer = ByteArray(65535)
                     while(fs.read(buffer, 0, buffer.size).also {readLength = it} > 0){
-                        if (!syncIsRunning.get()) throw InterruptedException()
+                        if (isCancelled) throw InterruptedException()
                         Thread.sleep(5)
                         writeArray(buffer, readLength)
                     }
@@ -1301,7 +1321,7 @@ class WifiSyncService : Service() {
         private fun showDeleteConfirmation() {
             val deleteCount = readInt()
             val progress = readShort().toInt()
-            if (syncIsRunning.get()) {
+            if (!isCancelled) {
                 syncPercentCompleted.set(progress)
             }
             readToEndOfCommand()
@@ -1323,7 +1343,7 @@ class WifiSyncService : Service() {
         @Throws(Exception::class)
         private fun deleteFiles() {
             val progress = readShort().toInt()
-            if (syncIsRunning.get()) {
+            if (!isCancelled) {
                 syncPercentCompleted.set(progress)
             }
             readToEndOfCommand()
@@ -1371,7 +1391,7 @@ class WifiSyncService : Service() {
                 val pathsToScan = ArrayList<String>()
 
                 for (path in paths) {
-                    if (!syncIsRunning.get()) throw InterruptedException()
+                    if (isCancelled) throw InterruptedException()
                     syncProgressMessage.set(String.format(getString(R.string.syncFileActionDelete), path))
 
                     val separatorIndex = path.lastIndexOf('/') + 1
@@ -1451,7 +1471,7 @@ class WifiSyncService : Service() {
                         logInfo("deleteFiles", "Deleting ${ownedUris.size} owned files silently")
                     }
                     for (uri in ownedUris) {
-                        if (!syncIsRunning.get()) throw InterruptedException()
+                        if (isCancelled) throw InterruptedException()
                         try {
                             contentResolver.delete(uri, null, null)
                         } catch (e: Exception) {
@@ -1468,7 +1488,7 @@ class WifiSyncService : Service() {
                         logInfo("deleteFiles", "Processing ${unownedUris.size} unowned URIs in ${chunks.size} batches")
                     }
                     for (chunk in chunks) {
-                        if (!syncIsRunning.get()) throw InterruptedException()
+                        if (isCancelled) throw InterruptedException()
                         waitPermissionEvent.reset()
                         (application as WifiSyncApp).deleteUrisImmediate(chunk)
                         try {
@@ -1503,13 +1523,13 @@ class WifiSyncService : Service() {
         @Throws(Exception::class)
         private fun deleteFolders() {
             val progress = readShort().toInt()
-            if (syncIsRunning.get()) {
+            if (!isCancelled) {
                 syncPercentCompleted.set(progress)
             }
             readToEndOfCommand()
             var status: String = syncStatusOK
             while (true) {
-                if (!syncIsRunning.get()) throw InterruptedException()
+                if (isCancelled) throw InterruptedException()
                 val folderPath = readString()
                 if (folderPath.isEmpty()) {
                     break
@@ -1591,7 +1611,7 @@ class WifiSyncService : Service() {
                     logInfo("sendPlaylists", "count=" + files!!.size)
                 }
                 for (info: FileInfo in files!!) {
-                    if (!syncIsRunning.get()) throw InterruptedException()
+                    if (isCancelled) throw InterruptedException()
                     writeString(storage!!.getDecodedUrl(info.filename))
                     writeLong(info.dateModified)
                     if (WifiSyncServiceSettings.debugMode) {
@@ -1681,7 +1701,7 @@ class WifiSyncService : Service() {
                     writeString("$syncStatusFAIL Unable to retrieve stats")
                 } else {
                     for (latestStatsInfo: FileStatsInfo in latestStats) {
-                        if (!syncIsRunning.get()) throw InterruptedException()
+                        if (isCancelled) throw InterruptedException()
                         var incrementalPlayCount: Int
                         var incrementalSkipCount = 0
                         var ratingChanged: Boolean
@@ -2019,7 +2039,7 @@ class WifiSyncService : Service() {
                 try {
                     readToEndOfCommand()
                     while (true) {
-                        if (!syncIsRunning.get()) throw InterruptedException()
+                        if (isCancelled) throw InterruptedException()
                         val action = readString()
                         if (action.isEmpty()) {
                             break
@@ -2114,7 +2134,7 @@ class WifiSyncService : Service() {
                 Socket().use { clientSocket ->
                     clientSocket.connect(
                         InetSocketAddress(address, serverPort),
-                        socketConnectTimeout
+                        pingConnectTimeout
                     )
                     if (WifiSyncServiceSettings.debugMode) {
                         logInfo("ping", "socket ok=$address")
@@ -2124,7 +2144,7 @@ class WifiSyncService : Service() {
                             DataInputStream((socketInputStream)).use { socketStreamReader ->
                                 clientSocket.getOutputStream().use { socketOutputStream ->
                                     DataOutputStream(socketOutputStream).use { socketStreamWriter ->
-                                        clientSocket.setSoTimeout(socketReadTimeout)
+                                        clientSocket.setSoTimeout(pingReadTimeout)
                                         val hello: String = socketStreamReader.readUTF()
                                         if (WifiSyncServiceSettings.debugMode) {
                                             logInfo("ping", "hello=$hello")
@@ -2232,6 +2252,8 @@ class WifiSyncService : Service() {
         private const val socketTextReadBufferLength = 16384
         //private const val socketReadBufferLength = 131072
         private const val socketReadBufferLength = 65536
+        private const val pingConnectTimeout = 7000
+        private const val pingReadTimeout = 7000
         private const val FOREGROUND_ID = 2938
         private const val serverPort = 27304
         private const val intentNameDefaultIpAddressValue = "defaultIpAddressValue"
