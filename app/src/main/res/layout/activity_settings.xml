@@ -104,7 +104,8 @@
             app:layout_constraintTop_toBottomOf="parent" />
 
     </RadioGroup>
-<!--
+
+    <!--
     <Button
         android:id="@+id/settingsGrantAccessButton"
         android:layout_width="wrap_content"
@@ -116,6 +117,16 @@
         app:layout_constraintLeft_toLeftOf="@+id/settingsStorageOptions"
         app:layout_constraintTop_toBottomOf="@+id/settingsStorageOptions" />
 -->
+    <Button
+        android:id="@+id/enable17Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:text="@string/enableAndroid17"
+        android:onClick="onEnableAndroid17Button_Click"
+        app:layout_constraintLeft_toLeftOf="@+id/settingsStorageOptions"
+        app:layout_constraintTop_toBottomOf="@+id/settingsStorageOptions" />
+
     <CheckBox
         android:id="@+id/settingsDebugMode"
         android:layout_width="0dp"

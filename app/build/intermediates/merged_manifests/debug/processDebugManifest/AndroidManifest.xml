@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="kim.tkland.musicbeewifisync"
-    android:versionCode="127"
-    android:versionName="2.8.5" >
+    android:versionCode="171"
+    android:versionName="2.8.7" >
 
     <uses-sdk
         android:minSdkVersion="31"
-        android:targetSdkVersion="35" />
+        android:targetSdkVersion="37" />
 
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission
@@ -25,6 +25,11 @@
         android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
         android:minSdkVersion="34" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission
+        android:name="android.permission.ACCESS_LOCAL_NETWORK"
+        android:minSdkVersion="37" />
 
     <queries>
         <package android:name="com.maxmpz.audioplayer" />
@@ -46,7 +51,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:testOnly="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:usesCleartextTraffic="true" >
         <service
             android:name="kim.tkland.musicbeewifisync.WifiSyncService"
             android:exported="false"

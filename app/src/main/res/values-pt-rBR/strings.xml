@@ -93,5 +93,6 @@
     <string name="menuAllPlaylitsDelete">Delete All Playlists in Device</string>
     <string name="menuAllPlaylitsDeleteConfirm">Really want to delete all playlists?</string>
     <string name="playlistDeletingMessage">Deleting playlists…</string>
+    <string name="enableAndroid17">Ativar os recursos do Android 17</string>
 
 </resources>

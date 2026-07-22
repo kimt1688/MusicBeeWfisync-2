@@ -92,6 +92,7 @@
     <string name="menuAllPlaylitsDelete">端末内のプレイリストの全削除</string>
     <string name="menuAllPlaylitsDeleteConfirm">本当にすべてのプレイリストを削除しますか？</string>
     <string name="playlistDeletingMessage">プレイリストの削除中…</string>
+    <string name="enableAndroid17">Android17の機能を有効にする</string>
 
     <!-- Strings used for fragments for navigation -->
 </resources>

@@ -46,6 +46,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
     private var settingsDeviceNamePrompt: TextView? = null
     private var settingsDeviceName: EditText? = null
     private val PERMISSION_READ_EXTERNAL_STORAGE = 1000
+    private val PERMISSION_ACCESS_LOCAL_NETWORK = 1001
     override fun onCreate(savedInstanceState: Bundle?) {
         //enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -197,7 +198,19 @@ class SettingsActivity : WifiSyncBaseActivity() {
     }
 
     private fun requestPermissionForReadWrite() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.READ_MEDIA_AUDIO,
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                    Manifest.permission.MANAGE_MEDIA,
+                    Manifest.permission.ACCESS_MEDIA_LOCATION,
+                    Manifest.permission.ACCESS_LOCAL_NETWORK
+                ), PERMISSION_READ_EXTERNAL_STORAGE
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
@@ -215,6 +228,17 @@ class SettingsActivity : WifiSyncBaseActivity() {
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.ACCESS_MEDIA_LOCATION
                 ), PERMISSION_READ_EXTERNAL_STORAGE
+            )
+        }
+    }
+
+    fun onEnableAndroid17Button_Click(view: View) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_LOCAL_NETWORK
+                ), PERMISSION_ACCESS_LOCAL_NETWORK
             )
         }
     }
@@ -269,6 +293,7 @@ class SettingsActivity : WifiSyncBaseActivity() {
                 serverIPAddress = findViewById<TextView>(R.id.connectToIPAddress).text.toString()
             } else {
                 serverIPAddress = WifiSyncService.getMusicBeeServerAddress(mainWindow, null)
+                // TODO エラー処理か、ボタン押せなくするか、強制的にmainActivityに遷移するかなんとかする（2025/11/13）
             }
             // windowに出してみる。
             findViewById<TextView>(R.id.connectingToIPAddress).text = "Connecting To:$serverIPAddress"

@@ -16,8 +16,8 @@ buildscript {
     //ext.agp_version = '8.9,1'
     //ext.kotlin_version = '2.1.10'
     extra.apply {
-        set("agpversion", "8.12.1")
-        set("kotlinversion", "2.1.10")
+        set("agpversion", "9.3.0")
+        set("kotlinversion", "2.4.10")
     }
     repositories {
         google()

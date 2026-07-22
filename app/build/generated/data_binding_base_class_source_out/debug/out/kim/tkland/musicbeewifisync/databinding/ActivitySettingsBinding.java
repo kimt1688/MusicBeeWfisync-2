@@ -32,6 +32,9 @@ public final class ActivitySettingsBinding implements ViewBinding {
   public final TextView connectingToIPAddress;
 
   @NonNull
+  public final Button enable17Button;
+
+  @NonNull
   public final Button locateServerButton;
 
   @NonNull
@@ -75,16 +78,18 @@ public final class ActivitySettingsBinding implements ViewBinding {
 
   private ActivitySettingsBinding(@NonNull ConstraintLayout rootView,
       @NonNull EditText connectToIPAddress, @NonNull TextView connectingToIPAddress,
-      @NonNull Button locateServerButton, @NonNull Toolbar myToolbar,
-      @NonNull CheckBox settingsDebugMode, @NonNull EditText settingsDeviceName,
-      @NonNull TextView settingsDeviceNamePrompt, @NonNull TextView settingsInfo0,
-      @NonNull TextView settingsInfo1, @NonNull TextView settingsInfo2,
-      @NonNull TextView settingsLocateServerNoConfig, @NonNull RadioButton settingsStorageInternal,
-      @NonNull RadioGroup settingsStorageOptions, @NonNull TextView settingsStoragePrompt,
-      @NonNull RadioButton settingsStorageSdCard1, @NonNull TextView textView3) {
+      @NonNull Button enable17Button, @NonNull Button locateServerButton,
+      @NonNull Toolbar myToolbar, @NonNull CheckBox settingsDebugMode,
+      @NonNull EditText settingsDeviceName, @NonNull TextView settingsDeviceNamePrompt,
+      @NonNull TextView settingsInfo0, @NonNull TextView settingsInfo1,
+      @NonNull TextView settingsInfo2, @NonNull TextView settingsLocateServerNoConfig,
+      @NonNull RadioButton settingsStorageInternal, @NonNull RadioGroup settingsStorageOptions,
+      @NonNull TextView settingsStoragePrompt, @NonNull RadioButton settingsStorageSdCard1,
+      @NonNull TextView textView3) {
     this.rootView = rootView;
     this.connectToIPAddress = connectToIPAddress;
     this.connectingToIPAddress = connectingToIPAddress;
+    this.enable17Button = enable17Button;
     this.locateServerButton = locateServerButton;
     this.myToolbar = myToolbar;
     this.settingsDebugMode = settingsDebugMode;
@@ -137,6 +142,12 @@ public final class ActivitySettingsBinding implements ViewBinding {
       id = R.id.connectingToIPAddress;
       TextView connectingToIPAddress = ViewBindings.findChildViewById(rootView, id);
       if (connectingToIPAddress == null) {
+        break missingId;
+      }
+
+      id = R.id.enable17Button;
+      Button enable17Button = ViewBindings.findChildViewById(rootView, id);
+      if (enable17Button == null) {
         break missingId;
       }
 
@@ -225,7 +236,7 @@ public final class ActivitySettingsBinding implements ViewBinding {
       }
 
       return new ActivitySettingsBinding((ConstraintLayout) rootView, connectToIPAddress,
-          connectingToIPAddress, locateServerButton, myToolbar, settingsDebugMode,
+          connectingToIPAddress, enable17Button, locateServerButton, myToolbar, settingsDebugMode,
           settingsDeviceName, settingsDeviceNamePrompt, settingsInfo0, settingsInfo1, settingsInfo2,
           settingsLocateServerNoConfig, settingsStorageInternal, settingsStorageOptions,
           settingsStoragePrompt, settingsStorageSdCard1, textView3);

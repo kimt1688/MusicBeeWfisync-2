@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-72:/values-watch-v20/values-watch-v20.xml",
+            "outputFile": "kim.tkland.musicbeewifisync.app-mergeDebugResources-65:/values-watch-v20/values-watch-v20.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\toshi\\.gradle\\caches\\8.14.3\\transforms\\29f6a7bfc2d9dff8d6454d026dcb4a91\\transformed\\appcompat-1.7.1\\res\\values-watch-v20\\values-watch-v20.xml",
+                    "source": "C:\\Users\\toshi\\.gradle\\caches\\9.5.0\\transforms\\e61ae2cdba6a87c63b21f2b40a699d25\\transformed\\appcompat-1.7.1\\res\\values-watch-v20\\values-watch-v20.xml",
                     "from": {
                         "startLines": "2,5,8",
                         "startColumns": "4,4,4",

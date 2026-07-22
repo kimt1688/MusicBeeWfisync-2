@@ -3,23 +3,23 @@ import com.android.sdklib.AndroidVersion.VersionCodes.*
 plugins {
     // Existing plugins
    id("com.android.application")
-   id("kotlin-android")
+   //id("kotlin-android")
    alias(libs.plugins.compose.compiler)
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 37
     namespace = "kim.tkland.musicbeewifisync"
     ndkVersion = "29.0.13113456"
 
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 127
-        versionName = "2.8.5"
+        versionCode = 171
+        versionName = "2.8.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        targetSdk = 35
+        targetSdk = 37
     }
 
     buildTypes {
@@ -36,7 +36,6 @@ android {
         getByName("debug") {
             isDebuggable = true
             isMinifyEnabled =  false
-            isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             isJniDebuggable = true
             // matchingFallbacks += listOf("")
@@ -52,9 +51,9 @@ android {
     buildFeatures {
         viewBinding = true
     }
-    kotlinOptions {
-        jvmTarget = "19"
-    }
+    //kotlinOptions {
+    //    jvmTarget = "19"
+    //}
 }
 
 // Javaコンパイル時
@@ -85,14 +84,10 @@ dependencies {
     implementation (libs.androidx.leanback)
     implementation(project(":app:poweramp_api_lib"))
     implementation(libs.androidx.activity)
-    testImplementation (libs.junit)
-    androidTestImplementation (libs.androidx.junit)
-    testImplementation (libs.androidx.espresso.core)
     implementation (libs.kotlin.stdlib.jdk7)
     implementation (libs.androidx.lifecycle.livedata.ktx)
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
     implementation (libs.androidx.core.ktx)
-    implementation (libs.kotlin.stdlib.jdk7)
     implementation (libs.androidx.activity.ktx)
     implementation (libs.androidx.fragment.ktx)
     implementation (libs.androidx.runtime)
@@ -101,8 +96,7 @@ dependencies {
     implementation (libs.androidx.preference.ktx)
     implementation (libs.androidx.documentfile)
     implementation (libs.kotlinx.coroutines.android)
-    implementation (platform(libs.compose.bom))
-    androidTestImplementation (platform(libs.compose.bom))
+
 }
 repositories {
     mavenCentral()
