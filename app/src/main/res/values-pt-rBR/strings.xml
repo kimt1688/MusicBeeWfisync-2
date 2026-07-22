@@ -104,5 +104,6 @@
     <string name="deletePlaylists0">Nenhuma lista de reprodução foi excluída.</string>
     <string name="titleOfIPAddress">Endereço IP</string>
     <string name="checkMBVersion">É necessário o MusicBee versão 3.7 ou superior.</string>
+    <string name="enableAndroid17">Ativar os recursos do Android 17</string>
 
 </resources>

@@ -103,7 +103,7 @@
     <string name="syncConfirmHeader">Confirm</string>
     <string name="titleOfIPAddress">IP Address</string>
     <string name="checkMBVersion">MusicBee version 3.7 or later is required.</string>
-
+    <string name="enableAndroid17">Enable Android17 Features</string>
 
     <!-- Strings used for fragments for navigation -->
 

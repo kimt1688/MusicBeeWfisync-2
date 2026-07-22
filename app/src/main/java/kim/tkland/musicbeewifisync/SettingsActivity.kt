@@ -15,6 +15,7 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -718,6 +719,32 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 }
                 Row(
                     modifier = Modifier
+                        .padding(start = 15.dp, end = 15.dp, top = 25.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                ){
+                    Button(
+                        modifier = Modifier
+                            .weight(0.5f)
+                            .height(80.dp)
+                            .border(
+                                width = 2.dp, // 枠線の幅
+                                color = Color(resources.getColor(white)), // 枠線の色
+                            ),
+                        shape = RectangleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(resources.getColor(R.color.colorButtonBackground)),
+                            contentColor = Color(resources.getColor(R.color.colorButtonTextEnabled))
+                        ),
+                        onClick = {
+                            Android17enable()
+                        }) {
+                        Modifier.weight(1f)
+                        Text(resources.getString(R.string.enableAndroid17), fontSize = 18.sp)
+                    }
+                }
+                Row(
+                    modifier = Modifier
                         .padding(start = 15.dp, end = 15.dp, top = 50.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
@@ -734,6 +761,14 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     )
                 }
             }
+        }
+    }
+
+    fun Android17enable() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+            val mediaPermissions: MutableList<String> = MutableList<String>(0) { "" }
+            mediaPermissions.add(Manifest.permission.ACCESS_LOCAL_NETWORK)
+            requestMultiplePermissionsLauncher.launch(mediaPermissions.toTypedArray())
         }
     }
 
