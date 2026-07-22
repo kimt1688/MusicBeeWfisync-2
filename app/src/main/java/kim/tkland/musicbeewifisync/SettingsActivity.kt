@@ -233,6 +233,45 @@ class SettingsActivity : WifiSyncBaseActivity("") {
     @SuppressLint("SuspiciousIndentation")
     private fun RequestPermissionForReadWrite() {
         when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN ->{
+                // For Android 17 (API 37) and above
+                val context = LocalContext.current
+                val mediaPermissions = arrayOf( // Define the array of permissions
+                    Manifest.permission.READ_MEDIA_AUDIO,
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                    Manifest.permission.ACCESS_MEDIA_LOCATION,
+                    Manifest.permission.ACCESS_LOCAL_NETWORK
+                )
+
+                var allMediaPermissionsGranted = true
+                for (permission in mediaPermissions) {
+                    // Don't check MANAGE_MEDIA with checkSelfPermission
+                    if (permission == Manifest.permission.MANAGE_MEDIA) continue
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            permission
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        allMediaPermissionsGranted = false
+                        break
+                    }
+                }
+                if (allMediaPermissionsGranted) {
+                    Log.d("Permission", "All media permissions already granted")
+                } else {
+                    // Directly request the permission
+                    Log.d("Permission", "Requesting READ_MEDIA_AUDIO")
+                    val mediaPermissions: MutableList<String> = MutableList<String>(0) { "" }
+                    mediaPermissions.add(Manifest.permission.READ_MEDIA_AUDIO)
+                    mediaPermissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+                    mediaPermissions.add(Manifest.permission.READ_MEDIA_VIDEO)
+                    mediaPermissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
+                    mediaPermissions.add(Manifest.permission.ACCESS_LOCAL_NETWORK)
+                    requestMultiplePermissionsLauncher.launch(mediaPermissions.toTypedArray())
+                }
+
+            }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                 // For Android 13 (API 33) and above, request READ_MEDIA_AUDIO
                 val context = LocalContext.current

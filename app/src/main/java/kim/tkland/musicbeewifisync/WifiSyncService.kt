@@ -113,6 +113,26 @@ import kotlin.text.toRegex
 import kotlin.text.uppercase
 import kotlin.toString
 
+// --- UTF-8 Helper Extensions ---
+@Throws(java.io.IOException::class)
+fun java.io.DataInputStream.readStandardUTF(): String {
+    val length = this.readUnsignedShort()
+    val bytes = ByteArray(length)
+    this.readFully(bytes)
+    return String(bytes, kotlin.text.Charsets.UTF_8)
+}
+
+@Throws(java.io.IOException::class)
+fun java.io.DataOutputStream.writeStandardUTF(str: String) {
+    val bytes = str.toByteArray(kotlin.text.Charsets.UTF_8)
+    if (bytes.size > 65535) {
+        throw java.io.UTFDataFormatException("encoded string too long: ${bytes.size} bytes")
+    }
+    this.writeShort(bytes.size)
+    this.write(bytes)
+}
+// -------------------------------
+
 class WifiSyncService : Service() {
     private val syncFileScanCount = AtomicInteger(0)
     private var settingsSyncFromMusicBee = false
@@ -582,7 +602,7 @@ class WifiSyncService : Service() {
        @Throws(IOException::class)
        private fun readString(): String {
            try {
-               return socketStreamReader!!.readUTF()
+               return socketStreamReader!!.readStandardUTF()
            } catch (eof: EOFException) {
                return ""
            } catch (ex: Exception) {
@@ -595,7 +615,7 @@ class WifiSyncService : Service() {
         @Throws(IOException::class)
         private fun writeString(value: String?) {
             try {
-                socketStreamWriter!!.writeUTF(value ?: "")
+                socketStreamWriter!!.writeStandardUTF(value ?: "")
             } catch (ex: Exception) {
                 throw IOException(ex.toString())
             }
@@ -1660,7 +1680,7 @@ class WifiSyncService : Service() {
                                 val count: Int = reader.readInt()
                                 cachedStatsLookup = FileStatsMap(count)
                                 for (index in 0 until count) {
-                                    val filename: String = reader.readUTF()
+                                    val filename: String = reader.readStandardUTF()
                                     val rating: Byte = reader.readByte()
                                     val lastPlayedDate: Long = reader.readLong()
                                     val playCount: Int = reader.readInt()
@@ -1768,7 +1788,7 @@ class WifiSyncService : Service() {
                                     writer.writeInt(count)
                                     for (index in 0 until count) {
                                         val stats: FileStatsInfo = latestStats[index]
-                                        writer.writeUTF(stats.fileUrl)
+                                        writer.writeStandardUTF(stats.fileUrl)
                                         writer.writeByte(stats.rating.toInt())
                                         writer.writeLong(stats.lastPlayedDate)
                                         writer.writeInt(stats.playCount)
@@ -2153,11 +2173,11 @@ class WifiSyncService : Service() {
                                             socketStreamWriter.writeUTF(clientHelloVersion)
                                             socketStreamWriter.writeUTF("Ping")
                                             socketStreamWriter.writeByte(0)
-                                            socketStreamWriter.writeUTF(WifiSyncServiceSettings.deviceName)
+                                            socketStreamWriter.writeStandardUTF(WifiSyncServiceSettings.deviceName ?: "")
                                             socketStreamWriter.writeByte(WifiSyncServiceSettings.deviceStorageIndex)
-                                            socketStreamWriter.writeUTF(syncEndOfData)
+                                            socketStreamWriter.writeStandardUTF(syncEndOfData)
                                             socketStreamWriter.flush()
-                                            val status: String = socketStreamReader.readUTF()
+                                            val status: String = socketStreamReader.readStandardUTF()
                                             connected = true
                                             if (WifiSyncServiceSettings.debugMode) {
                                                 logInfo(
@@ -2400,14 +2420,14 @@ class WifiSyncService : Service() {
                             clientSocket.getOutputStream().use { socketOutputStream ->
                                 DataOutputStream(socketOutputStream).use { socketStreamWriter ->
                                     clientSocket.setSoTimeout(socketReadTimeout)
-                                    val hello: String = socketStreamReader.readUTF()
+                                    val hello: String = socketStreamReader.readStandardUTF()
                                     if (hello.startsWith(serverHelloPrefix)) {
-                                        socketStreamWriter.writeUTF(clientHelloVersion)
-                                        socketStreamWriter.writeUTF("GetPlaylists")
-                                        socketStreamWriter.writeUTF(syncEndOfData)
+                                        socketStreamWriter.writeStandardUTF(clientHelloVersion)
+                                        socketStreamWriter.writeStandardUTF("GetPlaylists")
+                                        socketStreamWriter.writeStandardUTF(syncEndOfData)
                                         socketStreamWriter.flush()
                                         while (true) {
-                                            val playlistName: String = socketStreamReader.readUTF()
+                                            val playlistName: String = socketStreamReader.readStandardUTF()
                                             if (playlistName.isEmpty()) {
                                                 break
                                             }
@@ -3095,8 +3115,8 @@ internal object WifiSyncServiceSettings {
                             isSkipcountReverceSyncFirst = true
                         else
                             isSkipcountReverceSyncFirst = reader.readBoolean()
-                        defaultIpAddressValue = reader.readUTF()
-                        deviceName = reader.readUTF()
+                        defaultIpAddressValue = reader.readStandardUTF()
+                        deviceName = reader.readStandardUTF()
                         deviceStorageIndex = reader.readInt()
                         syncFromMusicBee = reader.readBoolean()
                         if (version < 5) {
@@ -3105,15 +3125,15 @@ internal object WifiSyncServiceSettings {
                         var count: Int = reader.readInt()
                         while (count > 0) {
                             count--
-                            val permissionsPath: String = reader.readUTF()
-                            val sdCardPath: String = reader.readUTF()
+                            val permissionsPath: String = reader.readStandardUTF()
+                            val sdCardPath: String = reader.readStandardUTF()
                             permissionPathToSdCardMapping[permissionsPath] = sdCardPath
                         }
                         syncDeleteUnselectedFiles = reader.readBoolean()
                         count = reader.readInt()
                         while (count > 0) {
                             count--
-                            syncCustomPlaylistNames.add(reader.readUTF())
+                            syncCustomPlaylistNames.add(reader.readStandardUTF())
                         }
                         reverseSyncPlayer = reader.readInt()
                         reverseSyncPlaylists = reader.readBoolean()
@@ -3121,7 +3141,7 @@ internal object WifiSyncServiceSettings {
                         if (version > 6)
                             reverseSyncSkipCounts = reader.readBoolean()
                         reverseSyncPlayCounts = reader.readBoolean()
-                        reverseSyncPlaylistsPath = reader.readUTF()
+                        reverseSyncPlaylistsPath = reader.readStandardUTF()
                         if (version < 6) {
                             permissionsUpgraded = false
                         } else {
@@ -3148,26 +3168,26 @@ internal object WifiSyncServiceSettings {
                 DataOutputStream(fs).use { writer ->
                     writer.writeInt(settingFileVersion)
                     writer.writeBoolean(isSkipcountReverceSyncFirst)
-                    writer.writeUTF(defaultIpAddressValue)
-                    writer.writeUTF(deviceName)
+                    writer.writeStandardUTF(defaultIpAddressValue ?: "")
+                    writer.writeStandardUTF(deviceName ?: "")
                     writer.writeInt(deviceStorageIndex)
                     writer.writeBoolean(syncFromMusicBee)
                     writer.writeInt(permissionPathToSdCardMapping.size)
                     for (item: Map.Entry<String, String> in permissionPathToSdCardMapping.entries) {
-                        writer.writeUTF(item.key)
-                        writer.writeUTF(item.value)
+                        writer.writeStandardUTF(item.key)
+                        writer.writeStandardUTF(item.value)
                     }
                     writer.writeBoolean(syncDeleteUnselectedFiles)
                     writer.writeInt(syncCustomPlaylistNames.size)
                     for (playlistName: String? in syncCustomPlaylistNames) {
-                        writer.writeUTF(playlistName)
+                        writer.writeStandardUTF(playlistName ?: "")
                     }
                     writer.writeInt(reverseSyncPlayer)
                     writer.writeBoolean(reverseSyncPlaylists)
                     writer.writeBoolean(reverseSyncRatings)
                     writer.writeBoolean(reverseSyncSkipCounts)
                     writer.writeBoolean(reverseSyncPlayCounts)
-                    writer.writeUTF(reverseSyncPlaylistsPath)
+                    writer.writeStandardUTF(reverseSyncPlaylistsPath ?: "")
                     writer.writeBoolean(permissionsUpgraded)
                 }
             }

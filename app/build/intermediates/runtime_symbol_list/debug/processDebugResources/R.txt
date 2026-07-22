@@ -10534,3 +10534,4 @@ int xml m3_list_item_shape_state_list 0x7f160001
 int xml m3_split_button_inner_corner_size_state_list 0x7f160002
 int xml m3expressive_button_shape_state_list 0x7f160003
 int xml m3expressive_connected_buttons_inner_corner_size_state_list 0x7f160004
+int xml network_security_config 0x7f160005

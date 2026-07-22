@@ -9,17 +9,13 @@ plugins {
 }
 
 buildscript {
-    extra.apply {
-        set("agpversion", "9.2.1")
-        set("kotlinversion", "2.4.0")
-    }
+    val agpversion by extra("9.3.0")
+    val kotlinversion by extra("2.4.10")
     repositories {
         google()
         mavenCentral()
         
     }
-    val agpversion: String by extra
-    val kotlinversion: String by extra
     dependencies {
         classpath ("com.android.tools.build:gradle:$agpversion")
         classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinversion")

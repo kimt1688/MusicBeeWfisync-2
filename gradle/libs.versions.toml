@@ -3,30 +3,30 @@ accompanistSystemuicontroller = "0.36.0"
 activityCompose = "1.13.0"
 androidxMaterial3Version = "1.4.0"
 appcompatResources = "1.7.1"
-checkerQual = "4.2.0"
+checkerQual = "4.2.1"
 constraintlayout = "2.2.1"
 documentfile = "1.1.0"
-hiltAndroid = "2.59.2"
+hiltAndroid = "2.60.1"
 junit = "4.13.2"
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 kotlinxCoroutinesAndroid = "1.11.0"
 leanback = "1.2.0"
 material = "1.14.0"
 material3 = "1.4.0"
 materialIconsCore = "1.7.8"
-compose = "1.11.3"
+compose = "1.11.4"
 navigationCompose = "2.9.8"
 orgEclipseJdtAnnotation = "2.4.100"
 preferenceKtx = "1.2.1"
-uiTextGoogleFonts = "1.11.3"
+uiTextGoogleFonts = "1.11.4"
 appcompat = "1.7.1"
 activity = "1.13.0"
 lifecycleRuntimeKtx = "2.11.0"
-foundationLayout = "1.11.3"
-foundation = "1.11.3"
-navigation3Runtime = "1.1.3"
+foundationLayout = "1.11.4"
+foundation = "1.11.4"
+navigation3Runtime = "1.1.4"
 litertMetadata = "1.4.2"
-uiGraphics = "1.11.3"
+uiGraphics = "1.11.4"
 fragment = "1.8.9"
 
 [libraries]
@@ -58,7 +58,7 @@ androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-f
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 checker-qual = { module = "org.checkerframework:checker-qual", version.ref = "checkerQual" }
-compose-bom = { module = "androidx.compose:compose-bom", version = "2026.06.00" }
+compose-bom = { module = "androidx.compose:compose-bom", version = "2026.06.01" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
@@ -70,7 +70,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 org-eclipse-jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "orgEclipseJdtAnnotation" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-databinding-runtime = { group = "androidx.databinding", name = "databinding-runtime", version = "9.2.1" }
+androidx-databinding-runtime = { group = "androidx.databinding", name = "databinding-runtime", version = "9.3.0" }
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3Runtime" }
