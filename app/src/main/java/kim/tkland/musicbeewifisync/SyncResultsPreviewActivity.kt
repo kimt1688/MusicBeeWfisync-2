@@ -6,7 +6,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuCompat
 
@@ -28,7 +27,7 @@ class SyncResultsPreviewActivity : SyncResultsBaseActivity() {
         proceedSyncButtonText = findViewById(R.id.proceedSyncButtonText)
         waitResultsThread = Thread {
             try {
-                WifiSyncService.waitSyncResults.waitOne()
+                WifiSyncService.waitSyncResults.waitOne(30000)
                 runOnUiThread {
                     findViewById<View>(R.id.previewWaitIndicator).visibility = View.GONE
                     proceedSyncButton?.visibility = View.VISIBLE

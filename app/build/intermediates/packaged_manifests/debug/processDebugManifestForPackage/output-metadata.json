@@ -11,7 +11,7 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 171,
+      "versionCode": 172,
       "versionName": "2.8.7",
       "outputFile": "AndroidManifest.xml"
     }
