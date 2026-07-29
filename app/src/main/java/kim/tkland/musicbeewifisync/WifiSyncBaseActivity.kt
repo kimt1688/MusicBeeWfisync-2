@@ -16,6 +16,7 @@ import android.view.MenuItem
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowInsets
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColor
 import androidx.core.view.ViewCompat
@@ -121,11 +122,22 @@ abstract class WifiSyncBaseActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
+
+            R.id.fullScanRegistMediaStoreMenuItem -> {
+                onFullScanMenuItemClick(item)
+                return true
+            }
+
+            R.id.deleteAllPlaylistsMenuItem -> {
+                onDeleteAllPlaylistsClick(item)
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    fun onFullScanMenuItemClick(item: MenuItem) {
+    @Keep
+    open fun onFullScanMenuItemClick(item: MenuItem) {
         AlertDialog.Builder(this)
             .setTitle(R.string.progressDialogTitle)
             .setMessage(R.string.alertDialogMessage)

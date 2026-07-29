@@ -1,7 +1,7 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 3    package="kim.tkland.musicbeewifisync"
-4    android:versionCode="172"
+4    android:versionCode="173"
 5    android:versionName="2.8.7" >
 6
 7    <uses-sdk
