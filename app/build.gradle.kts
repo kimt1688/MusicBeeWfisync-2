@@ -14,8 +14,8 @@ android {
     defaultConfig {
         applicationId = "kim.tkland.musicbeewifisync"
         minSdk = 31
-        versionCode = 176
-        versionName = "3.1.21"
+        versionCode = 177
+        versionName = "3.1.22"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         targetSdk = 37
@@ -29,6 +29,8 @@ android {
             )
             isJniDebuggable = false
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isShrinkResources = true
         }
         getByName("debug") {
             isDebuggable = true

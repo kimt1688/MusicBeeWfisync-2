@@ -2409,7 +2409,7 @@ class WifiSyncService : Service() {
         val musicBeePlaylists: ArrayList<String>
             get() {
                 val playlists = ArrayList<String>()
-                val address = InetAddress.getByName(WifiSyncServiceSettings.defaultIpAddressValue)
+                val address = Inet4Address.getByName(WifiSyncServiceSettings.defaultIpAddressValue)
                 Socket().use { clientSocket ->
                     clientSocket.connect(
                         InetSocketAddress(address, serverPort),
@@ -2422,12 +2422,16 @@ class WifiSyncService : Service() {
                                     clientSocket.setSoTimeout(socketReadTimeout)
                                     val hello: String = socketStreamReader.readStandardUTF()
                                     if (hello.startsWith(serverHelloPrefix)) {
-                                        socketStreamWriter.writeStandardUTF(clientHelloVersion)
-                                        socketStreamWriter.writeStandardUTF("GetPlaylists")
-                                        socketStreamWriter.writeStandardUTF(syncEndOfData)
+                                        socketStreamWriter.writeUTF(clientHelloVersion)
+                                        socketStreamWriter.writeUTF("GetPlaylists")
+                                        socketStreamWriter.writeUTF(syncEndOfData)
+                                        //socketStreamWriter.writeStandardUTF(clientHelloVersion)
+                                        //socketStreamWriter.writeStandardUTF("GetPlaylists")
+                                        //socketStreamWriter.writeStandardUTF(syncEndOfData)
                                         socketStreamWriter.flush()
                                         while (true) {
-                                            val playlistName: String = socketStreamReader.readStandardUTF()
+                                            //val playlistName: String = socketStreamReader.readStandardUTF()
+                                            val playlistName: String = socketStreamReader.readUTF()
                                             if (playlistName.isEmpty()) {
                                                 break
                                             }
