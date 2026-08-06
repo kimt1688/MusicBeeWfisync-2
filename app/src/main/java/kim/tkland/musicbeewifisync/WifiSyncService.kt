@@ -2129,6 +2129,7 @@ class WifiSyncService : Service() {
         private val scannedCount: AtomicInteger
         private val waitLock: AutoResetEvent?
         private val candidateAddresses: ArrayList<CandidateIpAddress>?
+        private var totalToScan = 253
 
         private constructor(address: InetAddress) {
             this.address = address
@@ -2141,12 +2142,18 @@ class WifiSyncService : Service() {
             address: InetAddress,
             waitLock: AutoResetEvent,
             scannedCount: AtomicInteger,
-            candidateAddresses: ArrayList<CandidateIpAddress>
+            candidateAddresses: ArrayList<CandidateIpAddress>,
+            totalToScan: Int = 253
         ) {
             this.address = address
             this.scannedCount = scannedCount
             this.waitLock = waitLock
             this.candidateAddresses = candidateAddresses
+            this.totalToScan = totalToScan
+        }
+
+        fun setTotalToScan(total: Int) {
+            this.totalToScan = total
         }
 
         override fun run() {
@@ -2209,7 +2216,7 @@ class WifiSyncService : Service() {
                 Log.d("run(1807)", ex.message!!)
             } finally {
                 if (candidateAddresses != null) {
-                    if (scannedCount.incrementAndGet() == 253) {
+                    if (scannedCount.incrementAndGet() >= totalToScan) {
                         waitLock!!.set()
                     }
                 }
@@ -2430,8 +2437,8 @@ class WifiSyncService : Service() {
                                         //socketStreamWriter.writeStandardUTF(syncEndOfData)
                                         socketStreamWriter.flush()
                                         while (true) {
-                                            //val playlistName: String = socketStreamReader.readStandardUTF()
-                                            val playlistName: String = socketStreamReader.readUTF()
+                                            val playlistName: String = socketStreamReader.readStandardUTF()
+                                            //val playlistName: String = socketStreamReader.readUTF()
                                             if (playlistName.isEmpty()) {
                                                 break
                                             }
@@ -2447,13 +2454,35 @@ class WifiSyncService : Service() {
             }
 
         fun getMusicBeeServerAddress(context: Context?, serverIP: InetAddress?): String? {
-            val ipProvider: IpAddressProvider = IpAddressProviderImpl((context)!!, serverIP)
-            val candidateAddresses = findCandidateIpAddresses(ipProvider)
-            if (candidateAddresses.isEmpty()) {
-                return null
+            if (serverIP != null) {
+                val candidateAddresses = ArrayList<CandidateIpAddress>()
+                try {
+                    val waitLock = AutoResetEvent(false)
+                    val scannedCount = AtomicInteger(0)
+                    val pinger = ServerPinger(serverIP, waitLock, scannedCount, candidateAddresses, 1)
+                    val thread = Thread(pinger)
+                    thread.start()
+                    waitLock.waitOne(10000)
+                    thread.interrupt()
+                } catch (ex: Exception) {
+                    logError("locate", ex)
+                }
+                
+                if (candidateAddresses.isEmpty()) {
+                    return null
+                } else {
+                    val candidate = candidateAddresses[0]
+                    return if ((!candidate.syncConfigMatched)) "FAIL" else candidate.toString()
+                }
             } else {
-                val candidate = candidateAddresses[0]
-                return if ((!candidate.syncConfigMatched)) "FAIL" else candidate.toString()
+                val ipProvider: IpAddressProvider = IpAddressProviderImpl((context)!!, null)
+                val candidateAddresses = findCandidateIpAddresses(ipProvider)
+                if (candidateAddresses.isEmpty()) {
+                    return null
+                } else {
+                    val candidate = candidateAddresses[0]
+                    return if ((!candidate.syncConfigMatched)) "FAIL" else candidate.toString()
+                }
             }
         }
 
@@ -2463,20 +2492,35 @@ class WifiSyncService : Service() {
                 if (WifiSyncServiceSettings.debugMode) {
                     logInfo(
                         "locate",
-                        "search=" + ipProvider.ipSearchPrefix + ", exclude=" + ipProvider.deviceAddress!!.hostAddress
+                        "search=" + ipProvider.ipSearchPrefix + ", exclude=" + ipProvider.deviceAddress?.hostAddress
                     )
                 }
                 val waitLock = AutoResetEvent(false)
                 val scannedCount = AtomicInteger(0)
-                val threads = ArrayList<Thread>(200)
+                val threads = ArrayList<Thread>(255)
 //                var ipAddr: InetAddress
+                
+                var totalToScan = 0
+                val pingers = ArrayList<ServerPinger>()
                 for (ipAddr in ipProvider) {
-                    val tmp =
-                        Thread(ServerPinger(ipAddr!!, waitLock, scannedCount, candidateAddresses))
+                    totalToScan++
+                    val pinger = ServerPinger(ipAddr!!, waitLock, scannedCount, candidateAddresses, 0) // placeholder
+                    pingers.add(pinger)
+                }
+
+                // If no IPs were provided, return immediately
+                if (totalToScan == 0) return candidateAddresses
+
+                for (pinger in pingers) {
+                    pinger.setTotalToScan(totalToScan)
+                    val tmp = Thread(pinger)
                     threads.add(tmp)
                     tmp.start()
                 }
-                waitLock.waitOne()
+
+                // wait with a timeout just in case thread counting goes wrong
+                waitLock.waitOne(10000)
+                
                 for (thread: Thread in threads) {
                     thread.interrupt()
                 }

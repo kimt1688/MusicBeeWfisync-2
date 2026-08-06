@@ -1,7 +1,12 @@
 package kim.tkland.musicbeewifisync
 
 import android.R.color.white
+import android.app.Activity.RESULT_OK
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.provider.DocumentsContract
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +38,16 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 
+private fun setLaunchIntent(): Intent {
+    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+        addCategory(Intent.CATEGORY_OPENABLE)
+        type = "text/xml"
+        putExtra(DocumentsContract.EXTRA_INITIAL_URI, "/storage/emulated/0/gmmp")
+    }
+    return intent
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MusicBeeWifiSyncTopBar(
@@ -72,6 +86,40 @@ fun SyncScreenTopBar(
 {
     val context = LocalContext.current
     val resources = context.resources
+
+    val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) {
+            // アクティビティ結果NG
+            return@rememberLauncherForActivityResult
+        } else {
+            // アクティビティ結果OK
+            try {
+                val mUri = result.data?.data
+                if (mUri != null) {
+                    val contentResolver = context.contentResolver
+                    for (uriPermission in contentResolver.persistedUriPermissions) {
+                        contentResolver.releasePersistableUriPermission(
+                            uriPermission.uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        )
+                    }
+                    contentResolver.takePersistableUriPermission(
+                        mUri, Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                    val preferences = context.getSharedPreferences(
+                        "kim.tkland.musicbeewifisync.sharedpref",
+                        MODE_PRIVATE
+                    )
+                    preferences.edit(commit = true) { putString("accesseduri", mUri.toString()) }
+                }
+            } catch (e: Exception) {
+                Log.d("launcher", e.message ?: "")
+            }
+        }
+    }
 
     MusicBeeWifiSyncTopBar(
         title = {
@@ -215,21 +263,19 @@ fun SyncScreenTopBar(
                     }
                 )
                 DropdownMenuItem(
+                    text = { Text(resources.getString(R.string.selectStats)) },
+                    onClick = {
+                        onExpandedChange(false)
+                        launcher.launch(setLaunchIntent())
+                    }
+                )
+                DropdownMenuItem(
                     text = { Text(resources.getString(R.string.menuFullScanFiles)) },
                     onClick = {
                         onExpandedChange(false)
                         showFullScanDialog()
                     }
                 )
-                /*
-                DropdownMenuItem(
-                    text = { Text(resources.getString(R.string.menuAllPlaylistsDelete)) },
-                    onClick = {
-                        onExpandedChange(false)
-                        showDeleteAllPlaylistsDialog()
-                    }
-                )
-                 */
                 DropdownMenuItem(
                     text = { Text(resources.getString(R.string.menuWifiSyncLog)) },
                     onClick = {

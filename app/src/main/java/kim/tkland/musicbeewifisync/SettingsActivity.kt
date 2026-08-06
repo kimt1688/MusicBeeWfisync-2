@@ -80,6 +80,9 @@ import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.runBlocking
+import java.net.Inet4Address
+import java.net.InetAddress
+import java.net.UnknownHostException
 
 class SettingsActivity : WifiSyncBaseActivity("") {
     private var initialSetup = false
@@ -165,13 +168,13 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                 val uriStr = sharedPref.getString("accesseduri", "")
                 val stats = File(WifiSyncServiceSettings.gmmpStatsFile)
 
-                if (stats.exists()) {
-                    if (uriStr.isNullOrEmpty()) {
-                        //showDialog.value = true
-                        launcher.launch(setLaunchIntent())
-                        FirstSettingView(newIPAddressState)
-                    }
-                }
+                //if (stats.exists()) {
+                //    if (uriStr.isNullOrEmpty()) {
+                //        //showDialog.value = true
+                //        launcher.launch(setLaunchIntent())
+                //        FirstSettingView(newIPAddressState)
+                //    }
+                //}
 
                 val viewModel: WifiSyncViewModel = viewModel()
 
@@ -180,12 +183,12 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     getMusicFilesThread,
                     getString(R.string.progressDialogMessage)
                 )
-                runBlocking {
+                //runBlocking {
                     setContent {
-                        CreateProgressDialog(viewModel)
+                        //CreateProgressDialog(viewModel)
                         FirstSettingView(newIPAddressState)
                     }
-                }
+                //}
             } else {
                 OptionSettingView(newIPAddressState)
             }
@@ -360,10 +363,8 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
     @Composable
     private fun ShowServerNotFoundDialog(showErrorState: MutableState<Boolean>, newIPAddressState: TextFieldState, isFirst: Boolean) {
-        val openAlertDialog = remember { mutableStateOf(showErrorState.value) }
-
-        when {
-            openAlertDialog.value -> AlertDialog(
+        if (showErrorState.value) {
+            AlertDialog(
                 onDismissRequest = { showErrorState.value = false },
                 title = { Text(getString(R.string.syncErrorHeader)) },
                 text = { Text(getString(R.string.errorServerNotFound)) },
@@ -371,14 +372,6 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     Button(
                         onClick = {
                             showErrorState.value = false
-                            openAlertDialog.value = false
-                            setContent {
-                                if (isFirst) {
-                                    FirstSettingView(newIPAddressState)
-                                } else {
-                                    OptionSettingView(newIPAddressState)
-                                }
-                            }
                         }
                     ) {
                         Text(getString(android.R.string.ok))
@@ -391,10 +384,8 @@ class SettingsActivity : WifiSyncBaseActivity("") {
 
     @Composable
     private fun ShowNoConfigMatchedDialog(showErrorState: MutableState<Boolean>, newIPAddressState: TextFieldState, isFirst: Boolean) {
-        val openAlertDialog = remember { mutableStateOf(showErrorState.value) }
-
-        when {
-            openAlertDialog.value -> AlertDialog(
+        if (showErrorState.value) {
+            AlertDialog(
                 onDismissRequest = { showErrorState.value = false },
                 title = { Text(getString(R.string.syncErrorHeader)) },
                 text = { Text(getString(R.string.errorLocateServerNoConfig)) },
@@ -402,14 +393,6 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                     Button(
                         onClick = {
                             showErrorState.value = false
-                            openAlertDialog.value = false
-                            setContent {
-                                if (isFirst) {
-                                    FirstSettingView(newIPAddressState)
-                                } else {
-                                    OptionSettingView(newIPAddressState)
-                                }
-                            }
                         }
                     ) {
                         Text(getString(android.R.string.ok))
@@ -498,10 +481,22 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             // Locate Server automatically
                             WifiSyncServiceSettings.deviceStorageIndex = initialStorage.intValue
                             WifiSyncServiceSettings.saveSettings(applicationContext)
+
+                            val ipText = newIPAddressState.text.toString()
                             
-                            // We can use a simple thread or Coroutine for this
                             val locateServerThread = Thread {
-                                val serverIPAddress = WifiSyncService.getMusicBeeServerAddress(context, null)
+                                var serverIPAddress: String? = null
+                                try {
+                                    val serverAddress: InetAddress? = if (ipText.isNotEmpty()) {
+                                        InetAddress.getByName(ipText)
+                                    } else {
+                                        null
+                                    }
+                                    serverIPAddress = WifiSyncService.getMusicBeeServerAddress(context, serverAddress)
+                                } catch (e: Exception) {
+                                    serverIPAddress = null
+                                }
+
                                 runOnUiThread {
                                     if (serverIPAddress == null) {
                                         showErrorDialog1.value = true
@@ -612,6 +607,23 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                         }
                     }
                 }
+                Row(
+                    modifier = Modifier
+                        .padding(start = 15.dp, end = 15.dp, top = 50.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                ) {
+                    TextField(
+                        state = newIPAddressState,
+                        label = { Text(applicationContext.getString(R.string.titleOfIPAddress)) },
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            disabledContainerColor = Color.White
+                        ),
+                    )
+                }
             }
         }
     }
@@ -698,17 +710,37 @@ class SettingsActivity : WifiSyncBaseActivity("") {
                             contentColor = Color(getColor(R.color.colorButtonTextEnabled))
                         ),
                         onClick = {
-                            val serverIPAddress = newIPAddressState.text.toString()
-                            if (serverIPAddress.isEmpty()) {
-                                showErrorDialog1.value = true
-                            } else {
-                                WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
-                                WifiSyncServiceSettings.saveSettings(applicationContext)
-                                val intent = Intent(context, MainActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                startActivity(intent)
-                                finish()
+                            val ipText = newIPAddressState.text.toString()
+                            
+                            val locateServerThread = Thread {
+                                var serverIPAddress: String? = null
+                                try {
+                                    val serverAddress: InetAddress? = if (ipText.isNotEmpty()) {
+                                        InetAddress.getByName(ipText)
+                                    } else {
+                                        null
+                                    }
+                                    serverIPAddress = WifiSyncService.getMusicBeeServerAddress(context, serverAddress)
+                                } catch (e: Exception) {
+                                    serverIPAddress = null
+                                }
+
+                                runOnUiThread {
+                                    if (serverIPAddress == null) {
+                                        showErrorDialog1.value = true
+                                    } else if (serverIPAddress == getString(R.string.syncStatusFAIL)) {
+                                        showErrorDialog2.value = true
+                                    } else {
+                                        WifiSyncServiceSettings.defaultIpAddressValue = serverIPAddress
+                                        WifiSyncServiceSettings.saveSettings(applicationContext)
+                                        val intent = Intent(context, MainActivity::class.java)
+                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        startActivity(intent)
+                                        finish()
+                                    }
+                                }
                             }
+                            locateServerThread.start()
                         }
                     ) {
                         Text(getString(R.string.settingsLocate), fontSize = 24.sp)

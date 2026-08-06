@@ -104,6 +104,7 @@
     <string name="titleOfIPAddress">IPアドレス</string>
     <string name="checkMBVersion">MusicBee Version 3.7以上が必要です.</string>
     <string name="enableAndroid17">Android17の機能を有効にする</string>
+    <string name="selectStats">stats.xmlを選択</string>
 
     <!-- Strings used for fragments for navigation -->
 </resources>
