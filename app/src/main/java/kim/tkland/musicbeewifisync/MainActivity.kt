@@ -84,8 +84,8 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
         } else {
             setContent {
                 CustomView()
-                checkServerStatus()
             }
+            checkServerStatus()
         }
 
         if (!MediaStore.canManageMedia(this)) {
@@ -109,7 +109,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
 
         var isSyncFromMusicBee by remember { mutableStateOf(WifiSyncServiceSettings.syncFromMusicBee) }
         var isSyncToPlaycounts by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlayCounts) }
-        var isSyncToSkipCounts by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncSkipCounts) }
+        //var isSyncToSkipCounts by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncSkipCounts) }
         var isSyncToRatings by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncRatings) }
         var isSyncToPlaylists by remember { mutableStateOf(WifiSyncServiceSettings.reverseSyncPlaylists) }
 
@@ -246,7 +246,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                         )
                         Text(getString(R.string.syncToPlaycounts), fontSize = 20.sp)
                     }
-                }
+                }/*
                 item {
                     Row(
                         modifier = Modifier
@@ -279,7 +279,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                         )
                         Text(getString(R.string.syncToSkipcounts), fontSize = 20.sp)
                     }
-                }
+                }*/
                 item {
                     Row(
                         modifier = Modifier
@@ -413,13 +413,12 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                                                         isSyncToSkipCountsEnabled = true
                                                         isSyncToRatingEnabled = true
                                                         isSyncToPlaylistsEnabled = true
-                                                        //isSyncToPlaylistsEnabled = false
                                                         WifiSyncServiceSettings.reverseSyncRatings =
                                                             isSyncToRatings
                                                         WifiSyncServiceSettings.reverseSyncPlayCounts =
                                                             isSyncToPlaycounts
-                                                        WifiSyncServiceSettings.reverseSyncSkipCounts =
-                                                            isSyncToSkipCounts
+                                                        //WifiSyncServiceSettings.reverseSyncSkipCounts =
+                                                        //    isSyncToSkipCounts
                                                         WifiSyncServiceSettings.reverseSyncPlaylists =
                                                             isSyncToPlaylists
                                                     }
@@ -466,7 +465,6 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                                                     isSyncToSkipCountsEnabled = false
                                                     isSyncToRatingEnabled = true
                                                     isSyncToPlaylistsEnabled = true
-                                                    //isSyncToPlaylistsEnabled = false
                                                     WifiSyncServiceSettings.reverseSyncPlayCounts =
                                                         isSyncToPlaycounts
                                                     WifiSyncServiceSettings.reverseSyncSkipCounts =
@@ -485,13 +483,12 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
                                                     isSyncToSkipCountsEnabled = true
                                                     isSyncToRatingEnabled = true
                                                     isSyncToPlaylistsEnabled = true
-                                                    //isSyncToPlaylistsEnabled = false
                                                     WifiSyncServiceSettings.reverseSyncRatings =
                                                         isSyncToRatings
                                                     WifiSyncServiceSettings.reverseSyncPlayCounts =
                                                         isSyncToPlaycounts
-                                                    WifiSyncServiceSettings.reverseSyncSkipCounts =
-                                                        isSyncToSkipCounts
+                                                    //WifiSyncServiceSettings.reverseSyncSkipCounts =
+                                                    //    isSyncToSkipCounts
                                                     WifiSyncServiceSettings.reverseSyncPlaylists =
                                                         isSyncToPlaylists
                                                 }
@@ -555,7 +552,7 @@ class MainActivity() : WifiSyncStartSyncBaseActivity() {
 
         val anyReverseSync =
             (WifiSyncServiceSettings.reverseSyncPlayer == 1 || WifiSyncServiceSettings.reverseSyncPlayer == 2) &&
-                    (WifiSyncServiceSettings.reverseSyncPlaylists || WifiSyncServiceSettings.reverseSyncRatings || WifiSyncServiceSettings.reverseSyncPlayCounts || WifiSyncServiceSettings.reverseSyncSkipCounts)
+                    (WifiSyncServiceSettings.reverseSyncPlaylists || WifiSyncServiceSettings.reverseSyncRatings || WifiSyncServiceSettings.reverseSyncPlayCounts)
         if (!anyReverseSync) {
             if (!WifiSyncServiceSettings.syncFromMusicBee) {
                 configErrorMessage.value = getString(R.string.errorSyncParamsNoneSelected)

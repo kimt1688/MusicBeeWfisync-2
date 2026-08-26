@@ -149,7 +149,7 @@ class WifiSyncService : Service() {
     private var settingsReverseSyncPlaylists = false
     private var settingsReverseSyncPlaylistsPath: String? = null
     private var settingsReverseSyncRatings = false
-    private var settingsReverseSyncSkipCounts = true
+    //private var settingsReverseSyncSkipCounts = true
     private var settingsReverseSyncPlayCounts = true
     private var syncWorker: SynchronisationWorker? = null
     private var syncWorkerThread: Thread? = null
@@ -227,9 +227,9 @@ class WifiSyncService : Service() {
                 settingsReverseSyncPlayCounts = intent.getBooleanExtra(
                     intentNameReverseSyncPlayCounts, false
                 )
-                settingsReverseSyncSkipCounts = intent.getBooleanExtra(
-                    intentNameReverseSyncSkipCounts, false
-                )
+                //settingsReverseSyncSkipCounts = intent.getBooleanExtra(
+                //    intentNameReverseSyncSkipCounts, false
+                //)
                 settingsSyncDeleteUnselectedFiles = intent.getBooleanExtra(
                     intentNameSyncDeleteUnselectedFiles, false
                 )
@@ -407,11 +407,13 @@ class WifiSyncService : Service() {
 
                                                     serverLocated = hello.startsWith(serverHelloPrefix)
 
+                                                    /*
                                                     if (hello.startsWith(serverHelloPrefix + "1.0")) {
                                                         syncErrorMessageId.set(R.string.checkMBVersion)
                                                         setPreviewFailed()
                                                         return false
                                                     }
+                                                    */
                                                     
                                                     if (!serverLocated) {
                                                         if (WifiSyncServiceSettings.debugMode) {
@@ -518,7 +520,7 @@ class WifiSyncService : Service() {
             if (WifiSyncServiceSettings.debugMode) {
                 logInfo(
                     "syncDevice",
-                    "root=" + storage!!.storageRootPath + ",ignoreErrors=" + settingsSyncIgnoreErrors + ",playlists=" + settingsReverseSyncPlaylists + ",ratings=" + settingsReverseSyncRatings + ",playcount=" + settingsReverseSyncPlayCounts + ", skipcount=" + settingsReverseSyncSkipCounts
+                    "root=" + storage!!.storageRootPath + ",ignoreErrors=" + settingsSyncIgnoreErrors + ",playlists=" + settingsReverseSyncPlaylists + ",ratings=" + settingsReverseSyncRatings + ",playcount=" + settingsReverseSyncPlayCounts
                 )
             }
             syncFromResults = null
@@ -530,7 +532,7 @@ class WifiSyncService : Service() {
                 writeByte(if ((!settingsReverseSyncRatings)) 0 else 1)
                 writeByte(if ((!settingsReverseSyncPlayCounts)) 0 else 1)
                 writeString(storage!!.storageRootPath)
-                writeByte(if ((!settingsReverseSyncSkipCounts)) 0 else 1)
+                //writeByte(if ((!settingsReverseSyncSkipCounts)) 0 else 1)
                 writeString(syncEndOfData)
             } else {
                 syncToResults = ArrayList()
@@ -1685,11 +1687,13 @@ class WifiSyncService : Service() {
                                     val lastPlayedDate: Long = reader.readLong()
                                     val playCount: Int = reader.readInt()
 
+                                    /*
                                     var skipCount: Int = 0
                                     if (WifiSyncServiceSettings.loadSettingVersion > 6 || WifiSyncServiceSettings.saveSettingVersion > 6)
                                         skipCount = reader.readInt()
+                                     */
                                     cachedStatsLookup[filename] =
-                                        FileStatsInfo(filename, rating, lastPlayedDate, playCount ,skipCount)
+                                        FileStatsInfo(filename, rating, lastPlayedDate, playCount)
                                 }
                             }
                         }
@@ -1723,7 +1727,6 @@ class WifiSyncService : Service() {
                     for (latestStatsInfo: FileStatsInfo in latestStats) {
                         if (isCancelled) throw InterruptedException()
                         var incrementalPlayCount: Int
-                        var incrementalSkipCount = 0
                         var ratingChanged: Boolean
                         val cachedStatsInfo = cachedStatsLookup[latestStatsInfo.fileUrl]
                         if (cachedStatsInfo == null) {
@@ -1741,12 +1744,6 @@ class WifiSyncService : Service() {
                             } else {
                                 incrementalPlayCount = latestStatsInfo.playCount
                             }
-                            if (!settingsReverseSyncSkipCounts) {
-                                latestStatsInfo.skipCount = 0
-                                incrementalSkipCount = 0
-                            } else {
-                                incrementalSkipCount = latestStatsInfo.skipCount
-                            }
                         } else {
                             if (!settingsReverseSyncRatings) {
                                 ratingChanged = false
@@ -1763,21 +1760,13 @@ class WifiSyncService : Service() {
                                 incrementalPlayCount =
                                     latestStatsInfo.playCount - cachedStatsInfo.playCount
                             }
-                            if (!settingsReverseSyncSkipCounts) {
-                                latestStatsInfo.skipCount = cachedStatsInfo.skipCount
-                                incrementalSkipCount = 0
-                            } else {
-                                incrementalSkipCount =
-                                    latestStatsInfo.skipCount - cachedStatsInfo.skipCount
-                            }
                         }
-                        if (ratingChanged || incrementalPlayCount > 0 || incrementalSkipCount > 0) {
+                        if (ratingChanged || incrementalPlayCount > 0) {
                             writeString(latestStatsInfo.fileUrl)
                             writeByte(if ((!settingsReverseSyncRatings && !ratingChanged)) 0 else latestStatsInfo.rating.toInt())
                             //writeByte(if ((!settingsReverseSyncRatings || !ratingChanged)) 0 else latestStatsInfo.rating.toInt())
                             writeLong(if ((!settingsReverseSyncPlayCounts)) 0 else latestStatsInfo.lastPlayedDate)
                             writeInt(if ((!settingsReverseSyncPlayCounts || incrementalPlayCount <= 0)) 0 else incrementalPlayCount)
-                            writeInt(if ((!settingsReverseSyncSkipCounts || incrementalSkipCount <= 0)) 0 else incrementalSkipCount)
                         }
                     }
                     if (!settingsSyncPreview) {
@@ -1792,10 +1781,9 @@ class WifiSyncService : Service() {
                                         writer.writeByte(stats.rating.toInt())
                                         writer.writeLong(stats.lastPlayedDate)
                                         writer.writeInt(stats.playCount)
-                                        writer.writeInt(stats.skipCount)
                                     }
                                     writer.flush()
-                                    WifiSyncServiceSettings.isSkipcountReverceSyncFirst = false
+                                    //WifiSyncServiceSettings.isSkipcountReverceSyncFirst = false
                                     WifiSyncServiceSettings.saveSettingVersion =
                                         WifiSyncServiceSettings.settingFileVersion
                                     WifiSyncServiceSettings.saveSettings(applicationContext)
@@ -1853,7 +1841,7 @@ class WifiSyncService : Service() {
                         val rating: Byte = (cursor.getInt(2) * 20).toByte()
                         val playCount: Int = cursor.getInt(3)
                         val lastPlayed: Long = cursor.getLong(4)
-                        results.add(FileStatsInfo(filePath, rating, lastPlayed, playCount, 0))
+                        results.add(FileStatsInfo(filePath, rating, lastPlayed, playCount))
                     }
                 }
             }
@@ -1992,7 +1980,6 @@ class WifiSyncService : Service() {
             private var lastRating: Byte = 0
             private var lastPlayedDate: Long = 0
             private var lastPlayCount = 0
-            private var lastSkipCount = 0
             override fun startElement(
                 uri: String,
                 localName: String,
@@ -2014,7 +2001,7 @@ class WifiSyncService : Service() {
                     ) {
                         lastFileUrl = lastFileUrl.substring(storageRootPath.length + 1)
                     }
-                    stats.add(FileStatsInfo(lastFileUrl, lastRating, lastPlayedDate, lastPlayCount, lastSkipCount))
+                    stats.add(FileStatsInfo(lastFileUrl, lastRating, lastPlayedDate, lastPlayCount))
                     lastFileUrl = ""
                 }
             }
@@ -2028,8 +2015,6 @@ class WifiSyncService : Service() {
                     lastPlayedDate = (java.lang.Long.valueOf(String(ch, start, length)))
                 } else if (lastName.equals("Playcount", ignoreCase = true)) {
                     lastPlayCount = Integer.valueOf(String(ch, start, length))
-                } else if (lastName.equals("SkipCount", ignoreCase = true)) {
-                    lastSkipCount = Integer.valueOf(String(ch, start, length))
                 }
             }
         }
@@ -2251,7 +2236,6 @@ class WifiSyncService : Service() {
         var rating: Byte,
         var lastPlayedDate: Long,
         var playCount: Int,
-        var skipCount: Int
     )
 
     companion object {
@@ -2298,7 +2282,7 @@ class WifiSyncService : Service() {
         private const val intentNameReverseSyncPlaylists = "reverseSyncPlaylists"
         private const val intentNameReverseSyncPlaylistsPath = "reverseSyncPlaylistsPath"
         private const val intentNameReverseSyncRatings = "reverseSyncRatings"
-        private const val intentNameReverseSyncSkipCounts = "reverseSyncSkipCounts"
+        //private const val intentNameReverseSyncSkipCounts = "reverseSyncSkipCounts"
         private const val intentNameReverseSyncPlayCounts = "reverseSyncPlayCounts"
         private const val commandSyncDevice = "SyncDevice"
         private const val commandSyncToDevice = "SyncToDevice"
@@ -2307,7 +2291,7 @@ class WifiSyncService : Service() {
         private const val syncStatusCANCEL = "CANCEL"
         private const val syncEndOfData = ""
         private const val serverHelloPrefix = "MusicBeeWifiSyncServer/"
-        private const val clientHelloVersion = "MusicBeeWifiSyncClient/1.1"
+        private const val clientHelloVersion = "MusicBeeWifiSyncClient/1.0"
 
         fun getVolumeName(context: Context): String {
             val names = MediaStore.getExternalVolumeNames(context)
@@ -2401,10 +2385,10 @@ class WifiSyncService : Service() {
                 intentNameReverseSyncRatings,
                 WifiSyncServiceSettings.reverseSyncRatings
             )
-            intent.putExtra(
-                intentNameReverseSyncSkipCounts,
-                WifiSyncServiceSettings.reverseSyncSkipCounts
-            )
+            //intent.putExtra(
+            //    intentNameReverseSyncSkipCounts,
+            //    WifiSyncServiceSettings.reverseSyncSkipCounts
+            //)
             intent.putExtra(
                 intentNameReverseSyncPlayCounts,
                 WifiSyncServiceSettings.reverseSyncPlayCounts
@@ -3128,7 +3112,7 @@ class FileErrorInfo(val errorCategory: Int, val filename: String, val errorMessa
 
 internal object WifiSyncServiceSettings {
     var isSkipcountReverceSyncFirst = false
-    val settingFileVersion: Int = 8
+    val settingFileVersion: Int = 6
     var loadSettingVersion: Int = 0
     var saveSettingVersion: Int = 0
     var defaultIpAddressValue = ""
@@ -3215,7 +3199,6 @@ internal object WifiSyncServiceSettings {
             FileOutputStream(settingsFile).use { fs ->
                 DataOutputStream(fs).use { writer ->
                     writer.writeInt(settingFileVersion)
-                    writer.writeBoolean(isSkipcountReverceSyncFirst)
                     writer.writeStandardUTF(defaultIpAddressValue ?: "")
                     writer.writeStandardUTF(deviceName ?: "")
                     writer.writeInt(deviceStorageIndex)
@@ -3233,7 +3216,6 @@ internal object WifiSyncServiceSettings {
                     writer.writeInt(reverseSyncPlayer)
                     writer.writeBoolean(reverseSyncPlaylists)
                     writer.writeBoolean(reverseSyncRatings)
-                    writer.writeBoolean(reverseSyncSkipCounts)
                     writer.writeBoolean(reverseSyncPlayCounts)
                     writer.writeStandardUTF(reverseSyncPlaylistsPath ?: "")
                     writer.writeBoolean(permissionsUpgraded)
