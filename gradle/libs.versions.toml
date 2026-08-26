@@ -2,9 +2,9 @@
 accompanistSystemuicontroller = "0.36.0"
 activityCompose = "1.13.0"
 androidxMaterial3Version = "1.4.0"
-appcompatResources = "1.7.1"
+appcompatResources = "1.8.0"
 checkerQual = "4.2.1"
-constraintlayout = "2.2.1"
+constraintlayout = "2.2.2"
 documentfile = "1.1.0"
 hiltAndroid = "2.60.1"
 junit = "4.13.2"
@@ -14,20 +14,20 @@ leanback = "1.2.0"
 material = "1.14.0"
 material3 = "1.4.0"
 materialIconsCore = "1.7.8"
-compose = "1.11.4"
+compose = "1.12.0"
 navigationCompose = "2.9.8"
 orgEclipseJdtAnnotation = "2.4.100"
 preferenceKtx = "1.2.1"
-uiTextGoogleFonts = "1.11.4"
-appcompat = "1.7.1"
+uiTextGoogleFonts = "1.12.0"
+appcompat = "1.8.0"
 activity = "1.13.0"
 lifecycleRuntimeKtx = "2.11.0"
-foundationLayout = "1.11.4"
-foundation = "1.11.4"
-navigation3Runtime = "1.1.4"
+foundationLayout = "1.12.0"
+foundation = "1.12.0"
+navigation3Runtime = "1.1.6"
 litertMetadata = "1.4.2"
-uiGraphics = "1.11.4"
-fragment = "1.8.9"
+uiGraphics = "1.12.0"
+fragment = "1.9.0"
 
 [libraries]
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
@@ -58,7 +58,7 @@ androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-f
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 checker-qual = { module = "org.checkerframework:checker-qual", version.ref = "checkerQual" }
-compose-bom = { module = "androidx.compose:compose-bom", version = "2026.06.01" }
+compose-bom = { module = "androidx.compose:compose-bom", version = "2026.08.00" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
@@ -70,7 +70,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 org-eclipse-jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "orgEclipseJdtAnnotation" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-databinding-runtime = { group = "androidx.databinding", name = "databinding-runtime", version = "9.3.0" }
+androidx-databinding-runtime = { group = "androidx.databinding", name = "databinding-runtime", version = "9.3.2" }
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3Runtime" }
